@@ -4,7 +4,15 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/users.js";
 import mongoose from 'mongoose';
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/your-app-name');
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://mongo:mongo@db:27017/homeGarden');
+
+const db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("Nous sommes connectés à MongoDB!");
+});
+
 
 const app = express();
 
