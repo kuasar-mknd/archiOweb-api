@@ -77,3 +77,21 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const listUserGardens = async (req, res) => {
+  try {
+    // Recherchez l'utilisateur par ID
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Recherchez les jardins associés à cet utilisateur
+    const gardens = await Garden.find({ userId: user._id });
+
+    res.json(gardens);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
