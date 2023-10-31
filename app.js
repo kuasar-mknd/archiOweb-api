@@ -1,42 +1,52 @@
-import express from "express";
-import createError from "http-errors";
-import logger from "morgan";
-import indexRouter from "./routes/index.js";
-import usersRouter from "./routes/users.js";
+import express from 'express';
+import createError from 'http-errors';
+import logger from 'morgan';
 import mongoose from 'mongoose';
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://mongo:mongo@db:27017/homeGarden');
 
-const db = mongoose.connection;
+// Importez vos routes personnalisées
+import indexRouter from './routes/index.js';
+import userRoutes from './routes/userRoutes.js';
+import gardenRoutes from './routes/gardenRoutes.js';
+import plantRoutes from './routes/plantRoutes.js';
 
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log("Nous sommes connectés à MongoDB!");
+// Connectez-vous à MongoDB
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://db:27017/homeGarden', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 });
 
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("Connected to MongoDB!");
+});
 
 const app = express();
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+// Utilisez vos routes personnalisées
+app.use('/', indexRouter);
+app.use('/users', userRoutes);
+app.use('/gardens', gardenRoutes);
+app.use('/plants', plantRoutes);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // Send the error status
+  // render the error page
   res.status(err.status || 500);
-  res.send(err.message);
+  res.send('error');
 });
 
 export default app;
