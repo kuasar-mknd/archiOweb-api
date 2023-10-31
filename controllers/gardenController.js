@@ -53,3 +53,17 @@ export const deleteGarden = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// **Lister les plantes d'un jardin (gardenId)** : Cette fonction renvoie la liste des plantes associées à un jardin donné en utilisant son identifiant (gardenId).
+export const listPlantsInGarden = async (req, res) => {
+  try {
+    const garden = await Garden.findById(req.params.id).populate('plants');
+    if (!garden) {
+      return res.status(404).json({ message: 'Garden not found' });
+    }
+    const plants = garden.plants; // Récupérer la liste des plantes du jardin
+    res.json(plants);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
