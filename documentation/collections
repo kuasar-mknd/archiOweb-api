@@ -1,0 +1,46 @@
+{
+  "User": {
+    "_id": "ID de l'utilisateur",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "name": "Nom",
+    "surname": "Prénom",
+    "birthDate": "Date de naissance",
+    "createdAt": "Date de création",
+    "modifiedAt": "Date de modification",
+    "gardens": [
+      "Références aux documents Garden"
+    ]
+  },
+  "Garden": {
+    "_id": "ID du jardin",
+    "gardenName": "Nom du jardin",
+    "localisation": "Localisation",
+    "userId": "Référence à l'utilisateur",
+    "createdAt": "Date de création",
+    "modifiedAt": "Date de modification",
+    "plants": [
+      "Références aux documents Plant"
+    ]
+  },
+  "Plant": {
+    "_id": "ID de la plante",
+    "latinName": "Nom latin",
+    "family": "Famille",
+    "description": "Description",
+    "origin": "Origine",
+    "exposition": "Exposition",
+    "maintenance": "Entretien",
+    "groundType": "Type de sol",
+    "color": "Couleur",
+    "height": "Hauteur",
+    "bloom": "Période de floraison",
+    "plantationDate": "Date de plantation",
+    "healthState": "État de santé",
+    "imgURL": "URL de l'image",
+    "useType": "Utilisation",
+    "createdAt": "Date de création",
+    "modifiedAt": "Date de modification",
+    "gardenId": "Référence à Garden"
+  }
+}
