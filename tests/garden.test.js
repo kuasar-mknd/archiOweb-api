@@ -15,7 +15,6 @@ describe('Garden API Tests', function () {
 
   // Connect to the test database before running any tests
   before(async function () {
-    process.env.DATABASE_URL = 'mongodb://localhost:27017/homeGardenTest'
     await connectDB()
   })
 
