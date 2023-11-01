@@ -13,9 +13,4 @@ router.get('/', (req, res) => {
   });
 });
 
-// Utilisation des routeurs pour les utilisateurs, les jardins et les plantes
-router.use('/users', userRoutes);
-router.use('/gardens', gardenRoutes);
-router.use('/plants', plantRoutes);
-
 export default router;
