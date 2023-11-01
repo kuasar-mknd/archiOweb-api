@@ -1,70 +1,137 @@
 {
-  "info": {
-    "_postman_id": "3205f61a-b035-4e38-b91f-38af93464fc2",
-    "name": "Users",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_uid": "30149154-3205f61a-b035-4e38-b91f-38af93464fc2"
-  },
-  "item": [
-    {
-      "name": "Create user",
-      "id": "bc7d9142-c6b4-40de-8306-0e6abdd60411",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "POST",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/gardens",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "gardens"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Login user",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "b8a85373-2edd-4382-bcef-e7a06016856c",
-            "exec": [
-              "// Vérifiez si la connexion est réussie puis stockez le token\r",
-              "if (pm.response.code === 200) {\r",
-              "    var responseData = pm.response.json();\r",
-              "    pm.environment.set(\"authToken\", responseData.token);\r",
-              "}\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "id": "7895e9ef-5d50-4128-a955-33c20f9feb7a",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"identifier\": \"{{registeredIdentifier}}\",\r\n  \"password\": \"{{registeredPassword}}\"\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/users/login",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "users", "login"]
-        }
-      },
-      "response": []
-    }
-  ]
+	"info": {
+		"_postman_id": "3205f61a-b035-4e38-b91f-38af93464fc2",
+		"name": "Users",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "30149154-3205f61a-b035-4e38-b91f-38af93464fc2"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d027a5b6-3b5e-486f-9fba-7eef37f472b7",
+						"exec": [
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d21fe9a7-693b-4332-9aba-f32356e6ad24",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has success message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"User created successfully\");\r",
+							"});\r",
+							"\r",
+							"// Vérifiez si l'enregistrement est réussi puis stockez l'identifiant et le mot de passe\r",
+							"if (pm.response.code === 201) {\r",
+							"    var requestBody = JSON.parse(pm.request.body.raw);\r",
+							"    pm.environment.set(\"registeredIdentifier\", requestBody.identifier);\r",
+							"    pm.environment.set(\"registeredPassword\", requestBody.password);\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "bc7d9142-c6b4-40de-8306-0e6abdd60411",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"identifier\": \"user@example.com_{{timestamp}}\",\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Doe\",\r\n  \"password\": \"yourSecurePassword\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b8a85373-2edd-4382-bcef-e7a06016856c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has success message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Auth successful\");\r",
+							"});\r",
+							"\r",
+							"// Vérifiez si la connexion est réussie puis stockez le token\r",
+							"if (pm.response.code === 200) {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.environment.set(\"authToken\", responseData.token);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "7895e9ef-5d50-4128-a955-33c20f9feb7a",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"identifier\": \"{{registeredIdentifier}}\",\r\n  \"password\": \"{{registeredPassword}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
 }
