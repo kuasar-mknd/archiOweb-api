@@ -1,34 +1,29 @@
 {
-	"info": {
-		"_postman_id": "b4cb4174-8ade-4aa2-a876-b8daee4a925d",
-		"name": "Gardens",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_uid": "30149154-b4cb4174-8ade-4aa2-a876-b8daee4a925d"
-	},
-	"item": [
-		{
-			"name": "List Gardens",
-			"id": "15fd08bb-2922-4464-9273-5f0e6abe91f7",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/gardens",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"gardens"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "b4cb4174-8ade-4aa2-a876-b8daee4a925d",
+    "name": "Gardens",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_uid": "30149154-b4cb4174-8ade-4aa2-a876-b8daee4a925d"
+  },
+  "item": [
+    {
+      "name": "List Gardens",
+      "id": "15fd08bb-2922-4464-9273-5f0e6abe91f7",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/gardens",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "gardens"]
+        }
+      },
+      "response": []
+    }
+  ]
 }

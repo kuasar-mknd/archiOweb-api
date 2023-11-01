@@ -1,44 +1,44 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-mongo
 {
-	"name": "Node.js & Mongo DB",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "name": "Node.js & Mongo DB",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
 
-	// Configure tool-specific properties.
-	"customizations": {
-		// Configure properties specific to VS Code.
-		"vscode": {
-			// Add the IDs of extensions you want installed when the container is created.
-			"extensions": [
-				"mongodb.mongodb-vscode",
-				"ms-azuretools.vscode-docker",
-				"esbenp.prettier-vscode",
-				"GitHub.copilot",
-				"GitHub.copilot-labs",
-				"GitHub.copilot-chat",
-				"dbaeumer.vscode-eslint",
-				"VisualStudioExptTeam.vscodeintellicode",
-				"VisualStudioExptTeam.intellicode-api-usage-examples",
-				"christian-kohler.npm-intellisense",
-				"bierner.markdown-mermaid"
-			]
-		}
-	},
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/mongosh-homebrew:1": {}
-	},
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "mongodb.mongodb-vscode",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "GitHub.copilot",
+        "GitHub.copilot-labs",
+        "GitHub.copilot-chat",
+        "dbaeumer.vscode-eslint",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "VisualStudioExptTeam.intellicode-api-usage-examples",
+        "christian-kohler.npm-intellisense",
+        "bierner.markdown-mermaid"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/mongosh-homebrew:1": {}
+  },
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [3000, 27017],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [3000, 27017],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "npm install"
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "npm install"
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
 }

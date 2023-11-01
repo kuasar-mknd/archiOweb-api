@@ -1,20 +1,20 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const gardenSchema = new mongoose.Schema({
   name: { type: String, required: true },
   location: {
     type: { type: String, enum: ['Point'], required: true },
-    coordinates: { type: [Number], required: true }
+    coordinates: { type: [Number], required: true },
   },
   plants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
+  updatedAt: { type: Date, default: Date.now },
+})
 
 // Index pour la recherche géospatiale
-gardenSchema.index({ location: '2dsphere' });
+gardenSchema.index({ location: '2dsphere' })
 
-const Garden = mongoose.model('Garden', gardenSchema);
+const Garden = mongoose.model('Garden', gardenSchema)
 
-export default Garden;
+export default Garden
