@@ -8,7 +8,7 @@ const connectDB = async () => {
     // Use MongoDB Memory Server for tests
     mongoServer = await MongoMemoryServer.create()
     const uri = mongoServer.getUri()
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+    await mongoose.connect(uri)
   } else {
     // Connect to the actual database for other environments
     const conn = await mongoose.connect(

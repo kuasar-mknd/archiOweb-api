@@ -1,9 +1,8 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
-import mongoose from 'mongoose'
 import { after, before, describe, it } from 'mocha'
 import app from '../app.js'
-import User from '../models/userModel.js'
+import { connectDB, disconnectDB } from '../config/database.js'
 
 // Chai middleware for HTTP assertions
 chai.use(chaiHttp)
@@ -12,14 +11,11 @@ const { expect } = chai
 describe('User API Tests', function () {
   // Setup and teardown
   before(async function () {
-    // Connect to a separate test database
-    await mongoose.connect('mongodb://localhost:27017/homeGardenTest', {})
+    await connectDB()
   })
 
   after(async function () {
-    // Disconnect and cleanup the test database
-    await User.deleteMany({})
-    await mongoose.disconnect()
+    await disconnectDB()
   })
 
   // Test the registration of a new user
