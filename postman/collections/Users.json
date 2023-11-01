@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "New Request",
+			"name": "Create user",
 			"id": "bc7d9142-c6b4-40de-8306-0e6abdd60411",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -23,6 +23,55 @@
 					"path": [
 						"api",
 						"gardens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b8a85373-2edd-4382-bcef-e7a06016856c",
+						"exec": [
+							"// Vérifiez si la connexion est réussie puis stockez le token\r",
+							"if (pm.response.code === 200) {\r",
+							"    var responseData = pm.response.json();\r",
+							"    pm.environment.set(\"authToken\", responseData.token);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "7895e9ef-5d50-4128-a955-33c20f9feb7a",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"identifier\": \"{{registeredIdentifier}}\",\r\n  \"password\": \"{{registeredPassword}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"login"
 					]
 				}
 			},
