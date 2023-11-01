@@ -9,12 +9,6 @@ import userRoutes from './routes/userRoutes.js';
 import gardenRoutes from './routes/gardenRoutes.js';
 import plantRoutes from './routes/plantRoutes.js';
 
-// Connectez-vous à MongoDB
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://db:27017/homeGarden', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -29,9 +23,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // Utilisez vos routes personnalisées
 app.use('/', indexRouter);
-app.use('/users', userRoutes);
-app.use('/gardens', gardenRoutes);
-app.use('/plants', plantRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/gardens', gardenRoutes);
+app.use('/api/plants', plantRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

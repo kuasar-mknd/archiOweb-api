@@ -7,6 +7,9 @@
 import app from "../app.js";
 import createDebugger from "debug";
 import http from "http";
+import { connectDB } from '../config/database.js';
+
+connectDB();
 
 const debug = createDebugger('archioweb-api:server')
 /**
