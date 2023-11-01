@@ -1,0 +1,32 @@
+{
+	"info": {
+		"_postman_id": "3205f61a-b035-4e38-b91f-38af93464fc2",
+		"name": "Users",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "30149154-3205f61a-b035-4e38-b91f-38af93464fc2"
+	},
+	"item": [
+		{
+			"name": "New Request",
+			"id": "bc7d9142-c6b4-40de-8306-0e6abdd60411",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/gardens",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"gardens"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
