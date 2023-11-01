@@ -36,7 +36,7 @@ export const getPlantById = async (req, res) => {
 export const updatePlant = async (req, res) => {
   try {
     const plant = await Plant.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      new: true
     })
     if (!plant) return res.status(404).json({ message: 'Plant not found' })
     res.json(plant)

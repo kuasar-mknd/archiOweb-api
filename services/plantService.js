@@ -30,9 +30,13 @@ export const getPlantById = async (plantId) => {
 // Mettre à jour une plante par son ID
 export const updatePlant = async (plantId, updateData) => {
   try {
-    const updatedPlant = await Plant.findByIdAndUpdate(plantId, updateData, {
-      new: true,
-    })
+    const updatedPlant = await Plant.findByIdAndUpdate(
+      plantId,
+      updateData,
+      {
+        new: true
+      }
+    )
     return updatedPlant
   } catch (error) {}
 }

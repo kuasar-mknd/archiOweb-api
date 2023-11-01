@@ -10,7 +10,7 @@ export const verifyToken = (req, res, next) => {
     next()
   } catch (error) {
     return res.status(401).json({
-      message: 'Authentification échouée',
+      message: 'Authentification échouée'
     })
   }
 }
@@ -20,7 +20,7 @@ export const generateToken = (userId) => {
   return jwt.sign(
     { userId },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' }, // ou une autre durée selon vos besoins
+    { expiresIn: '1h' } // ou une autre durée selon vos besoins
   )
 }
 

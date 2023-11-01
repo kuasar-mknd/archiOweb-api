@@ -4,7 +4,7 @@ import {
   getAllGardens,
   getGardenById,
   updateGarden,
-  deleteGarden,
+  deleteGarden
 } from '../controllers/gardenController.js'
 
 // Middleware pour vérifier l'authentification

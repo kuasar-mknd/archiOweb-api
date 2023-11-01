@@ -4,7 +4,7 @@ import {
   getAllPlants,
   getPlantById,
   updatePlant,
-  deletePlant,
+  deletePlant
 } from '../controllers/plantController.js'
 
 // Middleware pour vérifier l'authentification

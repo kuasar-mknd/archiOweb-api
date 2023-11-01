@@ -41,7 +41,7 @@ export const updateUser = async (userId, updateData) => {
       updateData.password = await hashPassword(updateData.password)
     }
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
+      new: true
     })
     return updatedUser
   } catch (error) {}

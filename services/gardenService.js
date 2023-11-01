@@ -28,9 +28,13 @@ export const getGardenById = async (gardenId) => {
 // Mettre à jour un jardin par son ID
 export const updateGarden = async (gardenId, updateData) => {
   try {
-    const updatedGarden = await Garden.findByIdAndUpdate(gardenId, updateData, {
-      new: true,
-    })
+    const updatedGarden = await Garden.findByIdAndUpdate(
+      gardenId,
+      updateData,
+      {
+        new: true
+      }
+    )
     return updatedGarden
   } catch (error) {}
 }

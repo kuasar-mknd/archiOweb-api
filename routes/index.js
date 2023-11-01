@@ -5,7 +5,7 @@ const router = express.Router()
 router.get('/', (req, res) => {
   res.json({
     message: "Bienvenue sur l'API HomeGarden",
-    documentation_url: 'http://api.homegarden.com/doc',
+    documentation_url: 'http://api.homegarden.com/doc'
   })
 })
 

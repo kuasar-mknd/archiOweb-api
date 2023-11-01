@@ -10,7 +10,7 @@ const plantSchema = new mongoose.Schema(
     exposure: {
       type: String,
       enum: ['Full Sun', 'Partial Shade', 'Shade'],
-      required: true,
+      required: true
     },
     watering: String,
     soilType: String,
@@ -22,13 +22,19 @@ const plantSchema = new mongoose.Schema(
     imageUrl: String, // Stocke l'URL d'une image de la plante
     use: {
       type: String,
-      enum: ['Ornamental', 'Groundcover', 'Food', 'Medicinal', 'Fragrance'],
+      enum: [
+        'Ornamental',
+        'Groundcover',
+        'Food',
+        'Medicinal',
+        'Fragrance'
+      ]
     },
-    garden: { type: mongoose.Schema.Types.ObjectId, ref: 'Garden' }, // Lien vers le jardin où la plante est cultivée
+    garden: { type: mongoose.Schema.Types.ObjectId, ref: 'Garden' } // Lien vers le jardin où la plante est cultivée
   },
   {
-    timestamps: true, // Ajoute les champs createdAt et updatedAt
-  },
+    timestamps: true // Ajoute les champs createdAt et updatedAt
+  }
 )
 
 const Plant = mongoose.model('Plant', plantSchema)

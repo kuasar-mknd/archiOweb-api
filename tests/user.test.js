@@ -25,21 +25,20 @@ describe('User API Tests', function () {
   // Test the registration of a new user
   describe('POST /api/users/register', function () {
     it('should register a new user', function (done) {
-      chai
-        .request(app)
+      chai.request(app)
         .post('/api/users/register')
         .send({
           identifier: 'test@example.com',
           firstName: 'Test',
           lastName: 'User',
-          password: 'password',
+          password: 'password'
         })
         .end((err, res) => {
           expect(err).to.be.equal(null)
           expect(res).to.have.status(201)
           expect(res.body).to.have.property(
             'message',
-            'User created successfully',
+            'User created successfully'
           )
           done()
         })
@@ -49,12 +48,11 @@ describe('User API Tests', function () {
   // Test the login functionality
   describe('POST /api/users/login', function () {
     it('should authenticate a user and return a token', function (done) {
-      chai
-        .request(app)
+      chai.request(app)
         .post('/api/users/login')
         .send({
           identifier: 'test@example.com',
-          password: 'password',
+          password: 'password'
         })
         .end((err, res) => {
           expect(err).to.be.equal(null)

@@ -7,7 +7,9 @@ import jwt from 'jsonwebtoken'
 export const registerUser = async (req, res) => {
   try {
     // Vérifiez si l'utilisateur existe déjà
-    const userExists = await User.findOne({ identifier: req.body.identifier })
+    const userExists = await User.findOne({
+      identifier: req.body.identifier
+    })
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' })
     }
@@ -31,7 +33,7 @@ export const loginUser = async (req, res) => {
       const token = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }, // ou une autre durée selon vos besoins
+        { expiresIn: '1h' } // ou une autre durée selon vos besoins
       )
 
       res.json({ message: 'Auth successful', token })
@@ -61,7 +63,7 @@ export const updateUser = async (req, res) => {
     delete req.body.password
 
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      new: true
     })
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.json(user)

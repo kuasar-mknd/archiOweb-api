@@ -29,16 +29,19 @@ describe('Garden API Tests', function () {
       identifier: 'testuser@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      password: 'password',
+      password: 'password'
     }
 
     // Register a new user
-    let res = await chai.request(app).post('/api/users/register').send(newUser)
+    let res = await chai
+      .request(app)
+      .post('/api/users/register')
+      .send(newUser)
 
     // Log in to get a token
     res = await chai.request(app).post('/api/users/login').send({
       identifier: newUser.identifier,
-      password: newUser.password,
+      password: newUser.password
     })
 
     token = res.body.token // Save the token for protected route tests
@@ -52,8 +55,7 @@ describe('Garden API Tests', function () {
   // Test cases
   describe('GET /api/gardens', function () {
     it('should get all gardens', function (done) {
-      chai
-        .request(app)
+      chai.request(app)
         .get('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token
         .end((err, res) => {

@@ -4,7 +4,7 @@ import {
   loginUser,
   getUserById,
   updateUser,
-  deleteUser,
+  deleteUser
 } from '../controllers/userController.js'
 
 // Middleware pour vérifier l'authentification

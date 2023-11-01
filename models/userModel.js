@@ -8,9 +8,9 @@ const userSchema = new mongoose.Schema(
     lastName: { type: String, required: true },
     birthDate: { type: Date },
     password: { type: String, required: true },
-    gardens: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Garden' }], // Supposant que vous avez un modèle Garden
+    gardens: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Garden' }] // Supposant que vous avez un modèle Garden
   },
-  { timestamps: true },
+  { timestamps: true }
 ) // Ajoute automatiquement les champs createdAt et updatedAt
 
 // Avant d'enregistrer le document, cryptez le mot de passe
