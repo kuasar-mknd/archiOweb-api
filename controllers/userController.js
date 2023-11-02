@@ -73,6 +73,7 @@ export const loginUser = [
         res.status(401).json({ message: 'Auth failed' })
       }
     } catch (error) {
+      console.error(error)
       res.status(500).json({ message: error.message })
     }
   }
