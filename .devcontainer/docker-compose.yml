@@ -8,6 +8,7 @@ services:
 
         environment:
             JWT_SECRET: apiArchiOWeb
+            SERVER_URL: http://localhost:3000
         volumes:
             - ../..:/workspaces:cached
 
