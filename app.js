@@ -3,6 +3,8 @@ import createError from 'http-errors'
 import logger from 'morgan'
 import mongoose from 'mongoose'
 import mongoSanitize from 'express-mongo-sanitize'
+import swaggerUi from 'swagger-ui-express'
+import swaggerSpec from './config/swagger.js'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
@@ -32,6 +34,7 @@ const app = express()
 app.use(limiter)
 app.use(mongoSanitize())
 app.use(express.json({ limit: '10kb' })) // Body limit is 10
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use(logger('dev'))
 app.use(express.json())
