@@ -1,4 +1,5 @@
 import Garden from '../models/gardenModel.js'
+import mongoose from 'mongoose'
 import { body, validationResult } from 'express-validator'
 
 // Middleware pour valider les données de jardin
@@ -14,6 +15,14 @@ const validateGarden = [
     next()
   }
 ]
+
+// Middleware pour valider l'ID du jardin
+const validateGardenId = (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: 'Invalid garden ID' })
+  }
+  next()
+}
 
 // Créer un nouveau jardin
 export const createGarden = [
@@ -54,6 +63,7 @@ export const getGardenById = async (req, res) => {
 
 // Mettre à jour un jardin
 export const updateGarden = [
+  validateGardenId,
   validateGarden,
   async (req, res) => {
     try {
@@ -69,17 +79,20 @@ export const updateGarden = [
 ]
 
 // Supprimer un jardin
-export const deleteGarden = async (req, res) => {
-  try {
-    const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
-    if (!deletedGarden) {
-      return res.status(404).json({ message: 'Garden not found' })
+export const deleteGarden = [
+  validateGardenId,
+  async (req, res) => {
+    try {
+      const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
+      if (!deletedGarden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
+      res.status(204).send()
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete garden' })
     }
-    res.status(204).send()
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to delete garden' })
   }
-}
+]
 
 // **Lister les plantes d'un jardin (gardenId)**
 export const listPlantsInGarden = async (req, res) => {
