@@ -9,6 +9,18 @@ import userRoutes from './routes/userRoutes.js'
 import gardenRoutes from './routes/gardenRoutes.js'
 import plantRoutes from './routes/plantRoutes.js'
 
+const rateLimit = require('express-rate-limit')
+
+// Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+// see https://expressjs.com/en/guide/behind-proxies.html
+// app.set('trust proxy', 1);
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after a break'
+})
+
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', function () {
@@ -16,6 +28,8 @@ db.once('open', function () {
 })
 
 const app = express()
+// Apply to all requests
+app.use(limiter)
 
 app.use(logger('dev'))
 app.use(express.json())
