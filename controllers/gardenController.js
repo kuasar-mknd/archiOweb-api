@@ -37,12 +37,12 @@ export const getGardenById = async (req, res) => {
 // Mettre à jour un jardin
 export const updateGarden = async (req, res) => {
   try {
-    const garden = await Garden.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
-    })
+    const id = req.params.id
+    const garden = await Garden.findById({ _id: { $eq: id } })
     if (!garden) {
       return res.status(404).json({ message: 'Garden not found' })
     }
+    await garden.update(req.body)
     res.json(garden)
   } catch (error) {
     res.status(400).json({ message: error.message })
@@ -52,7 +52,8 @@ export const updateGarden = async (req, res) => {
 // Supprimer un jardin
 export const deleteGarden = async (req, res) => {
   try {
-    const garden = await Garden.findByIdAndDelete(req.params.id)
+    const id = req.params.id
+    const garden = await Garden.findByIdAndDelete({ _id: { $eq: id } })
     if (!garden) {
       return res.status(404).json({ message: 'Garden not found' })
     }
@@ -65,7 +66,8 @@ export const deleteGarden = async (req, res) => {
 // **Lister les plantes d'un jardin (gardenId)** : Cette fonction renvoie la liste des plantes associées à un jardin donné en utilisant son identifiant (gardenId).
 export const listPlantsInGarden = async (req, res) => {
   try {
-    const garden = await Garden.findById(req.params.id).populate('plants')
+    const id = req.params.id
+    const garden = await Garden.findById({ _id: { $eq: id } }).populate('plants')
     if (!garden) {
       return res.status(404).json({ message: 'Garden not found' })
     }
