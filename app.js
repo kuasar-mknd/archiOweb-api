@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import mongoSanitize from 'express-mongo-sanitize'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
+import fs from 'fs'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
@@ -61,5 +62,13 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.send('error')
 })
+
+fs.writeFile('./swagger-output.json', JSON.stringify(swaggerSpec), err => {
+  if (err) {
+    console.error('Error writing Swagger spec to file:', err);
+  } else {
+    console.log('Successfully wrote Swagger spec to file.');
+  }
+});
 
 export default app
