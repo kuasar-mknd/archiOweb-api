@@ -14,10 +14,14 @@ describe('Garden API Tests', function () {
   let token // Variable pour stocker le token d'authentification
 
   // Connect to the test database before running any tests
+  // Setup and teardown
   before(async function () {
     await connectDB()
   })
 
+  after(async function () {
+    await disconnectDB()
+  })
   // Clear the test database before each test
   beforeEach(async function () {
     await Garden.deleteMany({})
@@ -44,11 +48,6 @@ describe('Garden API Tests', function () {
     })
 
     token = res.body.token // Save the token for protected route tests
-  })
-
-  // Disconnect from the database after all tests have finished running
-  after(async function () {
-    await disconnectDB()
   })
 
   // Test cases

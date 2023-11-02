@@ -9,8 +9,7 @@ import indexRouter from './routes/index.js'
 import userRoutes from './routes/userRoutes.js'
 import gardenRoutes from './routes/gardenRoutes.js'
 import plantRoutes from './routes/plantRoutes.js'
-
-const rateLimit = require('express-rate-limit')
+import rateLimit from 'express-rate-limit'
 
 // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 // see https://expressjs.com/en/guide/behind-proxies.html

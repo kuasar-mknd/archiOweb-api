@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import Plant from '../models/plantModel.js'
+import { body, validationResult } from 'express-validator'
 
-// Middleware pour valider l'ID de la plante
+// Middleware for validating plant IDs
 const validatePlantId = (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ message: 'Invalid plant ID' })
@@ -9,18 +10,35 @@ const validatePlantId = (req, res, next) => {
   next()
 }
 
-// Créer une nouvelle plante
-export const createPlant = async (req, res) => {
-  try {
-    const plant = new Plant(req.body)
-    const savedPlant = await plant.save()
-    res.status(201).json(savedPlant)
-  } catch (error) {
-    res.status(400).json({ message: error.message })
+// Validation for plant data
+const validatePlantData = [
+  body('name').trim().isLength({ min: 1 }).withMessage('Name is required'),
+  body('species').trim().isLength({ min: 1 }).withMessage('Species is required'),
+  // Add more validations as necessary for your Plant model
+  (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+    next()
   }
-}
+]
 
-// Récupérer toutes les plantes
+// Create a new plant
+export const createPlant = [
+  validatePlantData,
+  async (req, res) => {
+    try {
+      const plant = new Plant(req.body)
+      const savedPlant = await plant.save()
+      res.status(201).json(savedPlant)
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
+  }
+]
+
+// Retrieve all plants
 export const getAllPlants = async (req, res) => {
   try {
     const plants = await Plant.find()
@@ -30,7 +48,7 @@ export const getAllPlants = async (req, res) => {
   }
 }
 
-// Récupérer une seule plante par ID
+// Retrieve a single plant by ID
 export const getPlantById = [
   validatePlantId,
   async (req, res) => {
@@ -44,9 +62,10 @@ export const getPlantById = [
   }
 ]
 
-// Mettre à jour une plante
+// Update a plant
 export const updatePlant = [
   validatePlantId,
+  validatePlantData,
   async (req, res) => {
     try {
       const plant = await Plant.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -58,7 +77,7 @@ export const updatePlant = [
   }
 ]
 
-// Supprimer une plante
+// Delete a plant
 export const deletePlant = [
   validatePlantId,
   async (req, res) => {
@@ -72,7 +91,7 @@ export const deletePlant = [
   }
 ]
 
-// Exporter toutes les fonctions du contrôleur
+// Export all controller functions
 export default {
   createPlant,
   getAllPlants,

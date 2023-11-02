@@ -17,11 +17,25 @@ const validateUserInput = [
   }
 ]
 
-const sanitizeUserUpdate = (req, res, next) => {
+const sanitizeUserUpdate = [
+  // Middleware to sanitize the update request
+  (req, res, next) => {
+    const updateFields = ['firstName', 'lastName', 'identifier'] // Fields that can be updated
+    const updates = {}
+    for (const field of updateFields) {
+      if (req.body[field]) {
+        updates[field] = req.body[field]
+      }
+    }
+    req.body = updates // Only allow updates to specified fields
+    next()
+  },
   // Prevent password updates through this route
-  delete req.body.password
-  next()
-}
+  (req, res, next) => {
+    delete req.body.password
+    next()
+  }
+]
 
 export const registerUser = [
   validateUserInput,
@@ -81,6 +95,7 @@ export const updateUser = [
       const user = await User.findByIdAndUpdate(req.params.id, req.body, {
         new: true
       }).select('-password')
+
       if (!user) return res.status(404).json({ message: 'User not found' })
       res.json(user)
     } catch (error) {

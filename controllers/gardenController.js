@@ -2,11 +2,11 @@ import mongoose from 'mongoose'
 import Garden from '../models/gardenModel.js'
 import { body, validationResult } from 'express-validator'
 
-// Middleware pour valider les données de jardin
+// Middleware to validate garden data
 const validateGarden = [
   body('name').trim().isLength({ min: 1 }).withMessage('Name is required'),
   body('location').trim().isLength({ min: 1 }).withMessage('Location is required'),
-  // Ajoutez d'autres validations selon les champs de votre modèle Garden
+  // Add other validations according to your Garden model fields
   (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -16,7 +16,7 @@ const validateGarden = [
   }
 ]
 
-// Middleware pour valider l'ID du jardin
+// Middleware to validate garden ID
 const validateGardenId = (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ message: 'Invalid garden ID' })
@@ -24,12 +24,13 @@ const validateGardenId = (req, res, next) => {
   next()
 }
 
-// Créer un nouveau jardin
+// Create a new garden
 export const createGarden = [
   validateGarden,
   async (req, res) => {
     try {
-      const garden = new Garden(req.body)
+      const { name, location } = req.body
+      const garden = new Garden({ name, location }) // Utilisez uniquement les champs spécifiquement extraits
       const savedGarden = await garden.save()
       res.status(201).json(savedGarden)
     } catch (error) {
@@ -38,7 +39,7 @@ export const createGarden = [
   }
 ]
 
-// Récupérer tous les jardins
+// Retrieve all gardens
 export const getAllGardens = async (req, res) => {
   try {
     const gardens = await Garden.find().populate('plants')
@@ -48,7 +49,7 @@ export const getAllGardens = async (req, res) => {
   }
 }
 
-// Récupérer un seul jardin par ID
+// Retrieve a single garden by ID
 export const getGardenById = [
   validateGardenId,
   async (req, res) => {
@@ -64,13 +65,14 @@ export const getGardenById = [
   }
 ]
 
-// Mettre à jour un jardin
+// Update a garden
 export const updateGarden = [
   validateGardenId,
   validateGarden,
   async (req, res) => {
     try {
-      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      const { name, location } = req.body
+      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, { name, location }, { new: true }) // Utilisez uniquement les champs spécifiquement extraits
       if (!updatedGarden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -81,7 +83,7 @@ export const updateGarden = [
   }
 ]
 
-// Supprimer un jardin
+// Delete a garden
 export const deleteGarden = [
   validateGardenId,
   async (req, res) => {
@@ -97,7 +99,7 @@ export const deleteGarden = [
   }
 ]
 
-// Lister les plantes d'un jardin (gardenId)
+// List the plants in a garden (gardenId)
 export const listPlantsInGarden = [
   validateGardenId,
   async (req, res) => {
@@ -113,7 +115,7 @@ export const listPlantsInGarden = [
   }
 ]
 
-// Exporter toutes les fonctions du contrôleur
+// Export all controller functions
 export default {
   createGarden,
   getAllGardens,
