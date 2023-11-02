@@ -1,5 +1,5 @@
-import Garden from '../models/gardenModel.js'
 import mongoose from 'mongoose'
+import Garden from '../models/gardenModel.js'
 import { body, validationResult } from 'express-validator'
 
 // Middleware pour valider les données de jardin
@@ -33,7 +33,7 @@ export const createGarden = [
       const savedGarden = await garden.save()
       res.status(201).json(savedGarden)
     } catch (error) {
-      res.status(400).json({ message: 'Failed to create garden' })
+      res.status(400).json({ message: 'Failed to create garden', error: error.message })
     }
   }
 ]
@@ -44,22 +44,25 @@ export const getAllGardens = async (req, res) => {
     const gardens = await Garden.find().populate('plants')
     res.json(gardens)
   } catch (error) {
-    res.status(500).json({ message: 'Failed to retrieve gardens' })
+    res.status(500).json({ message: 'Failed to retrieve gardens', error: error.message })
   }
 }
 
 // Récupérer un seul jardin par ID
-export const getGardenById = async (req, res) => {
-  try {
-    const garden = await Garden.findById(req.params.id).populate('plants')
-    if (!garden) {
-      return res.status(404).json({ message: 'Garden not found' })
+export const getGardenById = [
+  validateGardenId,
+  async (req, res) => {
+    try {
+      const garden = await Garden.findById(req.params.id).populate('plants')
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
+      res.json(garden)
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to retrieve garden', error: error.message })
     }
-    res.json(garden)
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to retrieve garden' })
   }
-}
+]
 
 // Mettre à jour un jardin
 export const updateGarden = [
@@ -73,7 +76,7 @@ export const updateGarden = [
       }
       res.json(updatedGarden)
     } catch (error) {
-      res.status(400).json({ message: 'Failed to update garden' })
+      res.status(400).json({ message: 'Failed to update garden', error: error.message })
     }
   }
 ]
@@ -89,20 +92,33 @@ export const deleteGarden = [
       }
       res.status(204).send()
     } catch (error) {
-      res.status(500).json({ message: 'Failed to delete garden' })
+      res.status(500).json({ message: 'Failed to delete garden', error: error.message })
     }
   }
 ]
 
-// **Lister les plantes d'un jardin (gardenId)**
-export const listPlantsInGarden = async (req, res) => {
-  try {
-    const garden = await Garden.findById(req.params.id).populate('plants')
-    if (!garden) {
-      return res.status(404).json({ message: 'Garden not found' })
+// Lister les plantes d'un jardin (gardenId)
+export const listPlantsInGarden = [
+  validateGardenId,
+  async (req, res) => {
+    try {
+      const garden = await Garden.findById(req.params.id).populate('plants')
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
+      res.json(garden.plants)
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to list plants', error: error.message })
     }
-    res.json(garden.plants)
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to list plants' })
   }
+]
+
+// Exporter toutes les fonctions du contrôleur
+export default {
+  createGarden,
+  getAllGardens,
+  getGardenById,
+  updateGarden,
+  deleteGarden,
+  listPlantsInGarden
 }
