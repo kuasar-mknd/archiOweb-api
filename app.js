@@ -2,6 +2,7 @@ import express from 'express'
 import createError from 'http-errors'
 import logger from 'morgan'
 import mongoose from 'mongoose'
+import mongoSanitize from 'express-mongo-sanitize'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
@@ -28,8 +29,10 @@ db.once('open', function () {
 })
 
 const app = express()
-// Apply to all requests
+// Apply to all requests & sanitize req.body
 app.use(limiter)
+app.use(mongoSanitize())
+app.use(express.json({ limit: '10kb' })) // Body limit is 10
 
 app.use(logger('dev'))
 app.use(express.json())
