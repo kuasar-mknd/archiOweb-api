@@ -27,6 +27,42 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Create Garden",
+			"id": "82792ccb-4bb6-46b3-933d-3c376e1428a5",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Mon jardin\",\r\n  \"location\": \"Paris\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/gardens",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"gardens"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
