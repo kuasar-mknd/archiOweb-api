@@ -1,0 +1,58 @@
+{
+	"info": {
+		"_postman_id": "c2d08225-071b-445f-bf9e-47289ac0f791",
+		"name": "Plants",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "30149173-c2d08225-071b-445f-bf9e-47289ac0f791"
+	},
+	"item": [
+		{
+			"name": "List Plants",
+			"id": "6224adba-7d29-4d0b-a827-8d3e2fb34ae3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/plants",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"plants"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Plants",
+			"id": "72e1b996-91a5-4386-8a22-0558e592244e",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Ma Plante\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/plants",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"plants"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
