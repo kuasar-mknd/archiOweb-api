@@ -71,6 +71,21 @@
 		},
 		{
 			"name": "Delete Garden",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "12b4116c-bae9-4620-b12a-afe8f48e1994",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"id": "48c6791c-e8f0-423e-8f8a-a99a598886c9",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
