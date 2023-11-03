@@ -8,6 +8,7 @@
     },
     "scripts": {
         "start": "node --trace-deprecation ./bin/start",
+        "dev": "nodemon --trace-deprecation ./bin/start",
         "test": "NODE_ENV=test mocha tests --recursive --exit",
         "format": "prettier --write .",
         "lint": "eslint . --fix",
@@ -38,6 +39,7 @@
         "eslint-plugin-promise": "^6.1.1",
         "mocha": "^10.2.0",
         "mongodb-memory-server": "^9.0.1",
+        "nodemon": "^3.0.1",
         "prettier": "^3.0.3"
     }
 }
