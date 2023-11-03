@@ -68,23 +68,27 @@ describe('Garden API Tests', function () {
   describe('POST /api/gardens', function () {
     it('should create a new garden', function (done) {
       const gardenData = {
-        name: 'My Lovely Garden',
-        location: 'Backyard'
-        // Add other fields as necessary
+        name: 'Mon jardin',
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
+        },
+        user: '5f2b5bcd832a8c17645c854d' // Remplacer par l'ID utilisateur approprié
       }
 
-      const res = chai.request(app)
+      chai.request(app)
         .post('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token
         .send(gardenData)
         .end((err, res) => {
-          expect(err).to.be.null
+          expect(err).to.be.equal(null)
           expect(res).to.have.status(201)
-          expect(res.body).to.include.keys('name', 'location')
-          // Add other assertions as necessary
+          expect(res.body).to.have.property(
+            'name',
+            'Mon jardin'
+          )
           done()
         })
-      console.log(res.body)
     })
   })
 
