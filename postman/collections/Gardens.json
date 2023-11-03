@@ -49,7 +49,12 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Mon jardin\",\r\n  \"location\": \"Paris\"\r\n}\r\n"
+					"raw": "{\r\n  \"name\": \"Mon jardin\",\r\n  \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]\r\n  },\r\n  \"user\": \"5f2b5bcd832a8c17645c854d\" // Remplacer par l'ID utilisateur approprié\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				},
 				"url": {
 					"raw": "{{baseUrl}}/api/gardens",
