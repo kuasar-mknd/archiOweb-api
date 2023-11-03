@@ -5,7 +5,9 @@ import { body, validationResult } from 'express-validator'
 // Middleware to validate garden data
 const validateGarden = [
   body('name').trim().isLength({ min: 1 }).withMessage('Name is required'),
-  body('location').trim().isLength({ min: 1 }).withMessage('Location is required'),
+  body('location.type').trim().isIn(['Point']).withMessage('Location type must be "Point"'),
+  body('location.coordinates').isArray().withMessage('Location coordinates must be an array'),
+  body('location.coordinates.*').isNumeric().withMessage('Location coordinates must be numbers'),
   // Add other validations according to your Garden model fields
   (req, res, next) => {
     const errors = validationResult(req)
@@ -29,8 +31,12 @@ export const createGarden = [
   validateGarden,
   async (req, res) => {
     try {
-      const { name, location } = req.body
-      const garden = new Garden({ name, location }) // Utilisez uniquement les champs spécifiquement extraits
+      const { name, location, user } = req.body // Assuming you are sending the user ID in the request
+      const garden = new Garden({
+        name,
+        location,
+        user // You need to include the user field since it's required in your schema
+      })
       const savedGarden = await garden.save()
       res.status(201).json(savedGarden)
     } catch (error) {

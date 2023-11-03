@@ -62,5 +62,4 @@ app.use(function (err, req, res, next) {
   res.send('error')
 })
 
-
 export default app

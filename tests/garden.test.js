@@ -65,30 +65,28 @@ describe('Garden API Tests', function () {
     })
   })
 
-  /**
   describe('POST /api/gardens', function () {
     it('should create a new garden', function (done) {
       const gardenData = {
         name: 'My Lovely Garden',
         location: 'Backyard'
         // Add other fields as necessary
-      };
+      }
 
-      res = chai.request(app)
+      const res = chai.request(app)
         .post('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token
         .send(gardenData)
         .end((err, res) => {
-          expect(err).to.be.null;
-          expect(res).to.have.status(201);
-          expect(res.body).to.include.keys('name', 'location');
+          expect(err).to.be.null
+          expect(res).to.have.status(201)
+          expect(res.body).to.include.keys('name', 'location')
           // Add other assertions as necessary
-          done();
-        });
-        console.log(res.body);
-    });
-  });
-  */
+          done()
+        })
+      console.log(res.body)
+    })
+  })
 
   // Add more tests as needed for other operations
 })
