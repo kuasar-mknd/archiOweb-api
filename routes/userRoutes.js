@@ -22,7 +22,9 @@ const router = express.Router()
  *         - identifier
  *         - firstName
  *         - lastName
+ *         - birthDate
  *         - password
+ *         - gardens
  *       properties:
  *         identifier:
  *           type: string
@@ -34,10 +36,17 @@ const router = express.Router()
  *           type: string
  *           format: email
  *           description: Le nom d'utilisateur
+ *         birthDate:
+ *          type: string
+ *          format: date
+ *          description: La date de naissance de l'utilisateur
  *         password:
  *           type: string
  *           format: password
  *           description: Le mot de passe de l'utilisateur
+ *         gardens:
+ *           type: Array
+ *           description: Les jardins de l'utilisateur
  *       example:
  *         idendifier: johndoe@example.com
  *         firstName: john
@@ -63,6 +72,7 @@ const router = express.Router()
  *               - identifier
  *               - firstName
  *               - lastName
+ *               - birthDate
  *               - password
  *             properties:
  *               identifier:
@@ -70,6 +80,8 @@ const router = express.Router()
  *               firstName:
  *                 type: string
  *               lastName:
+ *                 type: string
+ *               birthDate:
  *                 type: string
  *               password:
  *                 type: string
@@ -95,6 +107,9 @@ router.post('/register', registerUser)
  *             type: object
  *             required:
  *               - identifier
+ *               - firstName
+  *              - lastName
+ *               - birthDate
  *               - password
  *             properties:
  *               identifier:
