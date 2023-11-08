@@ -22,7 +22,9 @@ const router = express.Router()
  *         - identifier
  *         - firstName
  *         - lastName
+ *         - birthDate
  *         - password
+ *         - gardens
  *       properties:
  *         identifier:
  *           type: string
@@ -34,10 +36,17 @@ const router = express.Router()
  *           type: string
  *           format: email
  *           description: Le nom d'utilisateur
+ *         birthDate:
+ *          type: string
+ *          format: date
+ *          description: La date de naissance de l'utilisateur
  *         password:
  *           type: string
  *           format: password
  *           description: Le mot de passe de l'utilisateur
+ *         gardens:
+ *           type: Array
+ *           description: Les jardins de l'utilisateur
  *       example:
  *         idendifier: johndoe@example.com
  *         firstName: john
@@ -51,7 +60,7 @@ const router = express.Router()
  *   post:
  *     tags:
  *       - Users
- *     summary: Register a new user
+ *     summary: Enregistre un nouvel utilisateur
  *     description: This route allows you to register a new user.
  *     requestBody:
  *       required: true
@@ -63,6 +72,7 @@ const router = express.Router()
  *               - identifier
  *               - firstName
  *               - lastName
+ *               - birthDate
  *               - password
  *             properties:
  *               identifier:
@@ -71,6 +81,8 @@ const router = express.Router()
  *                 type: string
  *               lastName:
  *                 type: string
+ *               birthDate:
+ *                 type: string
  *               password:
  *                 type: string
  *     responses:
@@ -78,6 +90,8 @@ const router = express.Router()
  *         description: User registered successfully.
  *       400:
  *         description: Bad request.
+ *       500:
+ *         description: Internal Server Error.
  */
 router.post('/register', registerUser)
 
@@ -118,6 +132,8 @@ router.post('/register', registerUser)
  *         description: Données d'entrée invalides
  *       401:
  *         description: Authentification échouée
+ *       500:
+ *         description: Internal Server Error.
  */
 router.post('/login', loginUser)
 
@@ -180,6 +196,8 @@ router.get('/:id', verifyToken, getUserById)
  *         description: Erreur dans la mise à jour
  *       404:
  *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Internal Server Error.
  */
 router.put('/:id', verifyToken, updateUser)
 
@@ -205,6 +223,8 @@ router.put('/:id', verifyToken, updateUser)
  *         description: Erreur dans la suppression
  *       404:
  *         description: Utilisateur non trouvé
+ *       500:
+ *        description: Internal Server Error.
  */
 router.delete('/:id', verifyToken, deleteUser)
 
