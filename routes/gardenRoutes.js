@@ -46,7 +46,7 @@ const router = express.Router()
 
 /**
  * @openapi
- * /api/gardens/register:
+ * /api/gardens/:
  *   post:
  *     tags:
  *       - Gardens
