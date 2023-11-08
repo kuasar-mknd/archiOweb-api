@@ -12,7 +12,8 @@ export const createPlant = [
   validatePlantData,
   async (req, res) => {
     try {
-      const garden = await Garden.findById(req.body.garden)
+      const bodyGarden = req.body.garden
+      const garden = await Garden.findById({ $eq: bodyGarden })
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -68,7 +69,8 @@ export const updatePlant = [
       if (!plant.garden.equals(req.user._id) && !isAdmin(req.user)) {
         return res.status(403).json({ message: 'Not authorized to update this plant' })
       }
-      const updatedPlant = await Plant.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      const body = req.body
+      const updatedPlant = await Plant.findByIdAndUpdate(req.params.id, { $eq: body }, { new: true })
       res.json(updatedPlant)
     } catch (error) {
       res.status(400).json({ message: 'Failed to update plant', error: error.message })

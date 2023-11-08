@@ -87,7 +87,7 @@ export const updateGarden = [
       if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
         return res.status(403).json({ message: 'Not authorized to update this garden' })
       }
-      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, { name, location }, { new: true })
+      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, { $eq: name, location }, { new: true })
       if (!updatedGarden) {
         return res.status(404).json({ message: 'Garden not found' })
       }

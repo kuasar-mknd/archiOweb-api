@@ -72,7 +72,8 @@ export const loginUser = [
   validateUserInput,
   async (req, res) => {
     try {
-      const user = await User.findOne({ identifier: req.body.identifier })
+      const identifier = req.body.identifier
+      const user = await User.findOne({ identifier: { $eq: identifier } })
       if (user && await bcrypt.compare(req.body.password, user.password)) {
         const token = jwt.sign(
           { userId: user._id, identifier: user.identifier },
@@ -113,8 +114,8 @@ export const updateUser = [
       if (!checkOwnershipOrRole(req.user, user._id)) {
         return res.status(403).json({ message: 'Not authorized to update this user' })
       }
-
-      const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password')
+      const body = req.body
+      const updatedUser = await User.findByIdAndUpdate(req.params.id, { $eq: body }, { new: true }).select('-password')
       res.json(updatedUser)
     } catch (error) {
       res.status(500).json({ message: error.message })
