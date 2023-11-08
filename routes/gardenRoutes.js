@@ -50,7 +50,7 @@ const router = express.Router()
  *   post:
  *     tags:
  *       - Gardens
- *     summary: Register a new garden
+ *     summary: Crée un jardin
  *     description: This route allows you to register a new garden.
  *     requestBody:
  *       required: true

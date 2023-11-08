@@ -60,7 +60,7 @@ const router = express.Router()
  *   post:
  *     tags:
  *       - Users
- *     summary: Register a new user
+ *     summary: Enregistre un nouvel utilisateur
  *     description: This route allows you to register a new user.
  *     requestBody:
  *       required: true
