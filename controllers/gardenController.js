@@ -1,4 +1,6 @@
 import Garden from '../models/gardenModel.js'
+
+// middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
 import { validateGardenId, validateGarden } from '../middlewares/validateGarden.js'
 import isAdmin from '../middlewares/isAdmin.js'

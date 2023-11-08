@@ -72,10 +72,8 @@ describe('Garden API Tests', function () {
         location: {
           type: 'Point',
           coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
-        },
-        user: '5f2b5bcd832a8c17645c854d' // Remplacer par l'ID utilisateur approprié
+        }
       }
-
       chai.request(app)
         .post('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token

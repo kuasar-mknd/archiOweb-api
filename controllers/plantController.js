@@ -1,7 +1,7 @@
 import Plant from '../models/plantModel.js'
 import Garden from '../models/gardenModel.js' // Import the Garden model
 
-// Add your middleware imports
+// middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
 import isAdmin from '../middlewares/isAdmin.js'
 import { validatePlantId, validatePlantData } from '../middlewares/validatePlant.js'

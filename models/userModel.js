@@ -11,17 +11,7 @@ const userSchema = new mongoose.Schema(
     gardens: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Garden' }] // Supposant que vous avez un modèle Garden
   },
   { timestamps: true }
-) // Ajoute automatiquement les champs createdAt et updatedAt
-
-// Avant d'enregistrer le document, cryptez le mot de passe
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password') || this.isNew) {
-    const salt = await bcrypt.genSalt(10)
-    const hash = await bcrypt.hash(this.password, salt)
-    this.password = hash
-  }
-  next()
-})
+)
 
 // Méthode pour comparer le mot de passe fourni avec le hash enregistré
 userSchema.methods.comparePassword = async function (candidatePassword) {
