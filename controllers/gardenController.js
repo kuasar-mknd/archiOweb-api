@@ -1,41 +1,20 @@
-import mongoose from 'mongoose'
 import Garden from '../models/gardenModel.js'
-import { body, validationResult } from 'express-validator'
-
-// Middleware to validate garden data
-const validateGarden = [
-  body('name').trim().isLength({ min: 1 }).withMessage('Name is required'),
-  body('location.type').trim().isIn(['Point']).withMessage('Location type must be "Point"'),
-  body('location.coordinates').isArray().withMessage('Location coordinates must be an array'),
-  body('location.coordinates.*').isNumeric().withMessage('Location coordinates must be numbers'),
-  // Add other validations according to your Garden model fields
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
-    }
-    next()
-  }
-]
-
-// Middleware to validate garden ID
-const validateGardenId = (req, res, next) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({ message: 'Invalid garden ID' })
-  }
-  next()
-}
+import verifyToken from '../middlewares/verifyToken.js'
+import { validateGardenId, validateGarden } from '../middlewares/validateGarden.js'
+import isAdmin from '../middlewares/isAdmin.js'
 
 // Create a new garden
 export const createGarden = [
+  verifyToken,
   validateGarden,
   async (req, res) => {
     try {
-      const { name, location, user } = req.body // Assuming you are sending the user ID in the request
+      const { name, location } = req.body
+      const user = req.user.userId
       const garden = new Garden({
         name,
         location,
-        user // You need to include the user field since it's required in your schema
+        user
       })
       const savedGarden = await garden.save()
       res.status(201).json(savedGarden)
@@ -48,10 +27,30 @@ export const createGarden = [
 // Retrieve all gardens
 export const getAllGardens = async (req, res) => {
   try {
-    const gardens = await Garden.find().populate('plants')
+    const page = parseInt(req.query.page) || 1
+    const pageSize = 10 // Fixed page size
+    const skip = (page - 1) * pageSize
+
+    const query = {}
+    const { lat, lng, radius = 10000 } = req.query // radius in meters, defaulting to 10km
+
+    // If latitude and longitude are provided, use them to filter gardens
+    if (lat && lng) {
+      query.location = {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [parseFloat(lng), parseFloat(lat)] // longitude, latitude
+          },
+          $maxDistance: radius
+        }
+      }
+    }
+
+    const gardens = await Garden.find(query).skip(skip).limit(pageSize)
     res.json(gardens)
   } catch (error) {
-    res.status(500).json({ message: 'Failed to retrieve gardens', error: error.message })
+    res.status(500).json({ message: error.message })
   }
 }
 
@@ -73,12 +72,20 @@ export const getGardenById = [
 
 // Update a garden
 export const updateGarden = [
+  verifyToken,
   validateGardenId,
   validateGarden,
   async (req, res) => {
     try {
       const { name, location } = req.body
-      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, { name, location }, { new: true }) // Utilisez uniquement les champs spécifiquement extraits
+      const garden = await Garden.findById(req.params.id)
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
+      if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to update this garden' })
+      }
+      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, { name, location }, { new: true })
       if (!updatedGarden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -91,9 +98,17 @@ export const updateGarden = [
 
 // Delete a garden
 export const deleteGarden = [
+  verifyToken,
   validateGardenId,
   async (req, res) => {
     try {
+      const garden = await Garden.findById(req.params.id)
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
+      if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to delete this garden' })
+      }
       const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
       if (!deletedGarden) {
         return res.status(404).json({ message: 'Garden not found' })

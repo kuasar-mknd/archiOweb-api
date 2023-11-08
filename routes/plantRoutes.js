@@ -8,7 +8,7 @@ import {
 } from '../controllers/plantController.js'
 
 // Middleware pour vérifier l'authentification
-import { verifyToken } from '../services/authService.js'
+import verifyToken from '../middlewares/verifyToken.js'
 
 const router = express.Router()
 

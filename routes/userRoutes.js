@@ -8,7 +8,7 @@ import {
 } from '../controllers/userController.js'
 
 // Middleware pour vérifier l'authentification
-import { verifyToken } from '../services/authService.js'
+import verifyToken from '../middlewares/verifyToken.js'
 
 const router = express.Router()
 
@@ -46,7 +46,7 @@ const router = express.Router()
  */
 
 /**
- * @openapi
+ * @swagger
  * /api/users/register:
  *   post:
  *     tags:
