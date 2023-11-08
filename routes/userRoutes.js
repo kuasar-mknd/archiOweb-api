@@ -90,6 +90,8 @@ const router = express.Router()
  *         description: User registered successfully.
  *       400:
  *         description: Bad request.
+ *       500:
+ *         description: Internal Server Error.
  */
 router.post('/register', registerUser)
 
@@ -107,9 +109,6 @@ router.post('/register', registerUser)
  *             type: object
  *             required:
  *               - identifier
- *               - firstName
-  *              - lastName
- *               - birthDate
  *               - password
  *             properties:
  *               identifier:
@@ -133,6 +132,8 @@ router.post('/register', registerUser)
  *         description: Données d'entrée invalides
  *       401:
  *         description: Authentification échouée
+ *       500:
+ *         description: Internal Server Error.
  */
 router.post('/login', loginUser)
 
@@ -195,6 +196,8 @@ router.get('/:id', verifyToken, getUserById)
  *         description: Erreur dans la mise à jour
  *       404:
  *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Internal Server Error.
  */
 router.put('/:id', verifyToken, updateUser)
 
@@ -220,6 +223,8 @@ router.put('/:id', verifyToken, updateUser)
  *         description: Erreur dans la suppression
  *       404:
  *         description: Utilisateur non trouvé
+ *       500:
+ *        description: Internal Server Error.
  */
 router.delete('/:id', verifyToken, deleteUser)
 
