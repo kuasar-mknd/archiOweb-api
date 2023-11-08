@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const plantSchema = new mongoose.Schema(
   {
     commonName: { type: String, required: true },
-    scientificName: { type: String, required: true, unique: true },
+    scientificName: { type: String, required: true },
     family: { type: String, required: true },
     description: String,
     origin: String, // Vous pouvez éventuellement créer un schéma séparé pour l'origine si c'est une liste prédéfinie
