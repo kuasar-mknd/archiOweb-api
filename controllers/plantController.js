@@ -1,33 +1,10 @@
-import mongoose from 'mongoose'
 import Plant from '../models/plantModel.js'
-import { body, validationResult } from 'express-validator'
 import Garden from '../models/gardenModel.js' // Import the Garden model
 
 // Add your middleware imports
-import verifyToken from '../middlewares/verifyToken.js' // Add the correct path
-import isAdmin from '../middlewares/isAdmin.js' // Add the correct path
-
-// Middleware for validating plant IDs
-const validatePlantId = (req, res, next) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({ message: 'Invalid plant ID' })
-  }
-  next()
-}
-
-// Validation for plant data
-const validatePlantData = [
-  body('commonName').trim().isLength({ min: 1 }).withMessage('Common name is required'),
-  body('scientificName').trim().isLength({ min: 1 }).withMessage('Scientific name is required'),
-  // Add more validations as necessary for your Plant model
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
-    }
-    next()
-  }
-]
+import verifyToken from '../middlewares/verifyToken.js'
+import isAdmin from '../middlewares/isAdmin.js'
+import { validatePlantId, validatePlantData } from '../middlewares/validatePlant.js'
 
 // Create a new plant
 export const createPlant = [
