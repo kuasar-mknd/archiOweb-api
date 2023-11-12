@@ -8,6 +8,26 @@
 	"item": [
 		{
 			"name": "List Gardens",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "58cbf5fb-b84a-41b1-9351-ff7a6ff43830",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is an array\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"id": "15fd08bb-2922-4464-9273-5f0e6abe91f7",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -30,6 +50,26 @@
 		},
 		{
 			"name": "Create Garden",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a1796104-a1f6-4a74-9bf3-f79d5f88e080",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has garden\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"name\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"id": "82792ccb-4bb6-46b3-933d-3c376e1428a5",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -49,7 +89,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Mon jardin\",\r\n  \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]\r\n  },\r\n  \"user\": \"5f2b5bcd832a8c17645c854d\" // Remplacer par l'ID utilisateur approprié\r\n}\r\n",
+					"raw": "{\r\n  \"name\": \"Mon jardin\",\r\n  \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]\r\n  }\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -71,6 +111,71 @@
 		},
 		{
 			"name": "Delete Garden",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "85fa3934-1973-4474-bd65-f7212d1b2966",
+						"exec": [
+							"// Vérifie si l'ID est déjà défini dans les paramètres de la requête\r",
+							"let requestId = pm.request.url.variables.get(\"id\");\r",
+							"\r",
+							"if (!requestId) {\r",
+							"    const requestBody = {\r",
+							"        name: \"Mon Jardin\",\r",
+							"        location: {\r",
+							"            type: \"Point\",\r",
+							"            coordinates: [-73.856077, 40.848447]\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    // Exécute la requête de création de jardin et récupère l'ID\r",
+							"    pm.sendRequest({\r",
+							"        url: pm.environment.get(\"baseUrl\") + \"/api/gardens\",\r",
+							"        method: 'POST',\r",
+							"        header: {\r",
+							"            'Content-Type': 'application/json',\r",
+							"            'Authorization': 'Bearer ' + pm.environment.get(\"authToken\")\r",
+							"        },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify(requestBody)\r",
+							"        }\r",
+							"    }, function (err, response) {\r",
+							"        if (err) {\r",
+							"            console.log(\"Erreur lors de la création du jardin :\", err);\r",
+							"        } else {\r",
+							"            const responseJson = response.json();\r",
+							"            let newId = responseJson._id;\r",
+							"\r",
+							"            // Définit l'ID dans les paramètres de la requête\r",
+							"            pm.request.url.variables.add({key: \"id\", value: newId});\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "90d498c6-cc8b-4f83-a017-0273ef147873",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body is empty\", function () {\r",
+							"    pm.expect(pm.response.text()).to.be.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"id": "48c6791c-e8f0-423e-8f8a-a99a598886c9",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -78,6 +183,215 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/gardens/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"gardens",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List garden with ID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5c84bac9-0213-4003-84dd-71c9c2dc5226",
+						"exec": [
+							"// Vérifie si l'ID est déjà défini dans les paramètres de la requête\r",
+							"let requestId = pm.request.url.variables.get(\"id\");\r",
+							"\r",
+							"if (!requestId) {\r",
+							"    const requestBody = {\r",
+							"        name: \"Mon Jardin\",\r",
+							"        location: {\r",
+							"            type: \"Point\",\r",
+							"            coordinates: [-73.856077, 40.848447]\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    // Exécute la requête de création de jardin et récupère l'ID\r",
+							"    pm.sendRequest({\r",
+							"        url: pm.environment.get(\"baseUrl\") + \"/api/gardens\",\r",
+							"        method: 'POST',\r",
+							"        header: {\r",
+							"            'Content-Type': 'application/json',\r",
+							"            'Authorization': 'Bearer ' + pm.environment.get(\"authToken\")\r",
+							"        },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify(requestBody)\r",
+							"        }\r",
+							"    }, function (err, response) {\r",
+							"        if (err) {\r",
+							"            console.log(\"Erreur lors de la création du jardin :\", err);\r",
+							"        } else {\r",
+							"            const responseJson = response.json();\r",
+							"            let newId = responseJson._id;\r",
+							"\r",
+							"            // Définit l'ID dans les paramètres de la requête\r",
+							"            pm.request.url.variables.add({key: \"id\", value: newId});\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "99480146-a37b-45b6-9577-1ada8b7d150d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has correct ID\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData._id).to.eql(pm.variables.get(\"gardenId\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "6aee5828-90b1-44cf-a286-8b14988c10a3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/gardens/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"gardens",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Garden",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2b4c09ba-4c28-4256-a4cd-ca8e86ff710a",
+						"exec": [
+							"// Vérifie si l'ID est déjà défini dans les paramètres de la requête\r",
+							"let requestId = pm.request.url.variables.get(\"id\");\r",
+							"\r",
+							"if (!requestId) {\r",
+							"    const requestBody = {\r",
+							"        name: \"Mon Jardin\",\r",
+							"        location: {\r",
+							"            type: \"Point\",\r",
+							"            coordinates: [-73.856077, 40.848447]\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    // Exécute la requête de création de jardin et récupère l'ID\r",
+							"    pm.sendRequest({\r",
+							"        url: pm.environment.get(\"baseUrl\") + \"/api/gardens\",\r",
+							"        method: 'POST',\r",
+							"        header: {\r",
+							"            'Content-Type': 'application/json',\r",
+							"            'Authorization': 'Bearer ' + pm.environment.get(\"authToken\")\r",
+							"        },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify(requestBody)\r",
+							"        }\r",
+							"    }, function (err, response) {\r",
+							"        if (err) {\r",
+							"            console.log(\"Erreur lors de la création du jardin :\", err);\r",
+							"        } else {\r",
+							"            const responseJson = response.json();\r",
+							"            let newId = responseJson._id;\r",
+							"\r",
+							"            // Définit l'ID dans les paramètres de la requête\r",
+							"            pm.request.url.variables.add({key: \"id\", value: newId});\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7ffdd5ec-fae6-4773-91ea-35bf7a132d81",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Garden is updated\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.name).to.eql(\"Mon Nouveau Jardin\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "cb3ed41d-47b4-433e-86a9-fe48bf07abea",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Mon Nouveau Jardin\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-73.856077, 40.848447]\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "{{baseUrl}}/api/gardens/:id",
 					"host": [
