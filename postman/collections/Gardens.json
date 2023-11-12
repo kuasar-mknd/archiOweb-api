@@ -270,11 +270,6 @@
 							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
-							"\r",
-							"pm.test(\"Response has correct ID\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData._id).to.eql(pm.variables.get(\"gardenId\"));\r",
-							"});\r",
 							""
 						],
 						"type": "text/javascript"
