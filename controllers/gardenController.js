@@ -1,9 +1,10 @@
 import Garden from '../models/gardenModel.js'
+import mongoose from 'mongoose'
 
 // middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
 import { validateGardenId, validateGarden } from '../middlewares/validateGarden.js'
-import isAdmin from '../middlewares/isAdmin.js'
+// import isAdmin from '../middlewares/isAdmin.js'
 
 // Create a new garden
 export const createGarden = [
@@ -38,6 +39,11 @@ export const getAllGardens = async (req, res) => {
 
     // If latitude and longitude are provided, use them to filter gardens
     if (lat && lng) {
+      // Validate lat and lng
+      if (!isNumeric(lat) || !isNumeric(lng)) {
+        return res.status(400).json({ message: 'Invalid latitude or longitude' })
+      }
+
       query.location = {
         $near: {
           $geometry: {
@@ -79,15 +85,24 @@ export const updateGarden = [
   validateGarden,
   async (req, res) => {
     try {
+      const { id } = req.params
       const { name, location } = req.body
-      const garden = await Garden.findById(req.params.id)
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid garden ID' })
+      }
+      const garden = await Garden.findById(id)
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
+
+      /* To do
       if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
         return res.status(403).json({ message: 'Not authorized to update this garden' })
       }
-      const updatedGarden = await Garden.findByIdAndUpdate(req.params.id, { $eq: name, location }, { new: true })
+      */
+
+      const updatedGarden = await Garden.findByIdAndUpdate(id, { name, location }, { new: true })
       if (!updatedGarden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -108,9 +123,11 @@ export const deleteGarden = [
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
+      /* To do
       if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
       }
+      */
       const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
       if (!deletedGarden) {
         return res.status(404).json({ message: 'Garden not found' })
@@ -146,4 +163,8 @@ export default {
   updateGarden,
   deleteGarden,
   listPlantsInGarden
+}
+
+function isNumeric (value) {
+  return !isNaN(value) && isFinite(value)
 }
