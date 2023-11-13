@@ -12,6 +12,7 @@ const { expect } = chai
 
 describe('Garden API Tests', function () {
   let token // Variable pour stocker le token d'authentification
+  let createdGardenId // Pour stocker l'ID du jardin créé
 
   // Connect to the test database before running any tests
   // Setup and teardown
@@ -48,6 +49,22 @@ describe('Garden API Tests', function () {
     })
 
     token = res.body.token // Save the token for protected route tests
+
+    // Create a new garden
+    const gardenData = {
+      name: 'Mon jardin',
+      location: {
+        type: 'Point',
+        coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
+      }
+    }
+    res = await chai
+      .request(app)
+      .post('/api/gardens')
+      .set('Authorization', `Bearer ${token}`) // Use the auth token
+      .send(gardenData)
+
+    createdGardenId = res.body._id // Save the ID of the created garden
   })
 
   // Test cases
@@ -90,5 +107,55 @@ describe('Garden API Tests', function () {
     })
   })
 
-  // Add more tests as needed for other operations
+  // Récupération d'un Jardin Spécifique par ID
+  describe('GET /api/gardens/:id', function () {
+    it('should get a specific garden by ID', function (done) {
+      chai.request(app)
+        .get('/api/gardens/' + createdGardenId)
+        .set('Authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          expect(err).to.be.equal(null)
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('_id', createdGardenId)
+          done()
+        })
+    })
+  })
+
+  // Mise à Jour d'un Jardin
+  describe('PUT /api/gardens/:id', function () {
+    it('should update a garden', function (done) {
+      const updatedGardenData = {
+        name: 'Jardin Mis à Jour',
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
+        }
+      }
+      chai.request(app)
+        .put('/api/gardens/' + createdGardenId)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updatedGardenData)
+        .end((err, res) => {
+          expect(err).to.be.equal(null)
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('name', 'Jardin Mis à Jour')
+          done()
+        })
+    })
+  })
+
+  // Suppression d'un Jardin
+  describe('DELETE /api/gardens/:id', function () {
+    it('should delete a garden', function (done) {
+      chai.request(app)
+        .delete('/api/gardens/' + createdGardenId)
+        .set('Authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          expect(err).to.be.equal(null)
+          expect(res).to.have.status(204)
+          done()
+        })
+    })
+  })
 })
