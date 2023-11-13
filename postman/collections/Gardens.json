@@ -63,7 +63,10 @@
 							"pm.test(\"Response has garden\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.have.property(\"name\");\r",
+							"    var requestBody = JSON.parse(pm.request.body.raw);\r",
+							"    pm.environment.set(\"gardenId\", requestBody._id);\r",
 							"});\r",
+							"\r",
 							""
 						],
 						"type": "text/javascript"

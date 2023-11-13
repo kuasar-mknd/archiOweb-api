@@ -8,6 +8,25 @@
 	"item": [
 		{
 			"name": "List Plants",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "79501ef9-88af-459b-b9a4-49cf3e2b1b3b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should be an array\", function () {\r",
+							"    pm.expect(pm.response.json()).to.be.an('array');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"id": "6224adba-7d29-4d0b-a827-8d3e2fb34ae3",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -40,6 +59,26 @@
 		},
 		{
 			"name": "Create Plants",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "56b0f3d0-8cdf-4b13-b2e7-d8760b6a1ce9",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should have a plant ID\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData._id).to.be.ok;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"id": "72e1b996-91a5-4386-8a22-0558e592244e",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -59,7 +98,12 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Ma Plante\"\r\n}\r\n"
+					"raw": "{\r\n  \"commonName\": \"Nom commun\",\r\n  \"scientificName\": \"Nom scientifique\",\r\n  \"family\": \"Famille de la plante\",\r\n  \"exposure\": \"Full Sun\",\r\n  \"garden\": \"{{gardenId}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				},
 				"url": {
 					"raw": "{{baseUrl}}/api/plants",
@@ -73,6 +117,238 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "List plant with ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9daf4dc8-4566-4fc6-9169-5a312f88bf03",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "960563b7-d943-411f-b264-12fad6a6fab0",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/plants/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"plants",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Plant",
+			"id": "282c8b61-0426-4e21-9965-224a1e81edc3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"commonName\": \"Nom commun mis à jour\",\r\n  \"scientificName\": \"Nom scientifique mis à jour\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/plants/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"plants",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d2debd63-7ec7-49b2-9c8c-8933b348321d",
+				"type": "text/javascript",
+				"exec": [
+					"// Créer un utilisateur s'il n'existe pas déjà",
+					"if (!pm.environment.get('authToken')) {",
+					"    const timestamp = new Date().getTime();",
+					"    const userCredentials = {",
+					"        identifier: `user_${timestamp}@example.com`,",
+					"        firstName: \"John\",",
+					"        lastName: \"Doe\",",
+					"        password: \"yourSecurePassword\"",
+					"    };",
+					"",
+					"    // Enregistrer un nouvel utilisateur",
+					"    pm.sendRequest({",
+					"        url: pm.environment.get('baseUrl') + '/api/users/register',",
+					"        method: 'POST',",
+					"        header: 'Content-Type:application/json',",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify(userCredentials)",
+					"        }",
+					"    }, function (err, res) {",
+					"        if (err) {",
+					"            console.log('Erreur lors de l’enregistrement:', err);",
+					"        } else {",
+					"            // Connexion de l'utilisateur pour obtenir le jeton",
+					"            pm.sendRequest({",
+					"                url: pm.environment.get('baseUrl') + '/api/users/login',",
+					"                method: 'POST',",
+					"                header: 'Content-Type:application/json',",
+					"                body: {",
+					"                    mode: 'raw',",
+					"                    raw: JSON.stringify({ identifier: userCredentials.identifier, password: userCredentials.password })",
+					"                }",
+					"            }, function (err, res) {",
+					"                if (err) {",
+					"                    console.log('Erreur lors de la connexion:', err);",
+					"                } else {",
+					"                    pm.environment.set('authToken', res.json().token);",
+					"                }",
+					"            });",
+					"        }",
+					"    });",
+					"}",
+					"",
+					"",
+					"",
+					"// Vérifie si l'garden ID est déjà défini dans les paramètres de la requête",
+					"let requestGardenId = pm.environment.get(\"gardenId\");",
+					"",
+					"if (!requestGardenId) {",
+					"    const requestBody = {",
+					"        name: \"Mon Jardin\",",
+					"        location: {",
+					"            type: \"Point\",",
+					"            coordinates: [-73.856077, 40.848447]",
+					"        }",
+					"    };",
+					"",
+					"    // Exécute la requête de création de jardin et récupère l'ID",
+					"    pm.sendRequest({",
+					"        url: pm.environment.get(\"baseUrl\") + \"/api/gardens\",",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json',",
+					"            'Authorization': 'Bearer ' + pm.environment.get(\"authToken\")",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify(requestBody)",
+					"        }",
+					"    }, function (err, response) {",
+					"        if (err) {",
+					"            console.log(\"Erreur lors de la création du jardin :\", err);",
+					"        } else {",
+					"            const responseJson = response.json();",
+					"            let newId = responseJson._id;",
+					"",
+					"            // Définit l'ID dans les paramètres de la requête",
+					"           pm.environment.set(\"gardenId\",  newId);",
+					"        }",
+					"    });",
+					"}",
+					"",
+					"// Vérifie si l'ID est déjà défini dans les paramètres de la requête",
+					"let requestId = pm.request.url.variables.get(\"id\");",
+					"",
+					"if (!requestId) {",
+					"    const requestBody = {",
+					"        \"commonName\": \"Nom commun\",",
+					"        \"scientificName\": \"Nom scientifique\",",
+					"        \"family\": \"Famille de la plante\",",
+					"        \"exposure\": \"Full Sun\",",
+					"        \"garden\": pm.environment.get(\"gardenId\")",
+					"    };",
+					"",
+					"    // Exécute la requête de création de jardin et récupère l'ID",
+					"    pm.sendRequest({",
+					"        url: pm.environment.get(\"baseUrl\") + \"/api/plants\",",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json',",
+					"            'Authorization': 'Bearer ' + pm.environment.get(\"authToken\")",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify(requestBody)",
+					"        }",
+					"    }, function (err, response) {",
+					"        if (err) {",
+					"            console.log(\"Erreur lors de la création de la plante :\", err);",
+					"        } else {",
+					"            const responseJson = response.json();",
+					"            let newId = responseJson._id;",
+					"",
+					"            // Définit l'ID dans les paramètres de la requête",
+					"            pm.request.url.variables.add({key: \"id\", value: newId});",
+					"        }",
+					"    });",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "92a68c65-75fe-455e-ac20-edc7f71e216b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
