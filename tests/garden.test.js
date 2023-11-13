@@ -105,6 +105,24 @@ describe('Garden API Tests', function () {
           done()
         })
     })
+
+    it('should return an error for missing garden name', function (done) {
+      const gardenData = {
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
+        }
+      }
+      chai.request(app)
+        .post('/api/gardens')
+        .set('Authorization', `Bearer ${token}`) // Use the auth token
+        .send(gardenData)
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(err).to.be.equal(null)
+          done()
+        })
+    })
   })
 
   // Récupération d'un Jardin Spécifique par ID
@@ -143,6 +161,19 @@ describe('Garden API Tests', function () {
           done()
         })
     })
+    it('should return an error for invalid garden ID', function (done) {
+      const updatedGardenData = { /* vos données mises à jour */ }
+      chai.request(app)
+        .put('/api/gardens/invalid-id')
+        .set('Authorization', `Bearer ${token}`)
+        .send(updatedGardenData)
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.have.property('message', 'Invalid garden ID')
+          expect(err).to.be.equal(null)
+          done()
+        })
+    })
   })
 
   // Suppression d'un Jardin
@@ -157,5 +188,33 @@ describe('Garden API Tests', function () {
           done()
         })
     })
+  })
+
+  describe('GET /api/gardens with query parameters', function () {
+    it('should get gardens near a specific location', function (done) {
+      chai.request(app)
+        .get('/api/gardens?lat=40.7128&lng=-74.0060')
+        .set('Authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          expect(err).to.be.equal(null)
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+          done()
+        })
+    })
+
+    it('should return an error for invalid lat/lng', function (done) {
+      chai.request(app)
+        .get('/api/gardens?lat=invalid&lng=invalid')
+        .set('Authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.have.property('message', 'Invalid latitude or longitude')
+          expect(err).to.be.equal(null)
+          done()
+        })
+    })
+
+    // Plus de tests pour la pagination et autres scénarios
   })
 })

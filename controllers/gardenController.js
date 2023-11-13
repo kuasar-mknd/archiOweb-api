@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 // middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
 import { validateGardenId, validateGarden } from '../middlewares/validateGarden.js'
-// import isAdmin from '../middlewares/isAdmin.js'
+import isAdmin from '../middlewares/isAdmin.js'
 
 // Create a new garden
 export const createGarden = [
@@ -95,12 +95,9 @@ export const updateGarden = [
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
-
-      /* To do
-      if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
+      if (!isAdmin(req.user) && garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to update this garden' })
       }
-      */
 
       const updatedGarden = await Garden.findByIdAndUpdate(id, { name, location }, { new: true })
       if (!updatedGarden) {
@@ -123,11 +120,9 @@ export const deleteGarden = [
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
-      /* To do
-      if (!isAdmin(req.user) && garden.user.toString() !== req.user._id.toString()) {
+      if (!isAdmin(req.user) && garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
       }
-      */
       const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
       if (!deletedGarden) {
         return res.status(404).json({ message: 'Garden not found' })
