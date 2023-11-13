@@ -5,9 +5,11 @@ import Garden from '../models/gardenModel.js'
 import bcrypt from 'bcrypt'
 import verifyToken from '../middlewares/verifyToken.js'
 
+/*
 const checkOwnershipOrRole = (user, resourceUserId) => {
   return user.role === 'admin' || user._id.toString() === resourceUserId.toString()
 }
+*/
 
 // Middlewares for validation
 const validateUserInput = [
@@ -92,30 +94,16 @@ export const loginUser = [
   }
 ]
 
-export const getUserById = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select('-password')
-    if (!user) return res.status(404).json({ message: 'User not found' })
-    res.json(user)
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
 export const updateUser = [
   sanitizeUserUpdate,
   verifyToken, // Middleware to verify the JWT token
   async (req, res) => {
     try {
-      const user = await User.findById(req.params.id)
-      if (!user) return res.status(404).json({ message: 'User not found' })
-
-      // Check if the logged-in user has permission to update the user resource
-      if (!checkOwnershipOrRole(req.user, user._id)) {
-        return res.status(403).json({ message: 'Not authorized to update this user' })
-      }
       const body = req.body
-      const updatedUser = await User.findByIdAndUpdate(req.params.id, { $eq: body }, { new: true }).select('-password')
+      const user = await User.findById(req.user.userId)
+      if (!user) return res.status(404).json({ message: 'User not found' })
+      console.log('test')
+      const updatedUser = await User.findByIdAndUpdate(req.user.userId, body, { new: true }).select('-password')
       res.json(updatedUser)
     } catch (error) {
       res.status(500).json({ message: error.message })
@@ -127,15 +115,10 @@ export const deleteUser = [
   verifyToken, // Middleware to verify the JWT token
   async (req, res) => {
     try {
-      const user = await User.findById(req.params.id)
+      const user = await User.findById(req.user.userId)
       if (!user) return res.status(404).json({ message: 'User not found' })
 
-      // Check if the logged-in user has permission to delete the user resource
-      if (!checkOwnershipOrRole(req.user, user._id)) {
-        return res.status(403).json({ message: 'Not authorized to delete this user' })
-      }
-
-      await User.findByIdAndDelete(req.params.id)
+      await User.findByIdAndDelete(req.user.userId)
       res.status(204).json({ message: 'User deleted' })
     } catch (error) {
       res.status(500).json({ message: error.message })
@@ -143,16 +126,19 @@ export const deleteUser = [
   }
 ]
 
-export const listUserGardens = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId)
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
+export const listUserGardens = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.user.userId)
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+      }
 
-    const gardens = await Garden.find({ userId: user._id })
-    res.json(gardens)
-  } catch (error) {
-    res.status(500).json({ message: error.message })
+      const gardens = await Garden.find({ userId: user._id })
+      res.json(gardens)
+    } catch (error) {
+      res.status(500).json({ message: error.message })
+    }
   }
-}
+]

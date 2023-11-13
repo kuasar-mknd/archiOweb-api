@@ -4,7 +4,7 @@ import Garden from '../models/gardenModel.js' // Import the Garden model
 // middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
 import isAdmin from '../middlewares/isAdmin.js'
-import { validatePlantId, validatePlantData } from '../middlewares/validatePlant.js'
+import { validatePlantId, validatePlantData, validatePlantDataUpdate } from '../middlewares/validatePlant.js'
 
 // Create a new plant
 export const createPlant = [
@@ -44,7 +44,8 @@ export const getPlantById = [
   validatePlantId,
   async (req, res) => {
     try {
-      const plant = await Plant.findById(req.params.id)
+      const { id } = req.params
+      const plant = await Plant.findById(id)
       if (!plant) {
         return res.status(404).json({ message: 'Plant not found' })
       }
@@ -59,9 +60,10 @@ export const getPlantById = [
 export const updatePlant = [
   verifyToken,
   validatePlantId,
-  validatePlantData,
+  validatePlantDataUpdate,
   async (req, res) => {
     try {
+      const body = req.body
       const plant = await Plant.findById(req.params.id)
       if (!plant) {
         return res.status(404).json({ message: 'Plant not found' })
@@ -69,8 +71,7 @@ export const updatePlant = [
       if (!plant.garden.equals(req.user._id) && !isAdmin(req.user)) {
         return res.status(403).json({ message: 'Not authorized to update this plant' })
       }
-      const body = req.body
-      const updatedPlant = await Plant.findByIdAndUpdate(req.params.id, { $eq: body }, { new: true })
+      const updatedPlant = await Plant.findByIdAndUpdate(req.params.id, body, { new: true })
       res.json(updatedPlant)
     } catch (error) {
       res.status(400).json({ message: 'Failed to update plant', error: error.message })

@@ -2,9 +2,9 @@ import express from 'express'
 import {
   registerUser,
   loginUser,
-  getUserById,
   updateUser,
-  deleteUser
+  deleteUser,
+  listUserGardens
 } from '../controllers/userController.js'
 
 // Middleware pour vérifier l'authentification
@@ -140,33 +140,6 @@ router.post('/login', loginUser)
 /**
  * @swagger
  * /api/users/{id}:
- *   get:
- *     summary: Récupère les détails d'un utilisateur par son ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID unique de l'utilisateur
- *         schema:
- *           type: string
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Détails de l'utilisateur
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: Utilisateur non trouvé
- */
-router.get('/:id', verifyToken, getUserById)
-
-/**
- * @swagger
- * /api/users/{id}:
  *   put:
  *     summary: Met à jour les informations d'un utilisateur
  *     tags: [Users]
@@ -199,7 +172,7 @@ router.get('/:id', verifyToken, getUserById)
  *       500:
  *         description: Internal Server Error.
  */
-router.put('/:id', verifyToken, updateUser)
+router.put('/', verifyToken, updateUser)
 
 /**
  * @swagger
@@ -226,6 +199,8 @@ router.put('/:id', verifyToken, updateUser)
  *       500:
  *        description: Internal Server Error.
  */
-router.delete('/:id', verifyToken, deleteUser)
+router.delete('/', verifyToken, deleteUser)
+
+router.get('/gardens', verifyToken, listUserGardens)
 
 export default router
