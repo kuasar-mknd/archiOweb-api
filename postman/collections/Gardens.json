@@ -311,6 +311,18 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "List Plants from Garden",
+			"id": "451d51e8-0ed9-4bb7-a157-3b5b653b4d40",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	],
 	"event": [
