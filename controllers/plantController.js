@@ -5,7 +5,6 @@ import Garden from '../models/gardenModel.js' // Import the Garden model
 import verifyToken from '../middlewares/verifyToken.js'
 import isAdmin from '../middlewares/isAdmin.js'
 import { validatePlantId, validatePlantData, validatePlantDataUpdate } from '../middlewares/validatePlant.js'
-import mongoose from 'mongoose'
 
 // Create a new plant
 export const createPlant = [
@@ -18,7 +17,7 @@ export const createPlant = [
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
-      if (!garden.user.equals(req.user._id) && !isAdmin(req.user)) {
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to add plants to this garden' })
       }
       const plant = new Plant({ ...req.body, user: req.user._id })
@@ -30,31 +29,31 @@ export const createPlant = [
 
       res.status(201).json(savedPlant)
     } catch (error) {
-      res.status(400).json({ message: error.message })
+      res.status(500).json({ message: error.message })
     }
   }
 ]
 
-// Retrieve all plants
-export const getAllPlants = async (req, res) => {
-  try {
-    const plants = await Plant.find()
-    res.json(plants)
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
+// Retrieve all plants TO DO AUTH & TEST
+export const getAllPlants = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const plants = await Plant.find()
+      res.json(plants)
+    } catch (error) {
+      res.status(500).json({ message: error.message })
+    }
+  }]
 
 // Retrieve a single plant by ID
 export const getPlantById = [
+  verifyToken,
   validatePlantId,
   async (req, res) => {
     try {
       const { id } = req.params
       const plant = await Plant.findById(id)
-      if (!plant) {
-        return res.status(404).json({ message: 'Plant not found' })
-      }
       res.json(plant)
     } catch (error) {
       res.status(500).json({ message: error.message })
@@ -70,20 +69,18 @@ export const updatePlant = [
   async (req, res) => {
     try {
       const body = req.body
-      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return res.status(400).json({ message: 'Invalid plant ID' })
-      }
       const plant = await Plant.findById(req.params.id)
-      if (!plant) {
-        return res.status(404).json({ message: 'Plant not found' })
+      const garden = await Garden.findById(plant.garden)
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
       }
-      if (!plant.garden.equals(req.user._id) && !isAdmin(req.user)) {
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to update this plant' })
       }
       const updatedPlant = await Plant.findByIdAndUpdate(req.params.id, body, { new: true })
       res.json(updatedPlant)
     } catch (error) {
-      res.status(400).json({ message: 'Failed to update plant', error: error.message })
+      res.status(500).json({ message: 'Failed to update plant', error: error.message })
     }
   }
 ]
@@ -95,10 +92,11 @@ export const deletePlant = [
   async (req, res) => {
     try {
       const plant = await Plant.findById(req.params.id)
-      if (!plant) {
-        return res.status(404).json({ message: 'Plant not found' })
+      const garden = await Garden.findById(plant.garden)
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
       }
-      if (!plant.garden.equals(req.user._id) && !isAdmin(req.user)) {
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this plant' })
       }
       await Plant.findByIdAndDelete(req.params.id)

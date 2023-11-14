@@ -161,7 +161,7 @@ router.post('/', verifyToken, createPlant)
  */
 
 // Route pour récupérer toutes les plantes
-router.get('/', getAllPlants)
+router.get('/', verifyToken, getAllPlants)
 /**
  * @swagger
  * /api/plants/{id}:
@@ -189,7 +189,7 @@ router.get('/', getAllPlants)
  */
 
 // Route pour récupérer une plante spécifique par son ID
-router.get('/:id', getPlantById)
+router.get('/:id', verifyToken, getPlantById)
 /**
  * @swagger
  * /api/plants/{id}:
