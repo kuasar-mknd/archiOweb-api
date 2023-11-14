@@ -132,6 +132,39 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get garden from user",
+			"id": "58c7c58f-6d1f-44b1-b2b4-7fc822cabb49",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/users/gardens",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"gardens"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
