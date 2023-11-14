@@ -22,7 +22,6 @@ export const createGarden = [
         user
       })
       const savedGarden = await garden.save()
-      console.log(savedGarden)
       userObject.gardens.push(savedGarden._id)
       await userObject.save()
 
