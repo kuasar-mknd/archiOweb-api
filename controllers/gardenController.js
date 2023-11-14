@@ -1,4 +1,5 @@
 import Garden from '../models/gardenModel.js'
+import User from '../models/userModel.js'
 import mongoose from 'mongoose'
 
 // middleware imports
@@ -14,12 +15,17 @@ export const createGarden = [
     try {
       const { name, location } = req.body
       const user = req.user.userId
+      const userObject = await User.findById(user)
       const garden = new Garden({
         name,
         location,
         user
       })
       const savedGarden = await garden.save()
+      console.log(savedGarden)
+      userObject.gardens.push(savedGarden._id)
+      await userObject.save()
+
       res.status(201).json(savedGarden)
     } catch (error) {
       res.status(400).json({ message: 'Failed to create garden', error: error.message })

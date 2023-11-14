@@ -1,7 +1,6 @@
 import User from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
 import { body, validationResult } from 'express-validator'
-import Garden from '../models/gardenModel.js'
 import bcrypt from 'bcrypt'
 import verifyToken from '../middlewares/verifyToken.js'
 
@@ -129,13 +128,11 @@ export const listUserGardens = [
   verifyToken,
   async (req, res) => {
     try {
-      const user = await User.findById(req.user.userId)
+      const user = await User.findById(req.user.userId).populate('gardens').select('-password')
       if (!user) {
         return res.status(404).json({ message: 'User not found' })
       }
-
-      const gardens = await Garden.find({ userId: user._id })
-      res.json(gardens)
+      res.json(user.gardens)
     } catch (error) {
       res.status(500).json({ message: error.message })
     }

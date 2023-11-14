@@ -71,7 +71,7 @@ export const updatePlant = [
     try {
       const body = req.body
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return res.status(400).json({ message: 'Invalid plant ID' });
+        return res.status(400).json({ message: 'Invalid plant ID' })
       }
       const plant = await Plant.findById(req.params.id)
       if (!plant) {

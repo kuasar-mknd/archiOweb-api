@@ -179,7 +179,6 @@ describe('Plants API Tests', function () {
         .send(updatedData)
 
       expect(res).to.have.status(200)
-      // Vérifiez les champs mis à jour
     })
 
     // Ajoutez des tests pour les erreurs d'autorisation et les données invalides
