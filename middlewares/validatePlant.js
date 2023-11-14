@@ -11,6 +11,10 @@ export const validatePlantId = (req, res, next) => {
 
 // Validation for plant data
 export const validatePlantData = [
+  body('garden')
+    .custom((value) => mongoose.Types.ObjectId.isValid(value))
+    .withMessage('Garden must be a valid ID'),
+
   body('commonName')
     .trim()
     .isLength({ min: 1, max: 100 })

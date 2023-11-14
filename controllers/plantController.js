@@ -5,6 +5,7 @@ import Garden from '../models/gardenModel.js' // Import the Garden model
 import verifyToken from '../middlewares/verifyToken.js'
 import isAdmin from '../middlewares/isAdmin.js'
 import { validatePlantId, validatePlantData, validatePlantDataUpdate } from '../middlewares/validatePlant.js'
+import mongoose from 'mongoose'
 
 // Create a new plant
 export const createPlant = [
@@ -13,7 +14,7 @@ export const createPlant = [
   async (req, res) => {
     try {
       const bodyGarden = req.body.garden
-      const garden = await Garden.findById(bodyGarden) // Correction ici
+      const garden = await Garden.findById(bodyGarden)
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -69,6 +70,9 @@ export const updatePlant = [
   async (req, res) => {
     try {
       const body = req.body
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({ message: 'Invalid plant ID' });
+      }
       const plant = await Plant.findById(req.params.id)
       if (!plant) {
         return res.status(404).json({ message: 'Plant not found' })
