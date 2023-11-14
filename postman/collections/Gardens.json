@@ -319,8 +319,36 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/gardens/:id/plants",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"gardens",
+						":id",
+						"plants"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "65533409e59c50c307aa922a"
+						}
+					]
+				}
 			},
 			"response": []
 		}
