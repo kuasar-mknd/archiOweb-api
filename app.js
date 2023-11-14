@@ -7,6 +7,7 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
+import { WebSocketServer } from 'ws'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
@@ -61,6 +62,24 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500)
   res.send('error')
+})
+
+// Création d'un serveur WebSocket sur le port 3001.
+const wss = new WebSocketServer({
+  port: 3001
+})
+
+// Attend qu'un client se connecte
+wss.on('connection', function connection (ws) {
+  console.log('Un client est connecté.')
+
+  // Envoyer un message de "bonjour" au client
+  ws.send('Bonjour')
+
+  // Quand on reçoit un message du client, on le note dans la console.
+  ws.on('message', function incoming (message) {
+    console.log('reçu: %s', message)
+  })
 })
 
 export default app
