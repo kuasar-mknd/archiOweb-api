@@ -123,11 +123,14 @@ export const deleteUser = [
 
       // Supprimer chaque jardin associé
       for (const garden of gardens) {
+        console.log(`Deleting garden with ID: ${garden._id}`)
+
         // Trouver toutes les plantes associées au jardin
         const plants = await Plant.find({ garden: garden._id })
 
         // Supprimer chaque plante associée
         for (const plant of plants) {
+          console.log(`Deleting plant with ID: ${plant._id}`)
           await Plant.findByIdAndDelete(plant._id)
         }
 
@@ -136,11 +139,13 @@ export const deleteUser = [
       }
 
       // Supprimer l'utilisateur
+      console.log(`Deleting user with ID: ${req.user.userId}`)
       await User.findByIdAndDelete(req.user.userId)
 
       res.status(204).json({ message: 'User, associated gardens, and plants deleted' })
     } catch (error) {
-      res.status(500).json({ message: error.message })
+      console.error('Error deleting user:', error)
+      res.status(500).json({ message: 'Internal Server Error' })
     }
   }
 ]
