@@ -95,7 +95,7 @@ export const updateGarden = [
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
-      if (!isAdmin(req.user) && garden.user.toString() !== req.user.userId.toString()) {
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to update this garden' })
       }
 
@@ -136,12 +136,16 @@ export const deleteGarden = [
 
 // List the plants in a garden (gardenId)
 export const listPlantsInGarden = [
+  verifyToken,
   validateGardenId,
   async (req, res) => {
     try {
       const garden = await Garden.findById(req.params.id).populate('plants')
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
+      }
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
+        return res.status(403).json({ message: 'Not authorized to get the plants from this garden' })
       }
       res.json(garden.plants)
     } catch (error) {

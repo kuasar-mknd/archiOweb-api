@@ -20,7 +20,6 @@ describe('User API Tests', function () {
   })
 
   beforeEach(async function () {
-    // Create a new user and get a token for testing
     const newUser = {
       identifier: 'testuser@example.com',
       firstName: 'John',
@@ -40,10 +39,9 @@ describe('User API Tests', function () {
       password: newUser.password
     })
 
-    token = res.body.token // Save the token for protected route tests
+    token = res.body.token
   })
 
-  // Test the registration of a new user
   describe('POST /api/users/register', function () {
     it('should register a new user', function (done) {
       chai.request(app)
@@ -64,6 +62,7 @@ describe('User API Tests', function () {
           done()
         })
     })
+
     it('should not register a user with existing email', async function () {
       chai.request(app)
         .post('/api/users/register')
@@ -84,7 +83,6 @@ describe('User API Tests', function () {
     })
   })
 
-  // Test the login functionality
   describe('POST /api/users/login', function () {
     it('should authenticate a user and return a token', function (done) {
       chai.request(app)
@@ -162,15 +160,4 @@ describe('User API Tests', function () {
       // ...
     })
   })
-
-  // Add more tests for getUserById, updateUser, deleteUser as needed
-
-  // Test fetching a user by ID
-  // ...
-
-  // Test updating a user's information
-  // ...
-
-  // Test deleting a user
-  // ...
 })

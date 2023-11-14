@@ -102,7 +102,6 @@ export const updateUser = [
       const body = req.body
       const user = await User.findById(req.user.userId)
       if (!user) return res.status(404).json({ message: 'User not found' })
-      console.log('test')
       const updatedUser = await User.findByIdAndUpdate(req.user.userId, body, { new: true }).select('-password')
       res.json(updatedUser)
     } catch (error) {

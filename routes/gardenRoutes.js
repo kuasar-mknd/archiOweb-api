@@ -4,6 +4,7 @@ import {
   getAllGardens,
   getGardenById,
   updateGarden,
+  listPlantsInGarden,
   deleteGarden
 } from '../controllers/gardenController.js'
 
@@ -193,5 +194,8 @@ router.put('/:id', verifyToken, updateGarden)
 
 // Route pour supprimer un jardin spécifique par son ID
 router.delete('/:id', verifyToken, deleteGarden)
+
+// Route pour récupérer les plantes d'un jardin
+router.get('/:id/plants', verifyToken, listPlantsInGarden)
 
 export default router

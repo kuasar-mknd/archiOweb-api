@@ -115,7 +115,23 @@ describe('Plants API Tests', function () {
       expect(res).to.have.status(401)
     })
 
-    // Ajoutez plus de tests pour d'autres cas d'erreur
+    it('should return error 400 when error in data is detected', async function () {
+      const plantData = {
+        commonName: 'Nom commun',
+        scientificName: 'Nom scientifique',
+        family: 'Famille de la plante',
+        exposure: 'Full Sun',
+        garden: 'nonexistent-id'
+      }
+      const res = await chai.request(app)
+        .post('/api/plants')
+        .set('Authorization', `Bearer ${token}`)
+        .send(plantData)
+
+      expect(res).to.have.status(400)
+    })
+
+    // TO DO gérer erreur 403
   })
 
   describe('GET /api/plants', function () {
