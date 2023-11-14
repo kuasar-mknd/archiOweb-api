@@ -13,7 +13,7 @@ export const createPlant = [
   async (req, res) => {
     try {
       const bodyGarden = req.body.garden
-      const garden = await Garden.findById({ $eq: bodyGarden })
+      const garden = await Garden.findById(bodyGarden) // Correction ici
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -22,6 +22,11 @@ export const createPlant = [
       }
       const plant = new Plant({ ...req.body, user: req.user._id })
       const savedPlant = await plant.save()
+
+      // Ajouter la plante créée à la liste des plantes du jardin
+      garden.plants.push(savedPlant._id)
+      await garden.save() // Sauvegarder les modifications du jardin
+
       res.status(201).json(savedPlant)
     } catch (error) {
       res.status(400).json({ message: error.message })
