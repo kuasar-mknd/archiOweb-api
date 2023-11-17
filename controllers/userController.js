@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import { body, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
 import verifyToken from '../middlewares/verifyToken.js'
+import Garden from '../models/gardenModel.js'
+import Plant from '../models/plantModel.js'
 
 /*
 const checkOwnershipOrRole = (user, resourceUserId) => {
@@ -109,16 +111,35 @@ export const updateUser = [
 ]
 
 export const deleteUser = [
-  verifyToken, // Middleware to verify the JWT token
+  verifyToken,
   async (req, res) => {
     try {
       const user = await User.findById(req.user.userId)
       if (!user) return res.status(404).json({ message: 'User not found' })
 
+      // Trouver tous les jardins associés à l'utilisateur
+      const gardens = await Garden.find({ user: req.user.userId })
+
+      // Supprimer chaque jardin associé
+      for (const garden of gardens) {
+        // Trouver toutes les plantes associées au jardin
+        const plants = await Plant.find({ garden: garden._id })
+
+        // Supprimer chaque plante associée
+        for (const plant of plants) {
+          await Plant.findByIdAndDelete(plant._id)
+        }
+
+        // Supprimer le jardin
+        await Garden.findByIdAndDelete(garden._id)
+      }
+
+      // Supprimer l'utilisateur
       await User.findByIdAndDelete(req.user.userId)
-      res.status(204).json({ message: 'User deleted' })
+
+      res.status(204).json({ message: 'User, associated gardens, and plants deleted' })
     } catch (error) {
-      res.status(500).json({ message: error.message })
+      res.status(500).json({ message: 'Internal Server Error' })
     }
   }
 ]
