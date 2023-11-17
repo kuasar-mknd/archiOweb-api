@@ -40,6 +40,7 @@ export const validateGarden = [
 
 export const validateGardenId = (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    console.log('Invalid garden ID')
     return res.status(404).json({ message: 'Invalid garden ID' })
   }
   next()

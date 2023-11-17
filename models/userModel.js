@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema(
   {
@@ -12,11 +11,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
-
-// Méthode pour comparer le mot de passe fourni avec le hash enregistré
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password)
-}
 
 const User = mongoose.model('User', userSchema)
 
