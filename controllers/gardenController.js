@@ -71,9 +71,10 @@ export const getGardenById = [
   validateGardenId,
   async (req, res) => {
     try {
-      console.log('test')
       const garden = await Garden.findById(req.params.id).populate('plants')
-      console.log('test')
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
       res.json(garden)
     } catch (error) {
       res.status(500).json({ message: 'Failed to retrieve garden', error: error.message })
@@ -96,9 +97,6 @@ export const updateGarden = [
       }
 
       const updatedGarden = await Garden.findByIdAndUpdate(id, { name, location }, { new: true })
-      if (!updatedGarden) {
-        return res.status(404).json({ message: 'Garden not found' })
-      }
       res.json(updatedGarden)
     } catch (error) {
       res.status(500).json({ message: 'Failed to update garden', error: error.message })
@@ -116,10 +114,7 @@ export const deleteGarden = [
       if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
       }
-      const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
-      if (!deletedGarden) {
-        return res.status(404).json({ message: 'Garden not found' })
-      }
+      await Garden.findByIdAndDelete(req.params.id)
       res.status(204).send()
     } catch (error) {
       res.status(500).json({ message: 'Failed to delete garden', error: error.message })
@@ -134,9 +129,6 @@ export const listPlantsInGarden = [
   async (req, res) => {
     try {
       const garden = await Garden.findById(req.params.id).populate('plants')
-      if (!garden) {
-        return res.status(404).json({ message: 'Garden not found' })
-      }
       if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to get the plants from this garden' })
       }

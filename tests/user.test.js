@@ -185,7 +185,7 @@ describe('User API Tests', function () {
     })
   })
 
-  describe('DELETE /api/users/:id', function () {
+  describe('DELETE /api/users', function () {
     it('should delete a user', async function () {
       const res = await chai.request(app)
         .delete('/api/users/')
@@ -206,6 +206,39 @@ describe('User API Tests', function () {
 
       // Reconnecter la base de données
       await connectDB()
+    })
+
+    it('should delete a user and associated gardens', async function () {
+      // Create a garden
+      const res = await chai.request(app)
+        .post('/api/gardens')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: 'Test Garden',
+          location: {
+            type: 'Point',
+            coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.have.property('name', 'Test Garden')
+
+      // Delete the user
+      const res2 = await chai.request(app)
+        .delete('/api/users/')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res2).to.have.status(204)
+
+      // Check that the garden was deleted
+      const res3 = await chai.request(app)
+        .get(`/api/gardens/${res.body._id}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      console.log(res3.body)
+
+      expect(res3).to.have.status(404)
     })
   })
 
