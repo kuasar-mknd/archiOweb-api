@@ -201,7 +201,7 @@ router.get('/', verifyToken, getAllPlants)
  *       401:
  *         description: No token, authorization denied.
  *       200:
- *         description: Plant details
+ *         description: Plant detailss
  *         content:
  *           application/json:
  *             schema:
