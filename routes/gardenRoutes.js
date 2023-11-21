@@ -82,8 +82,8 @@ const router = express.Router()
  *         description: Bad request, token is not valid.
  *       401:
  *         description: No token, authorization denied.
- *       404:
- *         description: Garden not found, Invalid garden ID.
+ *       488:
+ *         description: Incorrect content.
  *       500:
  *         description: Internal Server Error.
  */
@@ -127,7 +127,7 @@ router.get('/', getAllGardens)
  *             schema:
  *               $ref: '#/components/schemas/Garden'
  *       404:
- *         description: Garden not found
+ *         description: Garden not found, Invalid garden ID.
  */
 
 // Route pour récupérer un jardin spécifique par son ID
@@ -139,6 +139,8 @@ router.get('/:id', getGardenById)
  *   put:
  *     summary: Met à jour les informations d'un jardin
  *     tags: [Gardens]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -146,8 +148,6 @@ router.get('/:id', getGardenById)
  *         description: ID unique du jardin
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -156,15 +156,19 @@ router.get('/:id', getGardenById)
  *             $ref: '#/components/schemas/Garden'
  *     responses:
  *       200:
- *         description: Jardin mis à jour
+ *         description: Updated garden
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Garden'
  *       400:
- *         description: Erreur dans la mise à jour
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to update this garden.
  *       404:
- *         description: Jardin non trouvé
+ *         description: Garden not found, Invalid garden ID.
  *       500:
  *         description: Internal Server Error.
  */
@@ -178,6 +182,8 @@ router.put('/:id', verifyToken, updateGarden)
  *   delete:
  *     summary: Supprime un jardin
  *     tags: [Gardens]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -185,15 +191,17 @@ router.put('/:id', verifyToken, updateGarden)
  *         description: ID unique du jardin
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       204:
- *         description: Jardin supprimé avec succès
+ *         description: Garden successfully deleted
  *       400:
- *         description: Erreur dans la suppression
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to delete this garden.
  *       404:
- *         description: Jardin non trouvé
+ *         description: Garden not found, Invalid garden ID.
  *       500:
  *        description: Internal Server Error.
  */
