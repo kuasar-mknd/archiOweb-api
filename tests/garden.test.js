@@ -69,21 +69,48 @@ describe('Garden API Tests', function () {
 
   // Test cases
   describe('GET /api/gardens', function () {
-    it('should get all gardens', function (done) {
-      chai.request(app)
+    it('should get all gardens', async function () {
+      const res = await chai.request(app)
         .get('/api/gardens')
-        .set('Authorization', `Bearer ${token}`) // Use the auth token
-        .end((err, res) => {
-          expect(err).to.be.equal(null)
-          expect(res).to.have.status(200)
-          expect(res.body).to.be.an('array')
-          done()
-        })
+        .set('Authorization', `Bearer ${token}`)
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('array')
+    })
+
+    it('should get gardens near a specific location', async function () {
+      const res = await chai.request(app)
+        .get('/api/gardens?lat=40.7128&lng=-74.0060')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('array')
+    })
+
+    it('should return an error for invalid lat/lng', async function () {
+      const res = await chai.request(app)
+        .get('/api/gardens?lat=invalid&lng=invalid')
+        .set('Authorization', `Bearer ${token}`)
+      expect(res).to.have.status(400)
+      expect(res.body).to.have.property('message', 'Invalid latitude or longitude')
+    })
+
+    it('should return 500 for server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const res = await chai.request(app)
+        .get('/api/gardens')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(500)
+
+      // Reconnecter la base de données
+      await connectDB()
     })
   })
 
   describe('POST /api/gardens', function () {
-    it('should create a new garden', function (done) {
+    it('should create a new garden', async function () {
       const gardenData = {
         name: 'Mon jardin',
         location: {
@@ -91,58 +118,101 @@ describe('Garden API Tests', function () {
           coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
         }
       }
-      chai.request(app)
+      const res = await chai.request(app)
         .post('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token
         .send(gardenData)
-        .end((err, res) => {
-          expect(err).to.be.equal(null)
-          expect(res).to.have.status(201)
-          expect(res.body).to.have.property(
-            'name',
-            'Mon jardin'
-          )
-          done()
-        })
+      expect(res).to.have.status(201)
+      expect(res.body).to.have.property(
+        'name',
+        'Mon jardin'
+      )
     })
 
-    it('should return an error for missing garden name', function (done) {
+    it('should return an error for missing garden properties', async function () {
       const gardenData = {
         location: {
           type: 'Point',
           coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
         }
       }
-      chai.request(app)
+      const res = await chai.request(app)
         .post('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token
         .send(gardenData)
-        .end((err, res) => {
-          expect(res).to.have.status(400)
-          expect(err).to.be.equal(null)
-          done()
-        })
+      expect(res).to.have.status(400)
+    })
+
+    it('should return 401 for unauthenticated user', async function () {
+      const gardenData = {
+        name: 'Mon jardin',
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447]
+        }
+      }
+      const res = await chai.request(app)
+        .post('/api/gardens')
+        .send(gardenData)
+      expect(res).to.have.status(401)
+    })
+
+    it('should return 500 server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const gardenData = {
+        name: 'Mon jardin',
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447]
+        }
+      }
+      const res = await chai.request(app)
+        .post('/api/gardens')
+        .set('Authorization', `Bearer ${token}`) // Use the auth token
+        .send(gardenData)
+      expect(res).to.have.status(500)
+      // Reconnecter la base de données
+      await connectDB()
     })
   })
 
   // Récupération d'un Jardin Spécifique par ID
   describe('GET /api/gardens/:id', function () {
-    it('should get a specific garden by ID', function (done) {
-      chai.request(app)
+    it('should get a specific garden by ID', async function () {
+      const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          expect(err).to.be.equal(null)
-          expect(res).to.have.status(200)
-          expect(res.body).to.have.property('_id', createdGardenId)
-          done()
-        })
+      expect(res).to.have.status(200)
+      expect(res.body).to.have.property('_id', createdGardenId)
+    })
+
+    it('should return an error for invalid garden ID', async function () {
+      const res = await chai.request(app)
+        .get('/api/gardens/invalid-id')
+        .set('Authorization', `Bearer ${token}`)
+      expect(res).to.have.status(404)
+    })
+
+    it('should return error 500 for server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const res = await chai.request(app)
+        .get('/api/gardens/' + createdGardenId)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(500)
+
+      // Reconnecter la base de données
+      await connectDB()
     })
   })
 
   // Mise à Jour d'un Jardin
   describe('PUT /api/gardens/:id', function () {
-    it('should update a garden', function (done) {
+    it('should update a garden', async function () {
       const updatedGardenData = {
         name: 'Jardin Mis à Jour',
         location: {
@@ -150,18 +220,15 @@ describe('Garden API Tests', function () {
           coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
         }
       }
-      chai.request(app)
+      const res = await chai.request(app)
         .put('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
         .send(updatedGardenData)
-        .end((err, res) => {
-          expect(err).to.be.equal(null)
-          expect(res).to.have.status(200)
-          expect(res.body).to.have.property('name', 'Jardin Mis à Jour')
-          done()
-        })
+      expect(res).to.have.status(200)
+      expect(res.body).to.have.property('name', 'Jardin Mis à Jour')
     })
-    it('should return an error for invalid garden ID', function (done) {
+
+    it('should return an error for invalid garden ID', async function () {
       const updatedGardenData = {
         name: 'Jardin Mis à Jour 2',
         location: {
@@ -169,18 +236,15 @@ describe('Garden API Tests', function () {
           coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
         }
       }
-      chai.request(app)
+      const res = await chai.request(app)
         .put('/api/gardens/invalid-id')
         .set('Authorization', `Bearer ${token}`)
         .send(updatedGardenData)
-        .end((err, res) => {
-          expect(res).to.have.status(404)
-          expect(res.body).to.have.property('message', 'Invalid garden ID')
-          expect(err).to.be.equal(null)
-          done()
-        })
+      expect(res).to.have.status(404)
+      expect(res.body).to.have.property('message', 'Invalid garden ID')
     })
-    it('should return an error for unauthenticate user', function (done) {
+
+    it('should return an error for unauthenticate user', async function () {
       const updatedGardenData = {
         name: 'Jardin Mis à Jour 2',
         location: {
@@ -188,15 +252,12 @@ describe('Garden API Tests', function () {
           coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
         }
       }
-      chai.request(app)
+      const res = await chai.request(app)
         .put('/api/gardens/' + createdGardenId)
         .send(updatedGardenData)
-        .end((err, res) => {
-          expect(res).to.have.status(401)
-          expect(err).to.be.equal(null)
-          done()
-        })
+      expect(res).to.have.status(401)
     })
+
     it('should return an error for unauthorize user', async function () {
       // Créer un nouvel utilisateur et login
       const newUser = {
@@ -226,57 +287,100 @@ describe('Garden API Tests', function () {
           coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
         }
       }
-      chai.request(app)
+      res = await chai.request(app)
         .put('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
         .send(updatedGardenData)
-        .end((err, res) => {
-          expect(res).to.have.status(403)
-          expect(err).to.be.equal(null)
-        })
+      expect(res).to.have.status(403)
+    })
+
+    it('should return 500 server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const updatedGardenData = {
+        name: 'Jardin Mis à Jour 2',
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
+        }
+      }
+      const res = await chai.request(app)
+        .put('/api/gardens/' + createdGardenId)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updatedGardenData)
+
+      expect(res).to.have.status(500)
+
+      // Reconnecter la base de données
+      await connectDB()
     })
   })
 
   // Suppression d'un Jardin
   describe('DELETE /api/gardens/:id', function () {
-    it('should delete a garden', function (done) {
-      chai.request(app)
+    it('should delete a garden', async function () {
+      const res = await chai.request(app)
         .delete('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          expect(err).to.be.equal(null)
-          expect(res).to.have.status(204)
-          done()
-        })
+      expect(res).to.have.status(204)
     })
-  })
 
-  describe('GET /api/gardens with query parameters', function () {
-    it('should get gardens near a specific location', function (done) {
-      chai.request(app)
-        .get('/api/gardens?lat=40.7128&lng=-74.0060')
+    it('should return an error for invalid garden ID', async function () {
+      const res = await chai.request(app)
+        .delete('/api/gardens/invalid-id')
         .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          expect(err).to.be.equal(null)
-          expect(res).to.have.status(200)
-          expect(res.body).to.be.an('array')
-          done()
-        })
+      expect(res).to.have.status(404)
+      expect(res.body).to.have.property('message', 'Invalid garden ID')
     })
 
-    it('should return an error for invalid lat/lng', function (done) {
-      chai.request(app)
-        .get('/api/gardens?lat=invalid&lng=invalid')
+    it('should return an error for unauthenticate user', async function () {
+      const res = await chai.request(app)
+        .delete('/api/gardens/' + createdGardenId)
+      expect(res).to.have.status(401)
+    })
+
+    it('should return 403 for unauthorize user', async function () {
+      // Créer un nouvel utilisateur et login
+      const newUser = {
+        identifier: 'usertest2@exemple.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'password'
+      }
+      // Register a new user
+      let res = await chai
+        .request(app)
+        .post('/api/users/register')
+        .send(newUser)
+
+      // Log in to get a token
+      res = await chai.request(app).post('/api/users/login').send({
+        identifier: newUser.identifier,
+        password: newUser.password
+      })
+
+      token = res.body.token
+
+      res = await chai.request(app)
+        .delete('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          expect(res).to.have.status(400)
-          expect(res.body).to.have.property('message', 'Invalid latitude or longitude')
-          expect(err).to.be.equal(null)
-          done()
-        })
+      expect(res).to.have.status(403)
     })
 
-    // Plus de tests pour la pagination et autres scénarios
+    it('should return 500 server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const res = await chai.request(app)
+        .delete('/api/gardens/' + createdGardenId)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(500)
+
+      // Reconnecter la base de données
+      await connectDB()
+    })
   })
 
   describe('GET /api/gardens/:id/plants', function () {
@@ -284,7 +388,7 @@ describe('Garden API Tests', function () {
       const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId + '/plants')
         .set('Authorization', `Bearer ${token}`)
-
+      console.log(res.status)
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
     })
@@ -299,7 +403,7 @@ describe('Garden API Tests', function () {
     })
 
     it('should return 403 for unauthorized access', async function () {
-      // Créer un nouvel utilisateur et login
+    // Créer un nouvel utilisateur et login
       const newUser = {
         identifier: 'usertest2@exemple.com',
         firstName: 'John',
@@ -327,6 +431,18 @@ describe('Garden API Tests', function () {
       expect(res.body).to.have.property('message', 'Not authorized to get the plants from this garden')
     })
 
-    // Vous pouvez ajouter plus de tests pour d'autres cas de figure
+    it('should return 500 server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const res = await chai.request(app)
+        .get('/api/gardens/' + createdGardenId + '/plants')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(500)
+
+      // Reconnecter la base de données
+      await connectDB()
+    })
   })
 })
