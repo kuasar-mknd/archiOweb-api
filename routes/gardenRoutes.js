@@ -51,6 +51,8 @@ const router = express.Router()
  *   post:
  *     tags:
  *       - Gardens
+ *     security:
+ *       - bearerAuth: []
  *     summary: Crée un jardin
  *     description: This route allows you to register a new garden.
  *     requestBody:
@@ -77,7 +79,11 @@ const router = express.Router()
  *       201:
  *         description: Graden registered successfully.
  *       400:
- *         description: Bad request.
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       404:
+ *         description: Garden not found, Invalid garden ID.
  *       500:
  *         description: Internal Server Error.
  */
@@ -91,6 +97,8 @@ router.post('/', verifyToken, createGarden)
  *     summary: Récupère la liste de tous les jardins
  *     tags: [Gardens]
  *     responses:
+ *       400:
+ *        description: Bad request,Invalid latitude or longitude.
  *       500:
  *         description: Internal Server Error.
 
@@ -111,17 +119,15 @@ router.get('/', getAllGardens)
  *         description: ID du jardin
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Détails du jardin
+ *         description: Garden details
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Garden'
  *       404:
- *         description: Jardin non trouvé
+ *         description: Garden not found
  */
 
 // Route pour récupérer un jardin spécifique par son ID
