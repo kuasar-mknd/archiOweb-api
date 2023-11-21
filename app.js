@@ -7,7 +7,6 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import { startWebSocketServer } from './lib/websocket.js'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
@@ -63,7 +62,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.send('error')
 })
-
-startWebSocketServer()
 
 export default app
