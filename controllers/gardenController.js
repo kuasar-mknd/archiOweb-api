@@ -54,7 +54,7 @@ export const getAllGardens = async (req, res) => {
         $near: {
           $geometry: {
             type: 'Point',
-            coordinates: [parseFloat(lng), parseFloat(lat)] // longitude, latitude
+            coordinates: [parseFloat(lat), parseFloat(lng)] // longitude, latitude
           },
           $maxDistance: radius
         }
