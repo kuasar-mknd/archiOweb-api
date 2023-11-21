@@ -94,8 +94,10 @@ const router = express.Router()
  *   post:
  *     tags:
  *       - Plants
+ *     security:
+ *       - bearerAuth: []
  *     summary: Crée une plante
- *     description: Cette route vous permet d'enregistrer une nouvelle plante.
+ *     description: This route allows you to register a new plant.
  *     requestBody:
  *       required: true
  *       content:
@@ -138,11 +140,19 @@ const router = express.Router()
  *                 type: string
  *               garden:
  *                 type: string
-*     responses:
+ *     responses:
  *       201:
  *         description: Plant registered successfully.
  *       400:
- *         description: Bad request.
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: No token, authorization denied.
+ *       404:
+ *         description: Bad request, token is not valid.
+ *       488:
+ *         description: Incorrect Content.
  *       500:
  *         description: Internal Server Error.
  */
@@ -155,7 +165,13 @@ router.post('/', verifyToken, createPlant)
  *   get:
  *     summary: Récupère la liste de toutes les plantes
  *     tags: [Plants]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
+ *       400:
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
  *       500:
  *         description: Internal Server Error.
  */
@@ -168,6 +184,8 @@ router.get('/', verifyToken, getAllPlants)
  *   get:
  *     summary: Récupère une plante spécifique par son ID
  *     tags: [Plants]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -178,14 +196,18 @@ router.get('/', verifyToken, getAllPlants)
  *     responses:
  *       500:
  *         description: Internal Server Error.
+ *       400:
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
  *       200:
- *         description: Détails de la plante
+ *         description: Plant details
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Garden'
  *       404:
- *         description: Plante non trouvée
+ *         description: Invalid plant ID
  */
 
 // Route pour récupérer une plante spécifique par son ID
@@ -219,9 +241,15 @@ router.get('/:id', verifyToken, getPlantById)
  *             schema:
  *               $ref: '#/components/schemas/Plant'
  *       400:
- *         description: Erreur dans la mise à jour
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to update this plant.
  *       404:
- *         description: Plante non trouvée
+ *         description: Invalid plant ID.
+ *       488:
+ *         description: Incorrect Content.
  *       500:
  *         description: Internal Server Error.
  */
@@ -245,11 +273,15 @@ router.put('/:id', verifyToken, updatePlant)
  *       - bearerAuth: []
  *     responses:
  *       204:
- *         description: Plante supprimée avec succès
+ *         description: Plante deleted
  *       400:
- *         description: Erreur dans la suppression
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to delete this plant.
  *       404:
- *         description: Plante non trouvée
+ *         description: Invalid plant ID or Garden not found.
  *       500:
  *        description: Internal Server Error.
  */
