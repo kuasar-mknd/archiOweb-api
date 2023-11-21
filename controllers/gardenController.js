@@ -1,5 +1,6 @@
 import Garden from '../models/gardenModel.js'
 import User from '../models/userModel.js'
+import Plant from '../models/plantModel.js'
 
 // middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
@@ -111,10 +112,25 @@ export const deleteGarden = [
   async (req, res) => {
     try {
       const garden = await Garden.findById(req.params.id)
+      if (!garden) {
+        return res.status(404).json({ message: 'Garden not found' })
+      }
+
       if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
       }
+
+      // Trouver toutes les plantes associées au jardin
+      const plants = await Plant.find({ garden: req.params.id })
+
+      // Supprimer chaque plante associée au jardin supprimé
+      for (const plant of plants) {
+        await Plant.findByIdAndDelete(plant._id)
+      }
+
+      // Supprimer le jardin
       await Garden.findByIdAndDelete(req.params.id)
+
       res.status(204).send()
     } catch (error) {
       res.status(500).json({ message: 'Failed to delete garden', error: error.message })
