@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { body, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
 import verifyToken from '../middlewares/verifyToken.js'
+import createWebSocketConnection from '../lib/clientWebsocket.js'
 
 /*
 const checkOwnershipOrRole = (user, resourceUserId) => {
@@ -83,6 +84,8 @@ export const loginUser = [
         )
 
         res.json({ message: 'Auth successful', token })
+        /*  Ligne Ajoutée : Si la connection est bonne, il devrait envoyer un message au WebSocketServer */
+        createWebSocketConnection()
       } else {
         res.status(401).json({ message: 'Auth failed' })
       }
