@@ -7,7 +7,7 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import startWebSocketServer from './lib/websocket.js'
+import { startWebSocketServer } from './lib/websocket.js'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
