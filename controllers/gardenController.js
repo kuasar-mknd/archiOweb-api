@@ -1,6 +1,5 @@
 import Garden from '../models/gardenModel.js'
 import User from '../models/userModel.js'
-import mongoose from 'mongoose'
 import Plant from '../models/plantModel.js'
 
 // middleware imports
@@ -117,7 +116,7 @@ export const deleteGarden = [
         return res.status(404).json({ message: 'Garden not found' })
       }
 
-      if (!isAdmin(req.user) && garden.user.toString() !== req.user.userId.toString()) {
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
       }
 
@@ -130,7 +129,7 @@ export const deleteGarden = [
       }
 
       // Supprimer le jardin
-      const deletedGarden = await Garden.findByIdAndDelete(req.params.id)
+      await Garden.findByIdAndDelete(req.params.id)
 
       res.status(204).send()
     } catch (error) {
