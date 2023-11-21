@@ -8,8 +8,13 @@ import app from '../app.js'
 import createDebugger from 'debug'
 import http from 'http'
 import { connectDB } from '../config/database.js'
+import { startWebSocketServer } from '../lib/websocket.js'
 
 connectDB()
+
+if (process.env.NODE_ENV !== 'test') {
+  startWebSocketServer()
+}
 
 const debug = createDebugger('archioweb-api:server')
 /**
