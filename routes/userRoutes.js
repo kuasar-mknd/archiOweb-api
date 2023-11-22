@@ -89,7 +89,9 @@ const router = express.Router()
  *       201:
  *         description: User registered successfully.
  *       400:
- *         description: Bad request.
+ *         description: Bad request, user already exists.
+ *       488:
+ *         description: A valid email is required or password must be at least 6 characters long.
  *       500:
  *         description: Internal Server Error.
  */
@@ -129,13 +131,36 @@ router.post('/register', registerUser)
  *                   type: string
  *                   description: Token JWT pour authentification
  *       400:
- *         description: Données d'entrée invalides
+ *         description: Données d'entrée invalides.
  *       401:
- *         description: Authentification échouée
+ *         description: Authentification Auth failed.
+ *       488:
+ *         description: A valid email is required or password must be at least 6 characters long.
  *       500:
  *         description: Internal Server Error.
  */
 router.post('/login', loginUser)
+
+/**
+ * @swagger
+ * /api/users/gardens:
+ *   get:
+ *     summary: liste les gardens des users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       400:
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *        description: Internal Server Error.
+ */
+
+router.get('/gardens', verifyToken, listUserGardens)
 
 /**
  * @swagger
@@ -166,9 +191,11 @@ router.post('/login', loginUser)
  *             schema:
  *               $ref: '#/components/schemas/User'
  *       400:
- *         description: Erreur dans la mise à jour
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
  *       404:
- *         description: Utilisateur non trouvé
+ *         description: User not found.
  *       500:
  *         description: Internal Server Error.
  */
@@ -191,16 +218,16 @@ router.put('/', verifyToken, updateUser)
  *       - bearerAuth: []
  *     responses:
  *       204:
- *         description: Utilisateur supprimé avec succès
+ *         description: User, associated gardens, and plants deleted.
  *       400:
- *         description: Erreur dans la suppression
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
  *       404:
- *         description: Utilisateur non trouvé
+ *         description: User not found.
  *       500:
  *        description: Internal Server Error.
  */
 router.delete('/', verifyToken, deleteUser)
-
-router.get('/gardens', verifyToken, listUserGardens)
 
 export default router
