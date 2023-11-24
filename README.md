@@ -1,50 +1,95 @@
-# archiOweb-api
+# HomeGarden API REST
 
-# HomeGarden
+HomeGarden est une API REST conçue pour gérer des jardins et des plantes, intégrant des données météorologiques en temps réel et des fonctionnalités de notification via WebSocket.
 
-[https://www.aujardin.info/plantes/viola-odorata.php](https://www.aujardin.info/plantes/viola-odorata.php])
+## Fonctionnalités
 
-## But définir des rappels d’entretien
+- Gestion des utilisateurs : inscription, connexion et gestion des profils.
+- Gestion des jardins : création, mise à jour, suppression, et recherche géospatiale.
+- Gestion des plantes : ajout, mise à jour, et suppression dans les jardins.
+- Intégration de données météorologiques pour chaque jardin.
+- Notifications WebSocket pour des mises à jour météorologiques et des rappels de jardinage.
+- Filtrage avancé et pagination des données.
+- Authentification JWT pour sécuriser l'accès aux endpoints.
 
-### Utilisateur (possède 0-N jardin) :
+## Technologies Utilisées
 
--   Identifiant\*
--   Nom
--   Prenom
--   date de naissance
--   Mot de passe\*
--   Date et heure de création
--   Dernière date de modification
+- Node.js
+- Express.js
+- MongoDB
+- WebSocket
+- Axios
+- Mocha et Chai pour les tests
 
-### Plante (appartient à 1 jardin)
+## Installation
 
--   Nom familier (list)
--   Nom officielle latin \*
--   Famille \*
--   Description
--   Origine (Europe, Inde ..) (On peut imaginer pointer sur une liste de pays ou de région prédéfini)
--   Exposition (soleil, ombre, mi-ombre)
--   Entretien (arrosage)
--   Type de sol (riche, léger)
--   Couleurs des fleurs
--   Hauteur [cm]
--   Floraison (fac)
--   Date de plantation (saison)
--   Soins nécessaires
--   Image (fac)
--   Utilisation (massif, couvre-sol, pelouse, alimentaire, médicinale, parfum)
--   ID_Jardin
+Clonez le dépôt et installez les dépendances :
 
-### Jardin (possède 0-N plante(s) et appartient à 1 utilisateur)
+```bash
+git clone [URL du dépôt]
+cd archioweb-api
+npm install
+```
 
--   Nom du jardin\*
--   Liste de plantes cultivées
--   Localisation (géolocalisation)\*
--   ID_Utilisateur
--   Date de création
--   Dernière date de modification
+## Configuration
 
-### Fonctions téléphones
+Créez un fichier .env à la racine du projet et ajoutez-y les configurations nécessaires :
+```env
+PORT=3000
+DB_URI=mongodb://localhost:27017/mydb
+JWT_SECRET=monsecretjwt
+```
 
--   Géolocalisation du jardin
--   photos des plantes
+## Démarrage
+Lancez l'API en mode développement :
+```bash
+npm run dev
+```
+Lancez l'API en mode production :
+```bash
+npm run start
+```
+
+## Utilisation
+Exemples de requêtes :
+```http
+GET /api/gardens
+POST /api/users/register
+Content-Type: application/json
+
+{
+  "identifier": "email@example.com",
+  "password": "password"
+}
+```
+
+## Tests
+Exécutez les tests unitaires et d'intégration :
+```bash
+npm run test
+```
+Exécuter les tests unitaires et d'intégration avec coverage :
+```bash
+npm run coverage
+```
+
+## Lint
+Exécutez le lint esLint
+```bash
+npm run lint
+```
+
+## Sécurité
+Exécutez les tests de sécurité
+```bash
+npm run lint
+```
+
+## WebSockets
+Utilisez WebSocket pour recevoir des notifications en temps réel sur la météo des jardins et des alertes de jardinage.
+
+## Documentation API
+Consultez la documentation Swagger pour une liste complète des endpoints et modèles de données : [Swagger](https://homegarden.onrender.com/api-docs/)
+
+## Déploiement
+Suivez ces instructions pour déployer l'API sur votre serveur ou plateforme cloud de choix.
