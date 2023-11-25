@@ -388,7 +388,6 @@ describe('Garden API Tests', function () {
       const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId + '/plants')
         .set('Authorization', `Bearer ${token}`)
-      console.log(res.status)
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
     })
