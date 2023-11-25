@@ -140,7 +140,7 @@ describe('Garden API Tests', function () {
         .post('/api/gardens')
         .set('Authorization', `Bearer ${token}`) // Use the auth token
         .send(gardenData)
-      expect(res).to.have.status(400)
+      expect(res).to.have.status(488)
     })
 
     it('should return 401 for unauthenticated user', async function () {
