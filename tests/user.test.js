@@ -87,7 +87,7 @@ describe('User API Tests', function () {
           lastName: 'User'
         })
 
-      expect(res).to.have.status(400)
+      expect(res).to.have.status(488)
     })
 
     it('should return error 500 for server errors', async function () {
@@ -235,8 +235,6 @@ describe('User API Tests', function () {
       const res3 = await chai.request(app)
         .get(`/api/gardens/${res.body._id}`)
         .set('Authorization', `Bearer ${token}`)
-
-      console.log(res3.body)
 
       expect(res3).to.have.status(404)
     })

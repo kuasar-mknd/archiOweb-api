@@ -115,7 +115,7 @@ describe('Plants API Tests', function () {
       expect(res).to.have.status(401)
     })
 
-    it('should return error 400 when error in data is detected', async function () {
+    it('should return error 488 when error in data is detected', async function () {
       const plantData = {
         commonName: 'Nom commun',
         scientificName: 'Nom scientifique',
@@ -128,7 +128,7 @@ describe('Plants API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
         .send(plantData)
 
-      expect(res).to.have.status(400)
+      expect(res).to.have.status(488)
     })
 
     it('should return error 403 when user is not authorized to add plants to the garden', async function () {
