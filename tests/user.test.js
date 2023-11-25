@@ -236,8 +236,6 @@ describe('User API Tests', function () {
         .get(`/api/gardens/${res.body._id}`)
         .set('Authorization', `Bearer ${token}`)
 
-      console.log(res3.body)
-
       expect(res3).to.have.status(404)
     })
   })
