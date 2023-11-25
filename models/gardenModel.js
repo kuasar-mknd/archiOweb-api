@@ -6,6 +6,12 @@ const gardenSchema = new mongoose.Schema({
     type: { type: String, enum: ['Point'], required: true },
     coordinates: { type: [Number], required: true }
   },
+  weather: {
+    temperature: Number,
+    skyCondition: String,
+    precipitationNext48h: Number,
+    lastUpdated: Date
+  },
   plants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },

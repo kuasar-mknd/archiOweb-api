@@ -8,12 +8,17 @@ import app from '../app.js'
 import createDebugger from 'debug'
 import http from 'http'
 import { connectDB } from '../config/database.js'
-import { startWebSocketServer } from '../lib/websocket.js'
+import wss from '../lib/websocket.js'
+import { cronUpdateGarden } from '../cron/updateGardenWeather.js'
 
-connectDB()
+await connectDB()
+cronUpdateGarden()
 
 if (process.env.NODE_ENV !== 'test') {
-  startWebSocketServer()
+  process.on('SIGINT', () => {
+    wss.close()
+    process.exit()
+  })
 }
 
 const debug = createDebugger('archioweb-api:server')

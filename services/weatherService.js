@@ -33,7 +33,8 @@ export const getWeatherData = async (location) => {
     return {
       temperature: currentTemperature,
       skyCondition,
-      precipitationNext48h: totalPrecipitation
+      precipitationNext48h: totalPrecipitation,
+      lastUpdated: new Date()
     }
   } catch (error) {
     throw new Error('Erreur lors de la récupération des données météorologiques.')

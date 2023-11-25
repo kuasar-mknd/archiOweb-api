@@ -7,8 +7,8 @@
         "node": ">=20.9.0"
     },
     "scripts": {
-        "start": "node --trace-deprecation ./bin/start",
-        "dev": "nodemon --trace-deprecation ./bin/start",
+        "start": "node ./bin/start",
+        "dev": "nodemon ./bin/start",
         "test": "NODE_ENV=test mocha tests --recursive ",
         "coverage": "c8 npm test",
         "format": "prettier --write .",
@@ -30,6 +30,7 @@
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.0.1",
         "morgan": "~1.10.0",
+        "node-cron": "^3.0.3",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.0",
         "ws": "^8.14.2"
