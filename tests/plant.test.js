@@ -185,6 +185,24 @@ describe('Plants API Tests', function () {
       expect(res).to.have.status(500)
       await connectDB()
     })
+
+    it('should return error 404 when garden does not exist', async function () {
+      const plantData = {
+        commonName: 'Nom commun',
+        scientificName: 'Nom scientifique',
+        family: 'Famille de la plante',
+        exposure: 'Full Sun',
+        garden: createdGardenId
+      }
+      // Delete the garden
+      await Garden.findByIdAndDelete(createdGardenId)
+      const res = await chai.request(app)
+        .post('/api/plants')
+        .set('Authorization', `Bearer ${token}`)
+        .send(plantData)
+
+      expect(res).to.have.status(404)
+    })
   })
 
   describe('GET /api/plants', function () {
@@ -342,7 +360,20 @@ describe('Plants API Tests', function () {
       await connectDB()
     })
 
-    // TO DO : erreur 404 si garden n'existe pas mais je sais pas comment faire
+    it('should return 404 when garden does not exist', async function () {
+      const updatedData = {
+        commonName: 'Nom commun mis à jour',
+        scientificName: 'Nom scientifique mis à jour'
+      }
+      // delete the garden
+      await Garden.findByIdAndDelete(createdGardenId)
+      const res = await chai.request(app)
+        .put('/api/plants/' + plantId)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updatedData)
+
+      expect(res).to.have.status(404)
+    })
   })
 
   describe('DELETE /api/plants/:id', function () {
@@ -411,6 +442,14 @@ describe('Plants API Tests', function () {
       await connectDB()
     })
 
-    // Ajoutez d'autres tests pour d'autres cas
+    it('should return 404 when garden does not exist', async function () {
+      // delete the garden
+      await Garden.findByIdAndDelete(createdGardenId)
+      const res = await chai.request(app)
+        .delete('/api/plants/' + plantId)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(404)
+    })
   })
 })

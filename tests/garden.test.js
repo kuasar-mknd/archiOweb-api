@@ -320,7 +320,19 @@ describe('Garden API Tests', function () {
   // Suppression d'un Jardin
   describe('DELETE /api/gardens/:id', function () {
     it('should delete a garden', async function () {
-      const res = await chai.request(app)
+      // create plants in the garden
+      const plantData = {
+        commonName: 'Nom commun',
+        scientificName: 'Nom scientifique',
+        family: 'Famille de la plante',
+        exposure: 'Full Sun',
+        garden: createdGardenId
+      }
+      let res = await chai.request(app)
+        .post('/api/plants')
+        .set('Authorization', `Bearer ${token}`)
+        .send(plantData)
+      res = await chai.request(app)
         .delete('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
       expect(res).to.have.status(204)
@@ -436,6 +448,68 @@ describe('Garden API Tests', function () {
 
       const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId + '/plants')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(500)
+
+      // Reconnecter la base de données
+      await connectDB()
+    })
+  })
+
+  describe('GET /api/gardens/:id/plants/aggregate', function () {
+    it('should aggregate plants in a specific garden', async function () {
+      const res = await chai.request(app)
+        .get('/api/gardens/' + createdGardenId + '/plants/aggregate')
+        .set('Authorization', `Bearer ${token}`)
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('array')
+    })
+
+    it('should return 404 for a non-existent garden', async function () {
+      const res = await chai.request(app)
+        .get('/api/gardens/nonexistent-id/plants/aggregate')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.have.property('message', 'Invalid garden ID')
+    })
+
+    it('should return 403 for unauthorized access', async function () {
+    // Créer un nouvel utilisateur et login
+      const newUser = {
+        identifier: 'usertest2@exemple.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'password'
+      }
+      // Register a new user
+      await chai
+        .request(app)
+        .post('/api/users/register')
+        .send(newUser)
+
+      // Log in to get a token
+      let res = await chai.request(app).post('/api/users/login').send({
+        identifier: newUser.identifier,
+        password: newUser.password
+      })
+
+      token = res.body.token
+      res = await chai.request(app)
+        .get('/api/gardens/' + createdGardenId + '/plants/aggregate')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.have.property('message', 'Not authorized to get the plants from this garden')
+    })
+
+    it('should return 500 server error', async function () {
+      // Déconnecter la base de données
+      await disconnectDB()
+
+      const res = await chai.request(app)
+        .get('/api/gardens/' + createdGardenId + '/plants/aggregate')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)

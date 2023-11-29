@@ -5,7 +5,8 @@ import {
   getGardenById,
   updateGarden,
   listPlantsInGarden,
-  deleteGarden
+  deleteGarden,
+  getGardenAggregation
 } from '../controllers/gardenController.js'
 
 // Middleware pour vérifier l'authentification
@@ -211,5 +212,8 @@ router.delete('/:id', verifyToken, deleteGarden)
 
 // Route pour récupérer les plantes d'un jardin
 router.get('/:id/plants', verifyToken, listPlantsInGarden)
+
+// Route pour récupérer aggrégation des plantes d'un jardin
+router.get('/:id/plants/aggregate', verifyToken, getGardenAggregation)
 
 export default router

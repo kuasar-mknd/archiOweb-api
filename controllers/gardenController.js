@@ -1,6 +1,7 @@
 import Garden from '../models/gardenModel.js'
 import User from '../models/userModel.js'
 import Plant from '../models/plantModel.js'
+import mongoose from 'mongoose'
 
 // middleware imports
 import verifyToken from '../middlewares/verifyToken.js'
@@ -112,9 +113,6 @@ export const deleteGarden = [
   async (req, res) => {
     try {
       const garden = await Garden.findById(req.params.id)
-      if (!garden) {
-        return res.status(404).json({ message: 'Garden not found' })
-      }
 
       if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
@@ -155,6 +153,44 @@ export const listPlantsInGarden = [
   }
 ]
 
+export const getGardenAggregation = [
+  verifyToken,
+  validateGardenId,
+  async (req, res) => {
+    try {
+      const { ObjectId } = mongoose.Types
+      const gardenId = new ObjectId(req.params.id)
+      const garden = await Garden.findById(req.params.id).populate('plants')
+      if (!isAdmin(req.user) || garden.user.toString() !== req.user.userId.toString()) {
+        return res.status(403).json({ message: 'Not authorized to get the plants from this garden' })
+      }
+      const aggregation = await Garden.aggregate([
+        {
+          $match: { _id: gardenId }
+        },
+        {
+          $lookup: {
+            from: Plant.collection.name,
+            localField: '_id',
+            foreignField: 'garden',
+            as: 'plants'
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            numberOfPlants: { $size: '$plants' }
+          }
+        }
+      ])
+
+      res.json(aggregation)
+    } catch (error) {
+      res.status(500).send(error.message)
+    }
+  }
+]
+
 // Export all controller functions
 export default {
   createGarden,
@@ -162,7 +198,8 @@ export default {
   getGardenById,
   updateGarden,
   deleteGarden,
-  listPlantsInGarden
+  listPlantsInGarden,
+  getGardenAggregation
 }
 
 function isNumeric (value) {

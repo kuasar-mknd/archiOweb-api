@@ -183,11 +183,55 @@ describe('User API Tests', function () {
       // Reconnecter la base de données
       await connectDB()
     })
+
+    it('should return 404 for non-existent user', async function () {
+      const updateData = {
+        identifier: 'testusernew@example.com'
+      }
+      // delete user
+      await chai.request(app)
+        .delete('/api/users/')
+        .set('Authorization', `Bearer ${token}`)
+      const res = await chai.request(app)
+        .put('/api/users')
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData)
+
+      expect(res).to.have.status(404)
+    })
   })
 
   describe('DELETE /api/users', function () {
     it('should delete a user', async function () {
-      const res = await chai.request(app)
+      const gardenData = {
+        name: 'Mon jardin',
+        location: {
+          type: 'Point',
+          coordinates: [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]
+        }
+      }
+      let res = await chai.request(app)
+        .post('/api/gardens')
+        .set('Authorization', `Bearer ${token}`) // Use the auth token
+        .send(gardenData)
+      expect(res).to.have.status(201)
+
+      const createdGardenId = res.body._id
+
+      const plantData = {
+        commonName: 'Nom commun',
+        scientificName: 'Nom scientifique',
+        family: 'Famille de la plante',
+        exposure: 'Full Sun',
+        garden: createdGardenId
+      }
+      res = await chai.request(app)
+        .post('/api/plants')
+        .set('Authorization', `Bearer ${token}`)
+        .send(plantData)
+      expect(res).to.have.status(201)
+
+      res = await chai.request(app)
         .delete('/api/users/')
         .set('Authorization', `Bearer ${token}`)
 
@@ -237,6 +281,18 @@ describe('User API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res3).to.have.status(404)
+    })
+
+    it('should return 404 for non-existent user', async function () {
+      await chai.request(app)
+        .delete('/api/users/')
+        .set('Authorization', `Bearer ${token}`)
+
+      const res = await chai.request(app)
+        .delete('/api/users/')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(404)
     })
   })
 
