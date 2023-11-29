@@ -351,6 +351,18 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Aggregation",
+			"id": "25970676-b684-4dd8-ab89-c32dac72a8f0",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	],
 	"event": [
