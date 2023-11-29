@@ -210,6 +210,34 @@ router.put('/:id', verifyToken, updateGarden)
 // Route pour supprimer un jardin spécifique par son ID
 router.delete('/:id', verifyToken, deleteGarden)
 
+/**
+ * @swagger
+ * /api/gardens/{id}/plants:
+ *   get:
+ *     summary: Récupère les plantes d'un jardin
+ *     tags: [Gardens]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID du jardin
+ *         schema:
+ *           type: string
+ *     responses:
+ *       400:
+ *         description: Bad request,Token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to get plants in this garden.
+ *       404:
+ *         description: Garden not found, Invalid garden ID.
+ *       500:
+ *         description: Internal Server Error.
+ */
+
 // Route pour récupérer les plantes d'un jardin
 router.get('/:id/plants', verifyToken, listPlantsInGarden)
 
