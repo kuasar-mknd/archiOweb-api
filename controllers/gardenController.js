@@ -186,7 +186,7 @@ export const getGardenAggregation = [
 
       res.json(aggregation)
     } catch (error) {
-      res.status(500).send(error.message)
+      res.status(500).send({ message: 'Not authorized to get the plants from this garden' })
     }
   }
 ]
