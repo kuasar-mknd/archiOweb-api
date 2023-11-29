@@ -52,9 +52,33 @@ npm run start
 
 ## Utilisation
 
-Pour commencer vous devrez créer un utilisateur.
+Pour commencer à utiliser :
 
-La commande à entrer dans Postman se trouve dans ce doc au lien suivant https://homegarden.onrender.com/api-docs/ et voir sous "Users" -> "POST - Enregistre un nouvel utilisateur"
+Pour les commandes Postman à venir veuillez-vous référer au lien suivant -> https://homegarden.onrender.com/api-docs/
+
+Vous devrez maintenant créer un utilisateur. La commande à entrer dans Postman se trouve sous "Users" -> "POST - Enregistre un nouvel utilisateur" et utiliser précisement l'identifier et le mot de passe suivant :
+{
+  "identifier": "user@example.com",
+  "lastName": "VotreNom",
+  "firstName": "VotrePrenom",
+  "password": "yourSecurePassword"
+}
+
+Pour se loguer :
+
+Toujours dans le même site, vous trouverez les infos de la commande Postman pour s'authentifier dans "Users" Utiliser l'identifiant et le mot de passe du point précédent cela vous retournera : "Authentifie un utilisateur et retourne un token".
+
+Dans votre postman, créer dans votre Envrionment une variable authToken du type que vous voulez et dans currentValue mettez votre token sans les guillements.
+
+Vous êtes maintenant authentifié et pouvez créer des jardins.
+
+Créer un jardin :
+
+Pour créer le jardin, utilisez la commande "POST - Créer un jardin", mettez votre identifiant sous user et votre localisation est de type point et ressemblera à ça -> {
+  "name": "string",
+  "location": { "type": "Point", "coordinates": [ 41.40338, 2.17403 ]},
+  "user": "65674e770705a2f373b4ae13"
+}
 
 ```
 
@@ -82,6 +106,15 @@ npm run lint
 
 ## WebSockets
 Utilisez WebSocket pour recevoir des notifications en temps réel sur la météo des jardins et des alertes de jardinage.
+
+Le WebSocket nécessite l'existence et la création du compte identifier: 'user@example.com' et password: 'yourSecurePassword'.
+
+Vous pouvez désormais lancer la commande 'npm run clientWS'. Vous devriez recevoir la réponse : 
+Connected to the server
+Message from server: []
+[]
+
+
 
 ## Documentation API
 Consultez la documentation Swagger pour une liste complète des endpoints et modèles de données : [Swagger](https://homegarden.onrender.com/api-docs/)
