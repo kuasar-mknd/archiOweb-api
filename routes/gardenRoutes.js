@@ -266,7 +266,7 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *       404:
  *         description: Garden not found, Invalid garden ID.
  *       500:
- *         description: Internal Server Error.
+ *         description: Internal Server Error (Not authorized to get the plants from this garden).
  */
 
 // Route pour récupérer aggrégation des plantes d'un jardin
