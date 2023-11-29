@@ -92,7 +92,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Mon jardin\",\r\n  \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [-73.856077, 40.848447] // Exemple de coordonnées [longitude, latitude]\r\n  }\r\n}\r\n",
+					"raw": "{\r\n  \"name\": \"Mon jardin de test 3\",\r\n  \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [48.8566, 2.3522] // Exemple de coordonnées [longitude, latitude]\r\n  }\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -359,8 +359,37 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/gardens/:id/plants/aggregate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"gardens",
+						":id",
+						"plants",
+						"aggregate"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
 			},
 			"response": []
 		}
