@@ -257,16 +257,16 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     schema:
  *       type: string
  *     responses:
- * 400:
- * description: Bad request,Token is not valid.
- * 401:
- * description: No token, authorization denied.
- * 403:
- * description: Not authorized to get plants in this garden.
- * 404:
- * description: Garden not found, Invalid garden ID.
- * 500:
- * description: Internal Server Error.
+ *       400:
+ *         description: Bad request,Token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to get plants in this garden.
+ *       404:
+ *         description: Garden not found, Invalid garden ID.
+ *       500:
+ *         description: Internal Server Error.
  */
 
 // Route pour récupérer aggrégation des plantes d'un jardin
