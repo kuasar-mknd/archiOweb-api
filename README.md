@@ -51,16 +51,11 @@ npm run start
 ```
 
 ## Utilisation
-Exemples de requêtes :
-```http
-GET /api/gardens
-POST /api/users/register
-Content-Type: application/json
 
-{
-  "identifier": "email@example.com",
-  "password": "password"
-}
+Pour commencer vous devrez créer un utilisateur.
+
+La commande à entrer dans Postman se trouve dans ce doc au lien suivant https://homegarden.onrender.com/api-docs/ et voir sous "Users" -> "POST - Enregistre un nouvel utilisateur"
+
 ```
 
 ## Tests
