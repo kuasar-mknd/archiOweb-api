@@ -22,7 +22,6 @@ const router = express.Router()
  *         - identifier
  *         - firstName
  *         - lastName
- *         - birthDate
  *         - password
  *         - gardens
  *       properties:
