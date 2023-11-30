@@ -70,12 +70,20 @@ const router = express.Router()
  *             properties:
  *               name:
  *                 type: string
+ *                 default: potagé
+ *                 description: Le nom du jardin
  *               location:
  *                 type: string
+ *                 default: { type: Point, coordinates: [41.40338, 2.17403]}
+ *                 description: La localisation du jardin en coordonnées GPS
  *               plants:
  *                 type: string
+ *                 default: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
+ *                 description: Les plantes du jardin
  *               user:
  *                 type: string
+ *                 default: John Doe
+ *                 description: L'utilisateur du jardin
  *     responses:
  *       200:
  *         description: Authentification réussie, token retourné
@@ -167,11 +175,15 @@ router.get('/:id', getGardenById)
  *             $ref: '#/components/schemas/Garden'
  *     responses:
  *       200:
- *         description: Updated garden
+ *         description: Authentification réussie, token retourné
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Garden'
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
