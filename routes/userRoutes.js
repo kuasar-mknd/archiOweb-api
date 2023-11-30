@@ -76,14 +76,19 @@ const router = express.Router()
  *             properties:
  *               identifier:
  *                 type: string
+ *                 default:  jone@gmail.com
  *               firstName:
  *                 type: string
+ *                 default: john
  *               lastName:
  *                 type: string
+ *                 default: doe
  *               birthDate:
  *                 type: string
+ *                 default: 1990-01-01
  *               password:
  *                 type: string
+ *                 default: password123
  *     responses:
  *       201:
  *         description: User registered successfully.
@@ -114,9 +119,11 @@ router.post('/register', registerUser)
  *             properties:
  *               identifier:
  *                 type: string
+ *                 default:  john@gmail.com
  *                 description: Email ou nom d'utilisateur pour l'authentification
  *               password:
  *                 type: string
+ *                 default: password123
  *                 description: Mot de passe pour l'authentification
  *     responses:
  *       200:
@@ -147,8 +154,18 @@ router.post('/login', loginUser)
  *     summary: liste les gardens des users
  *     tags: [Users]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -174,8 +191,6 @@ router.get('/gardens', verifyToken, listUserGardens)
  *         description: ID unique de l'utilisateur
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
