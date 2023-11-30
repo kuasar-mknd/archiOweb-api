@@ -76,7 +76,7 @@ const router = express.Router()
  *             properties:
  *               identifier:
  *                 type: string
- *                 default:  jone@gmail.com
+ *                 default:  john@gmail.com
  *               firstName:
  *                 type: string
  *                 default: john
@@ -180,30 +180,45 @@ router.get('/gardens', verifyToken, listUserGardens)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users:
  *   put:
  *     summary: Met à jour les informations d'un utilisateur
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID unique de l'utilisateur
- *         schema:
- *           type: string
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               identifier:
+ *                 type: string
+ *                 example:  john@gmail.com
+ *               firstName:
+ *                 type: string
+ *                 example: john
+ *               lastName:
+ *                 type: string
+ *                 example: doe
+ *               birthDate:
+ *                 type: string
+ *                 example: 1990-01-01
+ *               password:
+ *                 type: string
+ *                 example: password123
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -217,19 +232,12 @@ router.put('/', verifyToken, updateUser)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users:
  *   delete:
  *     summary: Supprime un utilisateur
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID unique de l'utilisateur
- *         schema:
- *           type: string
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       204:
  *         description: User, associated gardens, and plants deleted.
