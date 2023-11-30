@@ -22,7 +22,6 @@ const router = express.Router()
  *         - identifier
  *         - firstName
  *         - lastName
- *         - birthDate
  *         - password
  *         - gardens
  *       properties:
@@ -34,7 +33,7 @@ const router = express.Router()
  *           description: Le prénom d'utilisateur
  *         lastName:
  *           type: string
- *           format: email
+ *           format: string
  *           description: Le nom d'utilisateur
  *         birthDate:
  *          type: string
