@@ -215,6 +215,16 @@ router.put('/:id', verifyToken, updateGarden)
  *         schema:
  *           type: string
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       204:
  *         description: Garden successfully deleted
  *       400:
