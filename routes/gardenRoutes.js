@@ -172,7 +172,23 @@ router.get('/:id', getGardenById)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Garden'
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 default: potagé
+ *                 description: Le nom du jardin
+ *               location:
+ *                 type: string
+ *                 default: { type: Point, coordinates: [41.40338, 2.17403]}
+ *                 description: La localisation du jardin en coordonnées GPS
+ *               plants:
+ *                 type: string
+ *                 default: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
+ *                 description: Les plantes du jardin
+ *               user:
+ *                 type: string
+ *                 default: John Doe
+ *                 description: L'utilisateur du jardin
  *     responses:
  *       200:
  *         description: Authentification réussie, token retourné
@@ -258,6 +274,16 @@ router.delete('/:id', verifyToken, deleteGarden)
  *         schema:
  *           type: string
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request,Token is not valid.
  *       401:
@@ -289,6 +315,16 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     schema:
  *       type: string
  *     responses:
+*       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request,Token is not valid.
  *       401:
