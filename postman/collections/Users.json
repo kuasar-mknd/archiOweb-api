@@ -54,7 +54,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"identifier\": \"user@example.com\",\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Doe\",\r\n  \"password\": \"yourSecurePassword\"\r\n}\r\n",
+					"raw": "{\r\n  \"identifier\": \"user_{{timestamp}}@example.com\",\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Doe\",\r\n  \"password\": \"yourSecurePassword\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
