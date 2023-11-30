@@ -53,7 +53,7 @@ const router = express.Router()
  *     tags:
  *       - Gardens
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     summary: Crée un jardin
  *     description: This route allows you to register a new garden.
  *     requestBody:
@@ -159,7 +159,7 @@ router.get('/:id', getGardenById)
  *     summary: Met à jour les informations d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -222,7 +222,7 @@ router.put('/:id', verifyToken, updateGarden)
  *     summary: Supprime un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -265,7 +265,7 @@ router.delete('/:id', verifyToken, deleteGarden)
  *     summary: Récupère les plantes d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -306,7 +306,7 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     summary: Récupère l'aggrégation des plantes d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *     name: id
