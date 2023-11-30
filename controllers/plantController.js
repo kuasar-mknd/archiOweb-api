@@ -14,6 +14,9 @@ export const createPlant = [
     try {
       const bodyGarden = req.body.garden
       const garden = await Garden.findById(bodyGarden)
+      if (req.file) {
+        req.body.imageUrl = req.file.path // URL de l'image
+      }
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }
@@ -71,6 +74,9 @@ export const updatePlant = [
       const body = req.body
       const plant = await Plant.findById(req.params.id)
       const garden = await Garden.findById(plant.garden)
+      if (req.file) {
+        req.body.imageUrl = req.file.path // URL de l'image
+      }
       if (!garden) {
         return res.status(404).json({ message: 'Garden not found' })
       }

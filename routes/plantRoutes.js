@@ -9,6 +9,7 @@ import {
 
 // Middleware pour vérifier l'authentification
 import verifyToken from '../middlewares/verifyToken.js'
+import { parser } from '../config/cloudinary.js'
 
 const router = express.Router()
 /**
@@ -158,7 +159,7 @@ const router = express.Router()
  */
 
 // Route pour créer une nouvelle plante
-router.post('/', verifyToken, createPlant)
+router.post('/', verifyToken, parser.single('image'), createPlant)
 /**
  * @swagger
  * /api/plants:
@@ -255,7 +256,7 @@ router.get('/:id', verifyToken, getPlantById)
  */
 
 // Route pour mettre à jour une plante spécifique par son ID
-router.put('/:id', verifyToken, updatePlant)
+router.put('/:id', verifyToken, parser.single('image'), updatePlant)
 /**
  * @swagger
  * /api/plants/{id}:
