@@ -84,7 +84,7 @@ Vous pouvez également utiliser efficacement les websockets pour avoir la mété
 Créer une plante dans un jardin
 
 Pour créer une plante, vous pouvez utiliser le JSON suivant, mais vous devez y ajouter l'id de votre jardin.
-
+```
 {
   "commonName": "Margueritte",
   "scientificName": "Marguerittus",
