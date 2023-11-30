@@ -53,7 +53,7 @@ const router = express.Router()
  *     tags:
  *       - Gardens
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     summary: Crée un jardin
  *     description: This route allows you to register a new garden.
  *     requestBody:
@@ -70,13 +70,31 @@ const router = express.Router()
  *             properties:
  *               name:
  *                 type: string
+ *                 default: potagé
+ *                 description: Le nom du jardin
  *               location:
  *                 type: string
+ *                 default: { type: Point, coordinates: [41.40338, 2.17403]}
+ *                 description: La localisation du jardin en coordonnées GPS
  *               plants:
  *                 type: string
+ *                 default: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
+ *                 description: Les plantes du jardin
  *               user:
  *                 type: string
+ *                 default: John Doe
+ *                 description: L'utilisateur du jardin
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       201:
  *         description: Graden registered successfully.
  *       400:
@@ -141,7 +159,7 @@ router.get('/:id', getGardenById)
  *     summary: Met à jour les informations d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -154,14 +172,34 @@ router.get('/:id', getGardenById)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Garden'
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 default: potagé
+ *                 description: Le nom du jardin
+ *               location:
+ *                 type: string
+ *                 default: { type: Point, coordinates: [41.40338, 2.17403]}
+ *                 description: La localisation du jardin en coordonnées GPS
+ *               plants:
+ *                 type: string
+ *                 default: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
+ *                 description: Les plantes du jardin
+ *               user:
+ *                 type: string
+ *                 default: John Doe
+ *                 description: L'utilisateur du jardin
  *     responses:
  *       200:
- *         description: Updated garden
+ *         description: Authentification réussie, token retourné
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Garden'
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -184,7 +222,7 @@ router.put('/:id', verifyToken, updateGarden)
  *     summary: Supprime un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -193,6 +231,16 @@ router.put('/:id', verifyToken, updateGarden)
  *         schema:
  *           type: string
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       204:
  *         description: Garden successfully deleted
  *       400:
@@ -217,7 +265,7 @@ router.delete('/:id', verifyToken, deleteGarden)
  *     summary: Récupère les plantes d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -226,6 +274,16 @@ router.delete('/:id', verifyToken, deleteGarden)
  *         schema:
  *           type: string
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request,Token is not valid.
  *       401:
@@ -248,7 +306,7 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     summary: Récupère l'aggrégation des plantes d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *     name: id
@@ -257,6 +315,16 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     schema:
  *       type: string
  *     responses:
+*       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *         description: Bad request,Token is not valid.
  *       401:
