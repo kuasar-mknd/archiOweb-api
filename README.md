@@ -124,7 +124,12 @@ Le WebSocket nécessite l'existence et la création du compte identifier: 'user@
 
 Il vous faudra également un jardin. Vous recevrez la météo, mais pour recevoir les jardins environnants des vôtres, nous vous conseillons d'utiliser des coordonnées proches de [48.8565, 2.3525].
 
-Vous pouvez désormais lancer la commande 'npm run clientWS'. Vous devriez recevoir la réponse : 
+Vous pouvez désormais lancer la commande 
+```
+npm run clientWS
+```
+Vous devriez recevoir la réponse : 
+```
 Connected to the server
 Message from server: [{"location":{"type":"Point","coordinates":[48.8566,2.3522]},"_id":"656858370b4ee586c78255c2","name":"Big Havana","plants":[],"user":"65674e770705a2f373b4ae13","createdAt":"2023-11-30T09:39:03.529Z","updatedAt":"2023-11-30T09:39:03.529Z","__v":0}]
 [
@@ -148,7 +153,7 @@ Message from server: {"gardenId":"65684fdb0b4ee586c7825570","weather":{"temperat
     precipitationNext48h: 13.3
   }
 }
-
+```
 Ce texte correspond à la météo de la localisation de votre jardin et vous en recevez autant que vous avez de jardin.
 
 
