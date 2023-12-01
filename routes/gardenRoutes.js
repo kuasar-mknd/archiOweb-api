@@ -66,15 +66,34 @@ const router = express.Router()
  *                 description: La localisation du jardin en coordonnées GPS
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Details of garden registered successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 _id:
  *                   type: string
- *                   description: Token JWT pour authentification
+ *                 name:
+ *                   type: string
+ *                 plants:
+ *                   type: [string]
+ *                 user:
+ *                  type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *                 location:
+ *                   type: Point
+ *               example:
+ *                 location: { type: Point, coordinates: [number, number]}
+ *                 _id: string
+ *                 name: string
+ *                 plants: [string]
+ *                 user: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       201:
  *         description: Graden registered successfully.
  *       400:
@@ -103,15 +122,34 @@ router.post('/', verifyToken, createGarden)
  *         description: Numéro de la page à récupérer
  *     responses:
  *       200:
- *         description: Jardin récupéré avec succès
+ *         description: Garden list successfully retrieved
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 _id:
  *                   type: string
- *                   description: Token JWT pour authentification
+ *                 name:
+ *                   type: string
+ *                 plants:
+ *                   type: [string]
+ *                 user:
+ *                  type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *                 location:
+ *                   type: Point
+ *               example:
+ *                 location: { type: Point, coordinates: [number, number]}
+ *                 _id: string
+ *                 name: string
+ *                 plants: [string]
+ *                 user: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *        description: Bad request,Invalid latitude or longitude.
  *       500:
@@ -140,7 +178,30 @@ router.get('/', getAllGardens)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Garden'
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 plants:
+ *                   type: [string]
+ *                 user:
+ *                  type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *                 location:
+ *                   type: Point
+ *               example:
+ *                 location: { type: Point, coordinates: [number, number]}
+ *                 _id: string
+ *                 name: string
+ *                 plants: [string]
+ *                 user: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       404:
  *         description: Garden not found, Invalid garden ID.
  *       500:
@@ -181,15 +242,34 @@ router.get('/:id', getGardenById)
  *                 description: La localisation du jardin en coordonnées GPS
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Modification successfull
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 _id:
  *                   type: string
- *                   description: Token JWT pour authentification
+ *                 name:
+ *                   type: string
+ *                 plants:
+ *                   type: [string]
+ *                 user:
+ *                  type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *                 location:
+ *                   type: Point
+ *               example:
+ *                 location: { type: Point, coordinates: [number, number]}
+ *                 _id: string
+ *                 name: string
+ *                 plants: [string]
+ *                 user: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -222,15 +302,13 @@ router.put('/:id', verifyToken, updateGarden)
  *           type: string
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 message:
  *                   type: string
- *                   description: Token JWT pour authentification
  *       204:
  *         description: Garden successfully deleted
  *       400:
@@ -265,15 +343,67 @@ router.delete('/:id', verifyToken, deleteGarden)
  *           type: string
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Return plants in garden
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
- *                   type: string
- *                   description: Token JWT pour authentification
+ *                 commonName:
+ *                  type: string
+ *                 scientificName:
+ *                  type: string
+ *                 family:
+ *                  type: string
+ *                 origin:
+ *                  type: string
+ *                 exposure:
+ *                  type: string
+ *                 watering:
+ *                  type: string
+ *                 soilType:
+ *                  type: string
+ *                 flowerColor:
+ *                  type: string
+ *                 height:
+ *                  type: number
+ *                 bloomingSeason:
+ *                  type: string
+ *                 plantingSeason:
+ *                  type: string
+ *                 care:
+ *                  type: string
+ *                 imageUrl:
+ *                  type: string
+ *                 use:
+ *                  type: string
+ *                 garden:
+ *                  type: string
+ *                 _id:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *               example:
+ *                 commonName: string
+ *                 scientificName: string
+ *                 family: string
+ *                 origin: string
+ *                 exposure: string
+ *                 watering: string
+ *                 soilType: string
+ *                 flowerColor: string
+ *                 height: number
+ *                 bloomingSeason: string
+ *                 plantingSeason: string
+ *                 care: string
+ *                 imageUrl: string
+ *                 use: string
+ *                 garden: string
+ *                 _id: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request,Token is not valid.
  *       401:
@@ -298,6 +428,7 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     security:
  *       - BearerAuth: []
  *     parameters:
+ *       - in: path
  *         name: id
  *         required: true
  *         description: ID du jardin
@@ -305,15 +436,22 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *           type: string
  *     responses:
 *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Return plants in garden aggregation by name and number of plants
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
- *                   type: string
- *                   description: Token JWT pour authentification
+ *                 _id:
+ *                  type: string
+ *                 name:
+ *                  type: string
+ *                 numberofplants:
+ *                  type: number
+ *               example:
+ *                _id: string
+ *                name: string
+ *                numberofplants: number
  *       400:
  *         description: Bad request,Token is not valid.
  *       401:
