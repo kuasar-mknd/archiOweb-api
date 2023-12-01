@@ -301,14 +301,6 @@ router.put('/:id', verifyToken, updateGarden)
  *         schema:
  *           type: string
  *     responses:
- *       200:
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
  *       204:
  *         description: Garden successfully deleted
  *       400:
