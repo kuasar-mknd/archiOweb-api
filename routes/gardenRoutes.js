@@ -23,8 +23,6 @@ const router = express.Router()
  *       required:
  *         - name
  *         - location
- *         - plants
- *         - user
  *       properties:
  *         name:
  *           type: string
@@ -33,17 +31,9 @@ const router = express.Router()
  *           type: Point
  *           coordinates: [longitude, latitude]
  *           description: La localisation du jardin en coordonnées GPS
- *         plants:
- *          type: Array
- *          description: Les plantes du jardin
- *         user:
- *           type: string
- *           description: L'utilisateur du jardin
  *       example:
  *         name: potagé
  *         location: { type: Point, coordinates: [41.40338, 2.17403]}
- *         plants: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
- *         user: John Doe
  */
 
 /**
@@ -65,8 +55,6 @@ const router = express.Router()
  *             required:
  *               - name
  *               - location
- *               - plants
- *               - user
  *             properties:
  *               name:
  *                 type: string
@@ -76,14 +64,6 @@ const router = express.Router()
  *                 type: string
  *                 default: { type: Point, coordinates: [41.40338, 2.17403]}
  *                 description: La localisation du jardin en coordonnées GPS
- *               plants:
- *                 type: string
- *                 default: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
- *                 description: Les plantes du jardin
- *               user:
- *                 type: string
- *                 default: John Doe
- *                 description: L'utilisateur du jardin
  *     responses:
  *       200:
  *         description: Authentification réussie, token retourné
@@ -111,10 +91,16 @@ const router = express.Router()
 router.post('/', verifyToken, createGarden)
 /**
  * @swagger
- * /api/gardens:
+ * /api/gardens/:
  *   get:
  *     summary: Récupère la liste de tous les jardins
  *     tags: [Gardens]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Numéro de la page à récupérer
  *     responses:
  *       400:
  *        description: Bad request,Invalid latitude or longitude.
@@ -181,14 +167,6 @@ router.get('/:id', getGardenById)
  *                 type: string
  *                 default: { type: Point, coordinates: [41.40338, 2.17403]}
  *                 description: La localisation du jardin en coordonnées GPS
- *               plants:
- *                 type: string
- *                 default: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
- *                 description: Les plantes du jardin
- *               user:
- *                 type: string
- *                 default: John Doe
- *                 description: L'utilisateur du jardin
  *     responses:
  *       200:
  *         description: Authentification réussie, token retourné
