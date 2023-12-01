@@ -102,6 +102,16 @@ router.post('/', verifyToken, createGarden)
  *           type: integer
  *         description: Numéro de la page à récupérer
  *     responses:
+ *       200:
+ *         description: Jardin récupéré avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT pour authentification
  *       400:
  *        description: Bad request,Invalid latitude or longitude.
  *       500:
@@ -133,6 +143,8 @@ router.get('/', getAllGardens)
  *               $ref: '#/components/schemas/Garden'
  *       404:
  *         description: Garden not found, Invalid garden ID.
+ *       500:
+ *         description: Internal Server Error.
  */
 
 // Route pour récupérer un jardin spécifique par son ID
