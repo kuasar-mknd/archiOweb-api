@@ -163,9 +163,28 @@ router.post('/login', loginUser)
  *             schema:
  *               type: object
  *               properties:
- *                 token:
- *                   type: string
- *                   description: Token JWT pour authentification
+ *                 _id :
+ *                  type: string
+ *                 name:
+ *                  type: string
+ *                 plants:
+ *                  type: string
+ *                 user:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *                 location:
+ *                   type: Point
+ *               example:
+ *                 location: { type: Point, coordinates: [string, string]}
+ *                 _id: string
+ *                 name: string
+ *                 plants: [string]
+ *                 user: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
