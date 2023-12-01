@@ -95,7 +95,7 @@ const router = express.Router()
  *     tags:
  *       - Plants
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     summary: Crée une plante
  *     description: This route allows you to register a new plant.
  *     requestBody:
@@ -112,34 +112,49 @@ const router = express.Router()
  *             properties:
  *               commonName:
  *                 type: string
+ *                 default: Basilic
  *               scientificName:
  *                 type: string
+ *                 default: Ocimum basilicum
  *               family:
  *                 type: string
+ *                 default: Lamiaceae
  *               origin:
  *                 type: string
+ *                 default: Inde
  *               exposure:
  *                 type: string
+ *                 default: Full Sun
  *               watering:
  *                 type: string
+ *                 default: 1 fois par semaine
  *               soilType:
  *                 type: string
+ *                 default: terreau
  *               flowerColor:
  *                 type: string
+ *                 default: blanc
  *               height:
  *                 type: number
+ *                 default: 30
  *               bloomingSeason:
  *                 type: string
+ *                 default: été
  *               plantingSeason:
  *                 type: string
+ *                 default: printemps
  *               care:
  *                 type: string
+ *                 default: arroser régulièrement
  *               imageUrl:
  *                 type: string
+ *                 default: https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Basil-Basilico-Ocimum_basilicum-albahaca.jpg/1200px-Basil-Basilico-Ocimum_basilicum-albahaca.jpg
  *               use:
  *                 type: string
+ *                 default: Food
  *               garden:
  *                 type: string
+ *                 default: 60a4d1a6a7b6f8e1e4a0a6d2
  *     responses:
  *       201:
  *         description: Plant registered successfully.
@@ -166,7 +181,7 @@ router.post('/', verifyToken, createPlant)
  *     summary: Récupère la liste de toutes les plantes
  *     tags: [Plants]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       400:
  *         description: Bad request, token is not valid.
@@ -185,7 +200,7 @@ router.get('/', verifyToken, getAllPlants)
  *     summary: Récupère une plante spécifique par son ID
  *     tags: [Plants]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -226,7 +241,7 @@ router.get('/:id', verifyToken, getPlantById)
  *         schema:
  *           type: string
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -270,7 +285,7 @@ router.put('/:id', verifyToken, updatePlant)
  *         schema:
  *           type: string
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       204:
  *         description: Plante deleted
