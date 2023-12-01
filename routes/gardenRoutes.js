@@ -154,7 +154,7 @@ router.post('/', verifyToken, createGarden)
  *        description: Bad request,Invalid latitude or longitude.
  *       500:
  *         description: Internal Server Error.
-
+ *
  */
 
 // Route pour récupérer tous les jardins
