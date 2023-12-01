@@ -127,7 +127,7 @@ router.post('/register', registerUser)
  *                 description: Mot de passe pour l'authentification
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Authentication successful, token returned
  *         content:
  *           application/json:
  *             schema:
@@ -157,15 +157,36 @@ router.post('/login', loginUser)
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: List of successfully returned gardens
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
- *                   type: string
- *                   description: Token JWT pour authentification
+ *                 _id :
+ *                  type: string
+ *                 name:
+ *                  type: string
+ *                 plants:
+ *                  type: array
+ *                 items:
+ *                  type: string
+ *                 user:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *                 location:
+ *                   type: Point
+ *               example:
+ *                 location: { type: Point, coordinates: [number, number]}
+ *                 _id: string
+ *                 name: string
+ *                 plants: [string]
+ *                 user: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -210,15 +231,40 @@ router.get('/gardens', verifyToken, listUserGardens)
  *                 example: password123
  *     responses:
  *       200:
- *         description: Utilisateur mis à jour
+ *         description: Successful user update
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 _id :
+ *                  type: string
+ *                 identifier:
+ *                  type: string
+ *                 firstName:
+ *                  type: string
+ *                 lastName:
+ *                  type: string
+ *                 birthDate:
+ *                  type: string
+ *                 gardens:
+ *                  type: array
+ *                  items:
  *                   type: string
- *                   description: Token JWT pour authentification
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *               example:
+ *                 location: { type: Point, coordinates: [string, string]}
+ *                 _id: string
+ *                 identifier: string
+ *                 firstName: string
+ *                 lastName: string
+ *                 birthDate: string
+ *                 gardens: [string]
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
