@@ -168,6 +168,8 @@ router.post('/login', loginUser)
  *                 name:
  *                  type: string
  *                 plants:
+ *                  type: array
+ *                 items:
  *                  type: string
  *                 user:
  *                  type: string
@@ -178,7 +180,7 @@ router.post('/login', loginUser)
  *                 location:
  *                   type: Point
  *               example:
- *                 location: { type: Point, coordinates: [string, string]}
+ *                 location: { type: Point, coordinates: [number, number]}
  *                 _id: string
  *                 name: string
  *                 plants: [string]
@@ -229,15 +231,40 @@ router.get('/gardens', verifyToken, listUserGardens)
  *                 example: password123
  *     responses:
  *       200:
- *         description: Utilisateur mis à jour
+ *         description: Authentification réussie, token retourné
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 _id :
+ *                  type: string
+ *                 identifier:
+ *                  type: string
+ *                 firstName:
+ *                  type: string
+ *                 lastName:
+ *                  type: string
+ *                 birthDate:
+ *                  type: string
+ *                 gardens:
+ *                  type: array
+ *                  items:
  *                   type: string
- *                   description: Token JWT pour authentification
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *               example:
+ *                 location: { type: Point, coordinates: [string, string]}
+ *                 _id: string
+ *                 identifier: string
+ *                 firstName: string
+ *                 lastName: string
+ *                 birthDate: string
+ *                 gardens: [string]
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
