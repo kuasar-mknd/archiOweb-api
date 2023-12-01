@@ -79,7 +79,7 @@ const router = express.Router()
  *         watering: 1 fois par semaine
  *         soilType: terreau
  *         flowerColor: blanc
- *         height: 30 cm
+ *         height: 30
  *         bloomingSeason: été
  *         plantingSeason: printemps
  *         care: arroser régulièrement
@@ -158,6 +158,66 @@ const router = express.Router()
  *     responses:
  *       201:
  *         description: Plant registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                  type: string
+ *                 commonName:
+ *                  type: string
+ *                 scientificName:
+ *                  type: string
+ *                 family:
+ *                  type: string
+ *                 origin:
+ *                  type: string
+ *                 exposure:
+ *                  type: string
+ *                 watering:
+ *                  type: string
+ *                 soilType:
+ *                  type: string
+ *                 flowerColor:
+ *                  type: string
+ *                 height:
+ *                  type: number
+ *                 bloomingSeason:
+ *                  type: string
+ *                 plantingSeason:
+ *                  type: string
+ *                 care:
+ *                  type: string
+ *                 imageUrl:
+ *                  type: string
+ *                 use:
+ *                  type: string
+ *                 garden:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *               example:
+ *                 _id: string
+ *                 commonName: string
+ *                 scientificName: string
+ *                 family: string
+ *                 origin: string
+ *                 exposure: string
+ *                 watering: string
+ *                 soilType: string
+ *                 flowerColor: string
+ *                 height: number
+ *                 bloomingSeason: string
+ *                 plantingSeason: string
+ *                 care: string
+ *                 imageUrl: string
+ *                 use: string
+ *                 garden: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -183,6 +243,68 @@ router.post('/', verifyToken, createPlant)
  *     security:
  *       - BearerAuth: []
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                  type: string
+ *                 commonName:
+ *                  type: string
+ *                 scientificName:
+ *                  type: string
+ *                 family:
+ *                  type: string
+ *                 origin:
+ *                  type: string
+ *                 exposure:
+ *                  type: string
+ *                 watering:
+ *                  type: string
+ *                 soilType:
+ *                  type: string
+ *                 flowerColor:
+ *                  type: string
+ *                 height:
+ *                  type: number
+ *                 bloomingSeason:
+ *                  type: string
+ *                 plantingSeason:
+ *                  type: string
+ *                 care:
+ *                  type: string
+ *                 imageUrl:
+ *                  type: string
+ *                 use:
+ *                  type: string
+ *                 garden:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *               example:
+ *                 _id: string
+ *                 commonName: string
+ *                 scientificName: string
+ *                 family: string
+ *                 origin: string
+ *                 exposure: string
+ *                 watering: string
+ *                 soilType: string
+ *                 flowerColor: string
+ *                 height: number
+ *                 bloomingSeason: string
+ *                 plantingSeason: string
+ *                 care: string
+ *                 imageUrl: string
+ *                 use: string
+ *                 garden: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -216,6 +338,8 @@ router.get('/', verifyToken, getAllPlants)
  *             schema:
  *               type: object
  *               properties:
+ *                 _id:
+ *                  type: string
  *                 commonName:
  *                  type: string
  *                 scientificName:
@@ -246,13 +370,12 @@ router.get('/', verifyToken, getAllPlants)
  *                  type: string
  *                 garden:
  *                  type: string
- *                 _id:
- *                  type: string
  *                 createdAt:
  *                  type: string
  *                 updatedAt:
  *                  type: string
  *               example:
+ *                 _id: string
  *                 commonName: string
  *                 scientificName: string
  *                 family: string
@@ -268,7 +391,6 @@ router.get('/', verifyToken, getAllPlants)
  *                 imageUrl: string
  *                 use: string
  *                 garden: string
- *                 _id: string
  *                 createdAt: string
  *                 updatedAt: string
  *       500:
@@ -306,11 +428,67 @@ router.get('/:id', verifyToken, getPlantById)
  *             $ref: '#/components/schemas/Plant'
  *     responses:
  *       200:
- *         description: Plante mise à jour avec succès
+ *         description: Authentification réussie, token retourné
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Plant'
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                  type: string
+ *                 commonName:
+ *                  type: string
+ *                 scientificName:
+ *                  type: string
+ *                 family:
+ *                  type: string
+ *                 origin:
+ *                  type: string
+ *                 exposure:
+ *                  type: string
+ *                 watering:
+ *                  type: string
+ *                 soilType:
+ *                  type: string
+ *                 flowerColor:
+ *                  type: string
+ *                 height:
+ *                  type: number
+ *                 bloomingSeason:
+ *                  type: string
+ *                 plantingSeason:
+ *                  type: string
+ *                 care:
+ *                  type: string
+ *                 imageUrl:
+ *                  type: string
+ *                 use:
+ *                  type: string
+ *                 garden:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *               example:
+ *                 _id: string
+ *                 commonName: string
+ *                 scientificName: string
+ *                 family: string
+ *                 origin: string
+ *                 exposure: string
+ *                 watering: string
+ *                 soilType: string
+ *                 flowerColor: string
+ *                 height: number
+ *                 bloomingSeason: string
+ *                 plantingSeason: string
+ *                 care: string
+ *                 imageUrl: string
+ *                 use: string
+ *                 garden: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
