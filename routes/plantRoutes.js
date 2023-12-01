@@ -209,18 +209,74 @@ router.get('/', verifyToken, getAllPlants)
  *         required: true
  *         description: ID de la plante
  *     responses:
+ *       200:
+ *         description: Authentification réussie, token retourné
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 commonName:
+ *                  type: string
+ *                 scientificName:
+ *                  type: string
+ *                 family:
+ *                  type: string
+ *                 origin:
+ *                  type: string
+ *                 exposure:
+ *                  type: string
+ *                 watering:
+ *                  type: string
+ *                 soilType:
+ *                  type: string
+ *                 flowerColor:
+ *                  type: string
+ *                 height:
+ *                  type: number
+ *                 bloomingSeason:
+ *                  type: string
+ *                 plantingSeason:
+ *                  type: string
+ *                 care:
+ *                  type: string
+ *                 imageUrl:
+ *                  type: string
+ *                 use:
+ *                  type: string
+ *                 garden:
+ *                  type: string
+ *                 _id:
+ *                  type: string
+ *                 createdAt:
+ *                  type: string
+ *                 updatedAt:
+ *                  type: string
+ *               example:
+ *                 commonName: string
+ *                 scientificName: string
+ *                 family: string
+ *                 origin: string
+ *                 exposure: string
+ *                 watering: string
+ *                 soilType: string
+ *                 flowerColor: string
+ *                 height: number
+ *                 bloomingSeason: string
+ *                 plantingSeason: string
+ *                 care: string
+ *                 imageUrl: string
+ *                 use: string
+ *                 garden: string
+ *                 _id: string
+ *                 createdAt: string
+ *                 updatedAt: string
  *       500:
  *         description: Internal Server Error.
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
  *         description: No token, authorization denied.
- *       200:
- *         description: Plant detailss
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Garden'
  *       404:
  *         description: Invalid plant ID
  */
