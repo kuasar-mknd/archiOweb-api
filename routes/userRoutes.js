@@ -127,7 +127,7 @@ router.post('/register', registerUser)
  *                 description: Mot de passe pour l'authentification
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Authentication successful, token returned
  *         content:
  *           application/json:
  *             schema:
@@ -157,7 +157,7 @@ router.post('/login', loginUser)
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: List of successfully returned gardens
  *         content:
  *           application/json:
  *             schema:
@@ -231,7 +231,7 @@ router.get('/gardens', verifyToken, listUserGardens)
  *                 example: password123
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Successful user update
  *         content:
  *           application/json:
  *             schema:
