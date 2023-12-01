@@ -298,12 +298,11 @@ router.get('/:id/plants', verifyToken, listPlantsInGarden)
  *     security:
  *       - BearerAuth: []
  *     parameters:
- *       - in: path
- *     name: id
- *     required: true
- *     description: ID du jardin
- *     schema:
- *       type: string
+ *         name: id
+ *         required: true
+ *         description: ID du jardin
+ *         schema:
+ *           type: string
  *     responses:
 *       200:
  *         description: Authentification réussie, token retourné
