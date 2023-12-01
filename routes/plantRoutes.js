@@ -244,7 +244,7 @@ router.post('/', verifyToken, createPlant)
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Plants successfully recovered
  *         content:
  *           application/json:
  *             schema:
@@ -332,7 +332,7 @@ router.get('/', verifyToken, getAllPlants)
  *         description: ID de la plante
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Specific plant successfully recovered
  *         content:
  *           application/json:
  *             schema:
@@ -428,7 +428,7 @@ router.get('/:id', verifyToken, getPlantById)
  *             $ref: '#/components/schemas/Plant'
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Plant update successfully completed
  *         content:
  *           application/json:
  *             schema:
