@@ -91,10 +91,16 @@ const router = express.Router()
 router.post('/', verifyToken, createGarden)
 /**
  * @swagger
- * /api/gardens:
+ * /api/gardens/:
  *   get:
  *     summary: Récupère la liste de tous les jardins
  *     tags: [Gardens]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Numéro de la page à récupérer
  *     responses:
  *       400:
  *        description: Bad request,Invalid latitude or longitude.
