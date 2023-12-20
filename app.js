@@ -7,12 +7,14 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
+import cors from 'cors'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
 import userRoutes from './routes/userRoutes.js'
 import gardenRoutes from './routes/gardenRoutes.js'
 import plantRoutes from './routes/plantRoutes.js'
+
 // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 // see https://expressjs.com/en/guide/behind-proxies.html
 // app.set('trust proxy', 1);
@@ -31,6 +33,7 @@ db.once('open', function () {
 
 const app = express()
 // Apply to all requests & sanitize req.body
+app.use(cors())
 app.use(limiter)
 app.use(mongoSanitize())
 app.use(helmet())
