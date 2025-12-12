@@ -1,53 +1,51 @@
-# 🚀 Déploiement avec Portainer
+# 🚀 Déploiement avec Portainer & MongoDB Atlas
 
-Ce document explique comment configurer votre instance Portainer pour le déploiement automatisé de l'API.
+Ce document explique comment configurer votre instance Portainer pour le déploiement automatisé de l'API avec une base de données Cloud.
 
 ## Prérequis
 
 1.  Un serveur avec **Docker** et **Portainer** installés.
-2.  Un compte GitHub.
-3.  Un **Personal Access Token (PAT)** GitHub avec les droits `read:packages` (pour que Portainer puisse tirer l'image depuis GHCR).
+2.  Un compte GitHub avec un **Personal Access Token (PAT)** (droits `read:packages`).
+3.  Un cluster **MongoDB Atlas** configuré.
+
+## Étape 0 : MongoDB Atlas
+
+1.  Créez un Cluster sur [MongoDB Atlas](https://www.mongodb.com/atlas).
+2.  Créez un utilisateur de base de données (Database Access).
+3.  Autorisez les IPs (Network Access) : `0.0.0.0/0` (pour permettre à votre NAS de s'y connecter).
+4.  Récupérez la chaîne de connexion (Connect > Drivers > Node.js).
+    *   Format : `mongodb+srv://<username>:<password>@cluster0.xxxx.mongodb.net/?retryWrites=true&w=majority`
 
 ## Étape 1 : Configurer le Registry dans Portainer
 
 1.  Allez dans **Registries** > **Add registry** > **Custom registry**.
-2.  **Name** : `GitHub Container Registry` (ou ce que vous voulez).
+2.  **Name** : `GitHub Container Registry`.
 3.  **Registry URL** : `ghcr.io`
 4.  **Username** : Votre nom d'utilisateur GitHub.
 5.  **Password** : Votre Personal Access Token (PAT).
-6.  Cliquez sur **Add registry**.
 
 ## Étape 2 : Créer la Stack
 
 1.  Allez dans **Stacks** > **Add stack**.
-2.  **Name** : `archioweb-api` (par exemple).
+2.  **Name** : `archioweb-api`.
 3.  **Build method** : `Web editor`.
-4.  Copiez-collez le contenu de votre fichier `docker-compose.yml`.
+4.  Copiez-collez le contenu de votre fichier `docker-compose.yml` simplifié.
 5.  **Environment variables** :
-    *   Cliquez sur **Add an environment variable**.
-    *   Name: `JWT_SECRET`
-    *   Value: `votre_secret_ultra_securise_ici`
+    *   `JWT_SECRET` : `votre_secret_ultra_securise_ici`
+    *   `DATABASE_URL` : Collez votre chaîne de connexion MongoDB Atlas (étape 0).
 6.  Cliquez sur **Deploy the stack**.
 
-## Étape 3 : Configurer le Webhook
+## Étape 3 : Configurer le Webhook Portainer
 
-1.  Une fois la stack déployée, cliquez sur le service `api` (dans la liste des services de la stack).
-2.  Cherchez la section **Service webhook** (souvent en bas).
-3.  Activez l'option **Webhook**.
-4.  Copiez l'URL générée (ex: `https://votre-portainer.com/api/webhooks/xxxx-xxxx`).
+1.  Une fois la stack déployée, cliquez sur le service `api`.
+2.  Activez **Service webhook**.
+3.  Copiez l'URL générée.
 
-## Étape 4 : Configurer GitHub
+## Étape 4 : Configurer GitHub Secrets
 
-1.  Allez sur votre repository GitHub > **Settings** > **Secrets and variables** > **Actions**.
-2.  Cliquez sur **New repository secret**.
-3.  **Name** : `PORTAINER_WEBHOOK_URL`
-4.  **Value** : Collez l'URL du webhook copiée à l'étape 3.
-5.  Cliquez sur **Add secret**.
+1.  Allez sur votre repository GitHub > **Settings** > **Secrets** > **Actions**.
+2.  Ajoutez `PORTAINER_WEBHOOK_URL` avec l'URL copiée.
 
 ## ✅ Terminé !
 
-Désormais, à chaque push sur la branche `main` :
-1.  GitHub Actions va construire la nouvelle image Docker.
-2.  L'image sera envoyée sur GitHub Container Registry.
-3.  GitHub appellera votre Portainer.
-4.  Portainer téléchargera la nouvelle image et redémarrera le service API automatiquement sans interruption (si possible).
+Votre API tourne sur votre NAS mais stocke ses données de manière sécurisée et gérée sur le Cloud MongoDB Atlas. Plus de souci de version CPU !

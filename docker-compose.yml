@@ -10,27 +10,6 @@ services:
       - "3001:3001" # WebSocket
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=mongodb://mongo:27017/homeGarden
-      # JWT_SECRET should be defined in Portainer Environment variables for security
-      - JWT_SECRET=${JWT_SECRET} 
-    networks:
-      - backend
-    depends_on:
-      - mongo
-
-  mongo:
-    image: mongo:4.4
-    container_name: archioweb-mongo
-    restart: unless-stopped
-    # No ports exposed to host = Ultra Security (Only accessible via backend network)
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - backend
-
-networks:
-  backend:
-    driver: bridge
-
-volumes:
-  mongo-data:
+      # DATABASE_URL doit être défini dans Portainer (Connection String Atlas)
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
