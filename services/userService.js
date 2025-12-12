@@ -8,7 +8,7 @@ import AppError from '../utils/AppError.js'
 export const createUser = async (userData) => {
   const { identifier, password, firstName, lastName, birthDate } = userData
 
-  const userExists = await User.findOne({ identifier })
+  const userExists = await User.findOne({ identifier: { $eq: identifier } })
   if (userExists) {
     throw new AppError('User already exists', 400)
   }
@@ -30,7 +30,7 @@ export const createUser = async (userData) => {
 }
 
 export const authenticateUser = async (identifier, password) => {
-  const user = await User.findOne({ identifier })
+  const user = await User.findOne({ identifier: { $eq: identifier } })
   if (!user || !(await bcrypt.compare(password, user.password))) {
     throw new AppError('Auth failed', 401)
   }
