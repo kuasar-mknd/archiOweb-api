@@ -8,6 +8,7 @@ import swaggerSpec from './config/swagger.js'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
 import cors from 'cors'
+import compression from 'compression'
 
 // Importez vos routes personnalisées
 import indexRouter from './routes/index.js'
@@ -40,7 +41,11 @@ app.use(helmet())
 app.use(express.json({ limit: '10kb' })) // Body limit is 10
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
-app.use(logger('dev'))
+app.use(compression())
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(logger('dev'))
+}
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 

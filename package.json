@@ -9,7 +9,7 @@
     "scripts": {
         "start": "node --trace-deprecation ./bin/start",
         "dev": "nodemon --trace-deprecation ./bin/start",
-        "test": "NODE_ENV=test mocha tests --recursive ",
+        "test": "NODE_ENV=test JWT_SECRET=testsecret mocha tests --recursive ",
         "coverage": "c8 npm test",
         "format": "prettier --write .",
         "lint": "eslint . --fix",
@@ -19,10 +19,10 @@
     "dependencies": {
         "axios": "^1.6.8",
         "bcrypt": "^5.1.1",
-        "bcryptjs": "^2.4.3",
+        "compression": "^1.7.4",
         "cors": "^2.8.5",
         "debug": "~4.3.4",
-        "express": "~4.18.2",
+        "express": "^4.22.1",
         "express-mongo-sanitize": "^2.2.0",
         "express-rate-limit": "^7.1.5",
         "express-validator": "^7.0.1",
@@ -46,7 +46,7 @@
         "eslint-plugin-promise": "^6.1.1",
         "mocha": "^10.2.0",
         "mongodb-memory-server": "^9.1.6",
-        "prettier": "^3.2.5",
-        "nodemon": "^3.1.0"
+        "nodemon": "^3.1.0",
+        "prettier": "^3.2.5"
     }
 }

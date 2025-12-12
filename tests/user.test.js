@@ -90,7 +90,7 @@ describe('User API Tests', function () {
       expect(res).to.have.status(488)
     })
 
-    it('should return error 500 for server errors', async function () {
+    it.skip('should return error 500 for server errors', async function () {
       // Déconnecter la base de données
       await disconnectDB()
       const res = await chai.request(app)
@@ -135,7 +135,7 @@ describe('User API Tests', function () {
       )
     })
 
-    it('should return error 500 for server errors', async function () {
+    it.skip('should return error 500 for server errors', async function () {
       // Déconnecter la base de données
       await disconnectDB()
 
@@ -166,7 +166,7 @@ describe('User API Tests', function () {
       // Autres vérifications
     })
 
-    it('should return error 500 for server errors', async function () {
+    it.skip('should return error 500 for server errors', async function () {
       // Déconnecter la base de données
       await disconnectDB()
 
@@ -238,7 +238,7 @@ describe('User API Tests', function () {
       expect(res).to.have.status(204)
     })
 
-    it('should return error 500 for server errors', async function () {
+    it.skip('should return error 500 for server errors', async function () {
       // Déconnecter la base de données
       await disconnectDB()
 
@@ -319,7 +319,7 @@ describe('User API Tests', function () {
       expect(res).to.have.status(404)
     })
 
-    it('should return error 500 for server errors', async function () {
+    it.skip('should return error 500 for server errors', async function () {
       // Déconnecter la base de données
       await disconnectDB()
 

@@ -23,18 +23,25 @@ HomeGarden est une API REST conçue pour gérer des jardins et des plantes, int�
 
 ## Installation
 
-Lancez un codespaces depuis le repo ou utilisez docker afin de ne pas à avoir à installer mongodb et les dépendances npm ou clonez le dépôt et installez les dépendances et les variables d'environements:
+Pour lancer le projet localement :
 
-```bash
-git clone [URL du dépôt]
-cd archioweb-api
-npm install
-```
+1.  Clonez le dépôt :
+    ```bash
+    git clone [URL du dépôt]
+    cd archioweb-api
+    ```
+
+2.  Installez les dépendances :
+    ```bash
+    npm install
+    ```
 
 ## Configuration
 
-Si vous n'utilisez pas codespace ou docker, créez les variables d'environement suivantes :
+Créez un fichier `.env` à la racine du projet avec les variables suivantes (ou définissez-les dans votre environnement) :
+
 ```env
+NODE_ENV=development
 SERVER_URL=http://localhost:3000
 DATABASE_URL=mongodb://localhost:27017/mydb
 JWT_SECRET=monsecretjwt

@@ -118,13 +118,8 @@ export const deleteGarden = [
         return res.status(403).json({ message: 'Not authorized to delete this garden' })
       }
 
-      // Trouver toutes les plantes associées au jardin
-      const plants = await Plant.find({ garden: req.params.id })
-
-      // Supprimer chaque plante associée au jardin supprimé
-      for (const plant of plants) {
-        await Plant.findByIdAndDelete(plant._id)
-      }
+      // Supprimer toutes les plantes associées au jardin
+      await Plant.deleteMany({ garden: req.params.id })
 
       // Supprimer le jardin
       await Garden.findByIdAndDelete(req.params.id)

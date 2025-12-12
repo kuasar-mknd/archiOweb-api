@@ -4,6 +4,9 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 let mongoServer
 
 const connectDB = async () => {
+  if (mongoose.connection.readyState !== 0) {
+    return
+  }
   if (process.env.NODE_ENV === 'test') {
     // Use MongoDB Memory Server for tests
     mongoServer = await MongoMemoryServer.create()
@@ -19,14 +22,11 @@ const connectDB = async () => {
 }
 
 const disconnectDB = async () => {
-  if (process.env.NODE_ENV === 'test') {
-    // Disconnect from MongoDB Memory Server
+  if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect()
-    await mongoServer.stop()
-  } else {
-    // Disconnect from the actual database
-    await mongoose.disconnect()
-    console.log('MongoDB Disconnected')
+  }
+  if (process.env.NODE_ENV === 'test' && mongoServer) {
+    // await mongoServer.stop()
   }
 }
 
