@@ -69,7 +69,16 @@ export const updatePlant = async (plantId, updateData, userRequesting) => {
     throw new AppError('Not authorized to update this plant', 403)
   }
 
-  const updatedPlant = await Plant.findByIdAndUpdate(plantId, updateData, { new: true, runValidators: true })
+  // Filter allowed fields to prevent arbitrary updates/injection
+  const allowedUpdates = ['commonName', 'scientificName', 'family', 'exposure', 'garden']
+  const filteredUpdateData = Object.keys(updateData)
+    .filter(key => allowedUpdates.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = updateData[key]
+      return obj
+    }, {})
+
+  const updatedPlant = await Plant.findByIdAndUpdate(plantId, filteredUpdateData, { new: true, runValidators: true })
   return updatedPlant
 }
 

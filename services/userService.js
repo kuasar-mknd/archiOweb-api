@@ -45,10 +45,17 @@ export const authenticateUser = async (identifier, password) => {
 }
 
 export const updateUser = async (userId, updateData) => {
-  // Empêcher la mise à jour du mot de passe via cette route si nécessaire (déjà filtré par contrôleur/validateur idéalement)
-  delete updateData.password
+  // Filter allowed fields to prevent arbitrary updates/injection
+  // Explicitly excluding 'password' and 'role' (if it existed) by omitting them from this list
+  const allowedUpdates = ['firstName', 'lastName', 'birthDate', 'identifier']
+  const filteredUpdateData = Object.keys(updateData)
+    .filter(key => allowedUpdates.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = updateData[key]
+      return obj
+    }, {})
 
-  const user = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true })
+  const user = await User.findByIdAndUpdate(userId, filteredUpdateData, { new: true, runValidators: true })
   if (!user) {
     throw new AppError('User not found', 404)
   }
