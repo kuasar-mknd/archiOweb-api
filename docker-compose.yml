@@ -19,7 +19,7 @@ services:
       - mongo
 
   mongo:
-    image: mongo:6.0
+    image: mongo:4.4
     container_name: archioweb-mongo
     restart: unless-stopped
     # No ports exposed to host = Ultra Security (Only accessible via backend network)
