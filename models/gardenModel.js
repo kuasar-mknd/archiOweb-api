@@ -7,10 +7,8 @@ const gardenSchema = new mongoose.Schema({
     coordinates: { type: [Number], required: true }
   },
   plants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-})
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+}, { timestamps: true })
 
 // Index pour la recherche géospatiale
 gardenSchema.index({ location: '2dsphere' })
