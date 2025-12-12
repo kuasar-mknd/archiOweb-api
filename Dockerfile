@@ -1,35 +1,52 @@
-FROM mcr.microsoft.com/devcontainers/javascript-node:0-20
+# --- Stage 1: Builder ---
+FROM node:23-alpine AS builder
 
-# Install MongoDB command line tools - though mongo-database-tools not available on arm64
-ARG MONGO_TOOLS_VERSION=6.0
-RUN . /etc/os-release \
-    && curl -sSL "https://www.mongodb.org/static/pgp/server-${MONGO_TOOLS_VERSION}.asc" | gpg --dearmor > /usr/share/keyrings/mongodb-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/mongodb-archive-keyring.gpg] http://repo.mongodb.org/apt/debian ${VERSION_CODENAME}/mongodb-org/${MONGO_TOOLS_VERSION} main" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_TOOLS_VERSION}.list \
-    && apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get install -y mongodb-mongosh \
-    && if [ "$(dpkg --print-architecture)" = "amd64" ]; then apt-get install -y mongodb-database-tools; fi \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
-
-# [Optional] Uncomment if you want to install an additional version of node using nvm
-# ARG EXTRA_NODE_VERSION=10
-# RUN su node -c "source /usr/local/share/nvm/nvm.sh && nvm install ${EXTRA_NODE_VERSION}"
-
-# [Optional] Uncomment if you want to install more global node modules
-# RUN su node -c "npm install -g <your-package-list-here>"
-
-# Copie des fichiers du projet
-COPY . /app
 WORKDIR /app
 
-# Installation des dépendances
-RUN npm install
+# Install build dependencies (python3, make, g++ needed for some npm native modules)
+# Although for a simple API usually not needed, kept just in case.
+RUN apk add --no-cache python3 make g++
 
-# Définition de la commande par défaut
-CMD ["npm", "run", "start"]
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies for build/test if needed, 
+# but here we focus on building the production artifact if there was a build step)
+# Since this is a raw JS project, we just need to install production deps for the final stage.
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# --- Stage 2: Runner ---
+FROM node:23-alpine AS runner
+
+WORKDIR /app
+
+# Install simple utilities if needed (curl for healthcheck)
+RUN apk add --no-cache curl
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Use non-root user for security
+USER node
+
+# Copy dependencies and source code from builder
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app .
+
+# Expose API and WebSocket ports
+EXPOSE 3000
+EXPOSE 3001
+
+# Healthcheck to ensure API is responsive
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
+
+# Start the application
+CMD ["npm", "start"]
+
 
 
 
