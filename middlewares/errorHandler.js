@@ -32,7 +32,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Erreurs Mongoose de duplication (E11000)
   if (err.code === 11000) {
-    const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0]
+    const value = err.errmsg.match(/(["'])(?:\\.|[^\\'"])*\1/)[0]
     return res.status(400).json({
       success: false,
       status: 'fail',
