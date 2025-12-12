@@ -75,11 +75,27 @@ export const updateGarden = async (gardenId, updateData, userRequesting) => {
     throw new AppError('Not authorized to update this garden', 403)
   }
 
-  // Update allowed fields
-  const { name, location } = updateData
+  // Update allowed fields with white-listing and validation
+  const update = {};
+  if (typeof updateData.name === "string") {
+    update.name = updateData.name;
+  } else if ('name' in updateData) {
+    throw new AppError('Invalid name: must be string', 400);
+  }
+  if (updateData.location !== undefined) {
+    // location should be object with [expected structure] (e.g., GeoJSON Point), but NOT contain MongoDB operators
+    if (typeof updateData.location === "object" && updateData.location !== null && !Object.keys(updateData.location).some(key => key.startsWith('$'))) {
+      update.location = updateData.location;
+    } else {
+      throw new AppError('Invalid location', 400);
+    }
+  }
+  if (Object.keys(update).length === 0) {
+    throw new AppError('No valid fields to update', 400);
+  }
   const updatedGarden = await Garden.findByIdAndUpdate(
-    gardenId, 
-    { name, location }, 
+    gardenId,
+    { $set: update },
     { new: true, runValidators: true }
   )
   return updatedGarden
