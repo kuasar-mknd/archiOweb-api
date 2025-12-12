@@ -36,7 +36,9 @@ const app = express()
 // Apply to all requests & sanitize req.body
 app.use(cors())
 app.use(limiter)
-app.use(helmet())
+app.use(helmet({
+  contentSecurityPolicy: false // Required for Swagger UI to work correctly
+}))
 app.use(express.json({ limit: '10kb' })) // Body limit is 10kb
 app.use(express.urlencoded({ extended: false }))
 // Custom mongoSanitize to avoid assigning to read-only req.query in Express 5
