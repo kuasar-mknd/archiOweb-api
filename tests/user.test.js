@@ -324,4 +324,22 @@ describe('User API Tests', function () {
       expect(res).to.have.status(500)
     })
   })
+
+  describe('GET /api/users/:id', function () {
+    it('should get a user by ID', async function () {
+      const user = await User.findOne({ identifier: 'testuser@example.com' })
+      const res = await chai.request(app)
+        .get(`/api/users/${user._id}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body.data).to.have.property('identifier', 'testuser@example.com')
+      expect(res.body.data).to.not.have.property('password')
+    })
+
+    it('should return 404 for non-existent user', async function () {
+      const res = await chai.request(app)
+        .get('/api/users/60f7e6e0b4e2a7001f7b8e1d') // Invalid ID
+      expect(res).to.have.status(404)
+    })
+  })
 })

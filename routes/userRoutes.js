@@ -5,7 +5,8 @@ import {
   loginUser,
   updateUser,
   deleteUser,
-  listUserGardens
+  listUserGardens,
+  getUserById
 } from '../controllers/userController.js'
 import { validate } from '../middlewares/validator.js'
 // Middleware pour vérifier l'authentification
@@ -326,5 +327,32 @@ router.put('/', verifyToken, validate(updateValidation), updateUser)
  *        description: Internal Server Error.
  */
 router.delete('/', verifyToken, deleteUser)
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Récupère le profil public d'un utilisateur par son ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID de l'utilisateur à récupérer
+ *     responses:
+ *       200:
+ *         description: Profil public de l'utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur interne du serveur
+ */
+router.get('/:id', getUserById)
 
 export default router
