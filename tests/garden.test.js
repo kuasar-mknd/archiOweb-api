@@ -3,7 +3,8 @@ import chaiHttp from 'chai-http'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
 import Garden from '../models/gardenModel.js'
-import User from '../models/userModel.js' // Assurez-vous d'importer le modèle User
+import User from '../models/userModel.js'
+import sinon from 'sinon' // Assurez-vous d'importer le modèle User
 import { connectDB, disconnectDB } from '../config/database.js'
 
 // Chai middleware
@@ -69,6 +70,10 @@ describe('Garden API Tests', function () {
     createdGardenId = res.body.data._id // Save the ID of the created garden
   })
 
+  afterEach(function () {
+    sinon.restore()
+  })
+
   // Test cases
   describe('GET /api/gardens', function () {
     it('should get all gardens', async function () {
@@ -96,18 +101,15 @@ describe('Garden API Tests', function () {
       // Message généré par Mongoose/Express-Validator pour cast failure
     })
 
-    it.skip('should return 500 for server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return 500 for server error', async function () {
+      // Stubbing Garden.find to throw an error
+      sinon.stub(Garden, 'find').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/gardens')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -159,9 +161,9 @@ describe('Garden API Tests', function () {
       expect(res).to.have.status(401)
     })
 
-    it.skip('should return 500 server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return 500 server error', async function () {
+      // Stubbing User.findById which is used in createGarden service
+      sinon.stub(User, 'findById').throws(new Error('Database error'))
 
       const gardenData = {
         name: 'Mon jardin',
@@ -172,11 +174,9 @@ describe('Garden API Tests', function () {
       }
       const res = await chai.request(app)
         .post('/api/gardens')
-        .set('Authorization', `Bearer ${token}`) // Use the auth token
+        .set('Authorization', `Bearer ${token}`)
         .send(gardenData)
       expect(res).to.have.status(500)
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -197,18 +197,15 @@ describe('Garden API Tests', function () {
       expect(res).to.have.status(404)
     })
 
-    it.skip('should return error 500 for server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return error 500 for server error', async function () {
+      // Stubbing Garden.findById
+      sinon.stub(Garden, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -296,15 +293,15 @@ describe('Garden API Tests', function () {
       expect(res).to.have.status(403)
     })
 
-    it.skip('should return 500 server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return 500 server error', async function () {
+      // Stubbing Garden.findById (called first in updateGarden)
+      sinon.stub(Garden, 'findById').throws(new Error('Database error'))
 
       const updatedGardenData = {
         name: 'Jardin Mis à Jour 2',
         location: {
           type: 'Point',
-          coordinates: [-73.856077, 40.848447] // Coordonnées mises à jour
+          coordinates: [-73.856077, 40.848447]
         }
       }
       const res = await chai.request(app)
@@ -313,9 +310,6 @@ describe('Garden API Tests', function () {
         .send(updatedGardenData)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -381,18 +375,15 @@ describe('Garden API Tests', function () {
       expect(res).to.have.status(403)
     })
 
-    it.skip('should return 500 server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return 500 server error', async function () {
+      // Stubbing Garden.findById used in deleteGarden
+      sinon.stub(Garden, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .delete('/api/gardens/' + createdGardenId)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -442,18 +433,15 @@ describe('Garden API Tests', function () {
       expect(res.body).to.have.property('message', 'Not authorized to get the plants from this garden')
     })
 
-    it.skip('should return 500 server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return 500 server error', async function () {
+      // Stubbing Garden.findById
+      sinon.stub(Garden, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId + '/plants')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -503,18 +491,15 @@ describe('Garden API Tests', function () {
       expect(res.body).to.have.property('message', 'Not authorized to get the plants from this garden')
     })
 
-    it.skip('should return 500 server error', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return 500 server error', async function () {
+      // Stubbing Garden.findById used in getGardenAggregation
+      sinon.stub(Garden, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/gardens/' + createdGardenId + '/plants/aggregate')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 })

@@ -4,6 +4,7 @@ import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
 import { connectDB, disconnectDB } from '../config/database.js'
 import User from '../models/userModel.js'
+import sinon from 'sinon'
 
 // Chai middleware for HTTP assertions
 chai.use(chaiHttp)
@@ -43,6 +44,10 @@ describe('User API Tests', function () {
     })
 
     token = res.body.data.token
+  })
+
+  afterEach(function () {
+    sinon.restore()
   })
 
   describe('POST /api/users/register', function () {
@@ -91,9 +96,10 @@ describe('User API Tests', function () {
       expect(res).to.have.status(422)
     })
 
-    it.skip('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return error 500 for server errors', async function () {
+      // Simuler une erreur de base de données
+      sinon.stub(User, 'findOne').throws(new Error('Database error'))
+
       const res = await chai.request(app)
         .post('/api/users/register')
         .send({
@@ -104,9 +110,6 @@ describe('User API Tests', function () {
         })
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -136,9 +139,9 @@ describe('User API Tests', function () {
       )
     })
 
-    it.skip('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return error 500 for server errors', async function () {
+      // Simuler une erreur de base de données
+      sinon.stub(User, 'findOne').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .post('/api/users/login')
@@ -147,9 +150,6 @@ describe('User API Tests', function () {
           password: 'pasdsword'
         })
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -167,9 +167,9 @@ describe('User API Tests', function () {
       // Autres vérifications
     })
 
-    it.skip('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return error 500 for server errors', async function () {
+      // Simuler une erreur
+      sinon.stub(User, 'findByIdAndUpdate').throws(new Error('Database error'))
 
       const updateData = {
         identifier: 'testusernew@example.com'
@@ -180,9 +180,6 @@ describe('User API Tests', function () {
         .send(updateData)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
 
     it('should return 404 for non-existent user', async function () {
@@ -239,18 +236,15 @@ describe('User API Tests', function () {
       expect(res).to.have.status(204)
     })
 
-    it.skip('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return error 500 for server errors', async function () {
+      // Simuler une erreur
+      sinon.stub(User, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .delete('/api/users/')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
 
     it('should delete a user and associated gardens', async function () {
@@ -320,18 +314,15 @@ describe('User API Tests', function () {
       expect(res).to.have.status(404)
     })
 
-    it.skip('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+    it('should return error 500 for server errors', async function () {
+      // Simuler une erreur
+      sinon.stub(User, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/users/gardens')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 })
