@@ -36,9 +36,16 @@ const app = express()
 // Apply to all requests & sanitize req.body
 app.use(cors())
 app.use(limiter)
-app.use(mongoSanitize())
 app.use(helmet())
-app.use(express.json({ limit: '10kb' })) // Body limit is 10
+app.use(express.json({ limit: '10kb' })) // Body limit is 10kb
+app.use(express.urlencoded({ extended: false }))
+// Custom mongoSanitize to avoid assigning to read-only req.query in Express 5
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body)
+  if (req.query) mongoSanitize.sanitize(req.query)
+  if (req.params) mongoSanitize.sanitize(req.params)
+  next()
+})
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use(compression())
@@ -46,8 +53,7 @@ app.use(compression())
 if (process.env.NODE_ENV === 'development') {
   app.use(logger('dev'))
 }
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+
 
 // Utilisez vos routes personnalisées
 app.use('/', indexRouter)

@@ -2,11 +2,10 @@ import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
-import { connectDB, disconnectDB } from '../config/database.js'
 import User from '../models/userModel.js'
 import sinon from 'sinon'
+import { connectDB, disconnectDB } from '../config/database.js'
 
-// Chai middleware for HTTP assertions
 chai.use(chaiHttp)
 const { expect } = chai
 
