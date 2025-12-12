@@ -13,3 +13,4 @@ services:
       # DATABASE_URL doit être défini dans Portainer (Connection String Atlas)
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
+      - "com.centurylinklabs.watchtower.enable=true"

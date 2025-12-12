@@ -2,50 +2,31 @@
 
 Ce document explique comment configurer votre instance Portainer pour le déploiement automatisé de l'API avec une base de données Cloud.
 
+*Note : La mise à jour automatique est gérée par votre instance **Watchtower** existante grâce au label ajouté.*
+
 ## Prérequis
 
-1.  Un serveur avec **Docker** et **Portainer** installés.
-2.  Un compte GitHub avec un **Personal Access Token (PAT)** (droits `read:packages`).
-3.  Un cluster **MongoDB Atlas** configuré.
+1.  Cluster **MongoDB Atlas** prêt.
+2.  **Watchtower** tournant déjà sur votre serveur.
+    *   *Attention : Assurez-vous que votre Watchtower a les droits pour puller depuis `ghcr.io` (si l'image est privée).*
 
 ## Étape 0 : MongoDB Atlas
 
-1.  Créez un Cluster sur [MongoDB Atlas](https://www.mongodb.com/atlas).
-2.  Créez un utilisateur de base de données (Database Access).
-3.  Autorisez les IPs (Network Access) : `0.0.0.0/0` (pour permettre à votre NAS de s'y connecter).
-4.  Récupérez la chaîne de connexion (Connect > Drivers > Node.js).
-    *   Format : `mongodb+srv://<username>:<password>@cluster0.xxxx.mongodb.net/?retryWrites=true&w=majority`
+1.  Récupérez votre chaîne de connexion sur Atlas.
 
-## Étape 1 : Configurer le Registry dans Portainer
+## Étape 1 : Créer la Stack Portainer
 
-1.  Allez dans **Registries** > **Add registry** > **Custom registry**.
-2.  **Name** : `GitHub Container Registry`.
-3.  **Registry URL** : `ghcr.io`
-4.  **Username** : Votre nom d'utilisateur GitHub.
-5.  **Password** : Votre Personal Access Token (PAT).
-
-## Étape 2 : Créer la Stack
-
-1.  Allez dans **Stacks** > **Add stack**.
+1.  **Stacks** > **Add stack**.
 2.  **Name** : `archioweb-api`.
 3.  **Build method** : `Web editor`.
-4.  Copiez-collez le contenu de votre fichier `docker-compose.yml` simplifié.
+4.  Copiez-collez le `docker-compose.yml`.
 5.  **Environment variables** :
-    *   `JWT_SECRET` : `votre_secret_ultra_securise_ici`
-    *   `DATABASE_URL` : Collez votre chaîne de connexion MongoDB Atlas (étape 0).
-6.  Cliquez sur **Deploy the stack**.
+    *   `JWT_SECRET` : Votre secret.
+    *   `DATABASE_URL` : Votre connexion string Atlas.
 
-## Étape 3 : Configurer le Webhook Portainer
+6.  Cliquez sur **Deploy**.
 
-1.  Une fois la stack déployée, cliquez sur le service `api`.
-2.  Activez **Service webhook**.
-3.  Copiez l'URL générée.
+## ✅ C'est tout !
 
-## Étape 4 : Configurer GitHub Secrets
-
-1.  Allez sur votre repository GitHub > **Settings** > **Secrets** > **Actions**.
-2.  Ajoutez `PORTAINER_WEBHOOK_URL` avec l'URL copiée.
-
-## ✅ Terminé !
-
-Votre API tourne sur votre NAS mais stocke ses données de manière sécurisée et gérée sur le Cloud MongoDB Atlas. Plus de souci de version CPU !
+1.  **GitHub Actions** construit l'image sur push.
+2.  Votre **Watchtower** détectera la nouvelle image (grâce au label `com.centurylinklabs.watchtower.enable=true`) et mettra à jour le conteneur `archioweb-api`.
