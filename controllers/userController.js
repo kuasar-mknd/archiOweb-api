@@ -54,6 +54,15 @@ export const registerUser = [
   }
 ]
 
+export const getUserById = async (req, res, next) => {
+  try {
+    const user = await userService.fetchUserById(req.params.id)
+    sendResponse(res, 200, user)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const loginUser = [
   validateUserInput,
   async (req, res, next) => {

@@ -93,3 +93,13 @@ export const getUserGardens = async (userId) => {
   }
   return user.gardens
 }
+
+export const fetchUserById = async (userId) => {
+  const user = await User.findById(userId)
+  if (!user) {
+    throw new AppError('User not found', 404)
+  }
+  const userResponse = user.toObject()
+  delete userResponse.password
+  return userResponse
+}
