@@ -1,4 +1,5 @@
 import express from 'express'
+import { body } from 'express-validator'
 import {
   registerUser,
   loginUser,
@@ -6,11 +7,30 @@ import {
   deleteUser,
   listUserGardens
 } from '../controllers/userController.js'
-
+import { validate } from '../middlewares/validator.js'
 // Middleware pour vérifier l'authentification
 import verifyToken from '../middlewares/verifyToken.js'
 
 const router = express.Router()
+
+// Validation rules
+const registerValidation = [
+  body('identifier').isEmail().withMessage('A valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+  body('firstName').notEmpty().withMessage('First name is required'),
+  body('lastName').notEmpty().withMessage('Last name is required')
+]
+
+const loginValidation = [
+  body('identifier').isEmail().withMessage('A valid email is required'),
+  body('password').notEmpty().withMessage('Password is required')
+]
+
+const updateValidation = [
+  body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
+  body('lastName').optional().notEmpty().withMessage('Last name cannot be empty'),
+  body('identifier').optional().isEmail().withMessage('A valid email is required')
+]
 
 /**
  * @swagger
@@ -92,14 +112,34 @@ const router = express.Router()
  *     responses:
  *       201:
  *         description: User registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     identifier:
+ *                       type: string
+ *                     firstName:
+ *                       type: string
+ *                     lastName:
+ *                       type: string
+ *                 message:
+ *                   type: string
  *       400:
  *         description: Bad request, user already exists.
- *       488:
- *         description: A valid email is required or password must be at least 6 characters long.
+ *       422:
+ *         description: Validation error.
  *       500:
  *         description: Internal Server Error.
  */
-router.post('/register', registerUser)
+router.post('/register', validate(registerValidation), registerUser)
 
 /**
  * @swagger
@@ -133,19 +173,26 @@ router.post('/register', registerUser)
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: Token JWT pour authentification
+ *                 message:
  *                   type: string
- *                   description: Token JWT pour authentification
  *       400:
  *         description: Données d'entrée invalides.
  *       401:
  *         description: Authentification Auth failed.
- *       488:
- *         description: A valid email is required or password must be at least 6 characters long.
+ *       422:
+ *         description: Validation error.
  *       500:
  *         description: Internal Server Error.
  */
-router.post('/login', loginUser)
+router.post('/login', validate(loginValidation), loginUser)
 
 /**
  * @swagger
@@ -163,30 +210,12 @@ router.post('/login', loginUser)
  *             schema:
  *               type: object
  *               properties:
- *                 _id :
- *                  type: string
- *                 name:
- *                  type: string
- *                 plants:
- *                  type: array
- *                 items:
- *                  type: string
- *                 user:
- *                  type: string
- *                 createdAt:
- *                  type: string
- *                 updatedAt:
- *                  type: string
- *                 location:
- *                   type: Point
- *               example:
- *                 location: { type: Point, coordinates: [number, number]}
- *                 _id: string
- *                 name: string
- *                 plants: [string]
- *                 user: string
- *                 createdAt: string
- *                 updatedAt: string
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Garden'
  *       400:
  *         description: Bad request, token is not valid.
  *       401:
@@ -274,7 +303,7 @@ router.get('/gardens', verifyToken, listUserGardens)
  *       500:
  *         description: Internal Server Error.
  */
-router.put('/', verifyToken, updateUser)
+router.put('/', verifyToken, validate(updateValidation), updateUser)
 
 /**
  * @swagger

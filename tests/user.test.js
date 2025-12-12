@@ -13,6 +13,7 @@ describe('User API Tests', function () {
   let token
   // Setup and teardown
   before(async function () {
+    this.timeout(30000)
     await connectDB()
   })
 
@@ -41,7 +42,7 @@ describe('User API Tests', function () {
       password: newUser.password
     })
 
-    token = res.body.token
+    token = res.body.data.token
   })
 
   describe('POST /api/users/register', function () {
@@ -87,7 +88,7 @@ describe('User API Tests', function () {
           lastName: 'User'
         })
 
-      expect(res).to.have.status(488)
+      expect(res).to.have.status(422)
     })
 
     it.skip('should return error 500 for server errors', async function () {
@@ -118,7 +119,7 @@ describe('User API Tests', function () {
           password: 'password'
         })
       expect(res).to.have.status(200)
-      expect(res.body).to.have.property('token')
+      expect(res.body.data).to.have.property('token')
     })
 
     it('should not login user with incorrect credentials', async function () {
@@ -216,7 +217,7 @@ describe('User API Tests', function () {
         .send(gardenData)
       expect(res).to.have.status(201)
 
-      const createdGardenId = res.body._id
+      const createdGardenId = res.body.data._id
 
       const plantData = {
         commonName: 'Nom commun',
@@ -266,7 +267,7 @@ describe('User API Tests', function () {
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.have.property('name', 'Test Garden')
+      expect(res.body.data).to.have.property('name', 'Test Garden')
 
       // Delete the user
       const res2 = await chai.request(app)
@@ -277,7 +278,7 @@ describe('User API Tests', function () {
 
       // Check that the garden was deleted
       const res3 = await chai.request(app)
-        .get(`/api/gardens/${res.body._id}`)
+        .get(`/api/gardens/${res.body.data._id}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res3).to.have.status(404)
@@ -303,7 +304,7 @@ describe('User API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.be.an('array')
+      expect(res.body.data).to.be.an('array')
     })
 
     it('should return 404 for non-existent user', async function () {

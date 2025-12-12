@@ -18,6 +18,7 @@ describe('Plants API Tests', function () {
   // Connect to the test database before running any tests
   // Setup and teardown
   before(async function () {
+    this.timeout(30000) // Increase timeout for initial DB connection
     await connectDB()
   })
 
@@ -26,6 +27,7 @@ describe('Plants API Tests', function () {
   })
   // Clear the test database before each test
   beforeEach(async function () {
+    this.timeout(10000)
     await Garden.deleteMany({})
     await User.deleteMany({})
 
@@ -49,7 +51,7 @@ describe('Plants API Tests', function () {
       password: newUser.password
     })
 
-    token = res.body.token // Save the token for protected route tests
+    token = res.body.data.token // Save the token for protected route tests
 
     // Create a new garden
     const gardenData = {
@@ -65,7 +67,7 @@ describe('Plants API Tests', function () {
       .set('Authorization', `Bearer ${token}`) // Use the auth token
       .send(gardenData)
 
-    createdGardenId = res.body._id // Save the ID of the created garden
+    createdGardenId = res.body.data._id // Save the ID of the created garden
 
     // Create a new plant
     const plantData = {
@@ -79,7 +81,7 @@ describe('Plants API Tests', function () {
       .post('/api/plants')
       .set('Authorization', `Bearer ${token}`)
       .send(plantData)
-    plantId = res.body._id
+    plantId = res.body.data._id
   })
 
   describe('POST /api/plants', function () {
@@ -97,7 +99,7 @@ describe('Plants API Tests', function () {
         .send(plantData)
 
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('_id', 'commonName', 'scientificName') // et d'autres champs
+      expect(res.body.data).to.include.keys('_id', 'commonName', 'scientificName') // et d'autres champs
     })
 
     it('should return error for unauthenticated user', async function () {
@@ -115,7 +117,7 @@ describe('Plants API Tests', function () {
       expect(res).to.have.status(401)
     })
 
-    it('should return error 488 when error in data is detected', async function () {
+    it('should return error 422 when error in data is detected', async function () {
       const plantData = {
         commonName: 'Nom commun',
         scientificName: 'Nom scientifique',
@@ -128,7 +130,7 @@ describe('Plants API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
         .send(plantData)
 
-      expect(res).to.have.status(488)
+      expect(res).to.have.status(422)
     })
 
     it('should return error 403 when user is not authorized to add plants to the garden', async function () {
@@ -151,7 +153,7 @@ describe('Plants API Tests', function () {
         password: newUser.password
       })
 
-      token = res.body.token
+      token = res.body.data.token
       const plantData = {
         commonName: 'Nom commun',
         scientificName: 'Nom scientifique',
@@ -212,7 +214,7 @@ describe('Plants API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.be.an('array')
+      expect(res.body.data).to.be.an('array')
     })
 
     it.skip('should handle server error', async function () {
@@ -237,12 +239,12 @@ describe('Plants API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
-      expect(res.body._id).to.equal(plantId)
+      expect(res.body.data._id).to.equal(plantId)
     })
 
     it('should return 404 for non-existent plant ID', async function () {
       const res = await chai.request(app)
-        .get('/api/plants/nonexistent-id')
+        .get('/api/plants/000000000000000000000000')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(404)
@@ -274,7 +276,10 @@ describe('Plants API Tests', function () {
     it('should update a plant with valid data', async function () {
       const updatedData = {
         commonName: 'Nom commun mis à jour',
-        scientificName: 'Nom scientifique mis à jour'
+        scientificName: 'Nom scientifique mis à jour',
+        family: 'Famille Modifiée',
+        exposure: 'Partial Shade',
+        garden: createdGardenId
       }
       const res = await chai.request(app)
         .put('/api/plants/' + plantId)
@@ -287,10 +292,13 @@ describe('Plants API Tests', function () {
     it('should return 404 for non-existent plant ID', async function () {
       const updatedData = {
         commonName: 'Nom commun mis à jour',
-        scientificName: 'Nom scientifique mis à jour'
+        scientificName: 'Nom scientifique mis à jour',
+        family: 'Famille Modifiée',
+        exposure: 'Partial Shade',
+        garden: createdGardenId
       }
       const res = await chai.request(app)
-        .put('/api/plants/nonexistent-id')
+        .put('/api/plants/000000000000000000000000')
         .set('Authorization', `Bearer ${token}`)
         .send(updatedData)
 
@@ -300,7 +308,10 @@ describe('Plants API Tests', function () {
     it('should return 401 for unauthenticated user', async function () {
       const updatedData = {
         commonName: 'Nom commun mis à jour',
-        scientificName: 'Nom scientifique mis à jour'
+        scientificName: 'Nom scientifique mis à jour',
+        family: 'Famille Modifiée',
+        exposure: 'Partial Shade',
+        garden: createdGardenId
       }
       const res = await chai.request(app)
         .put('/api/plants/' + plantId)
@@ -329,10 +340,13 @@ describe('Plants API Tests', function () {
         password: newUser.password
       })
 
-      token = res.body.token
+      token = res.body.data.token
       const updatedData = {
         commonName: 'Nom commun mis à jour',
-        scientificName: 'Nom scientifique mis à jour'
+        scientificName: 'Nom scientifique mis à jour',
+        family: 'Famille Modifiée',
+        exposure: 'Partial Shade',
+        garden: createdGardenId
       }
       res = await chai.request(app)
         .put('/api/plants/' + plantId)
@@ -347,7 +361,10 @@ describe('Plants API Tests', function () {
 
       const updatedData = {
         commonName: 'Nom commun mis à jour',
-        scientificName: 'Nom scientifique mis à jour'
+        scientificName: 'Nom scientifique mis à jour',
+        family: 'Famille Modifiée',
+        exposure: 'Partial Shade',
+        garden: createdGardenId
       }
       const res = await chai.request(app)
         .put('/api/plants/' + plantId)
@@ -363,7 +380,10 @@ describe('Plants API Tests', function () {
     it('should return 404 when garden does not exist', async function () {
       const updatedData = {
         commonName: 'Nom commun mis à jour',
-        scientificName: 'Nom scientifique mis à jour'
+        scientificName: 'Nom scientifique mis à jour',
+        family: 'Famille Modifiée',
+        exposure: 'Partial Shade',
+        garden: createdGardenId
       }
       // delete the garden
       await Garden.findByIdAndDelete(createdGardenId)
@@ -387,7 +407,7 @@ describe('Plants API Tests', function () {
 
     it('should return 404 for non-existent plant ID', async function () {
       const res = await chai.request(app)
-        .delete('/api/plants/nonexistent-id')
+        .delete('/api/plants/000000000000000000000000')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(404)
@@ -420,7 +440,7 @@ describe('Plants API Tests', function () {
         password: newUser.password
       })
 
-      token = res.body.token
+      token = res.body.data.token
       res = await chai.request(app)
         .delete('/api/plants/' + plantId)
         .set('Authorization', `Bearer ${token}`)
