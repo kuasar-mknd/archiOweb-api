@@ -9,7 +9,11 @@ const isOwnerOrAdmin = (userRequesting, resourceOwnerId) => {
 
 export const createPlant = async (plantData, userId, userRequesting) => {
   const { garden: gardenId } = plantData
-  
+
+  if (typeof gardenId !== "string") {
+    throw new AppError('Invalid garden ID', 400)
+  }
+
   const garden = await Garden.findById(gardenId)
   if (!garden) {
     throw new AppError('Garden not found', 404)
