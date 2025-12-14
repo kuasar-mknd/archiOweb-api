@@ -10,7 +10,11 @@ import http from 'http'
 import { connectDB } from '../config/database.js'
 import { startWebSocketServer } from '../lib/websocket.js'
 
-connectDB()
+connectDB().catch(err => {
+  console.error('Failed to connect to database. Please check your DATABASE_URL environment variable.')
+  console.error(err)
+  process.exit(1)
+})
 
 if (process.env.NODE_ENV !== 'test') {
   startWebSocketServer()
