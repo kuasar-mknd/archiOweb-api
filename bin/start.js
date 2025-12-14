@@ -14,7 +14,9 @@ try {
   await connectDB()
 } catch (error) {
   console.error('Failed to connect to database:', error)
-  process.exit(1)
+  console.warn('⚠️  Starting server WITHOUT database connection! API endpoints requiring DB will fail.')
+  // We do not exit the process so that the deployment can succeed and logs can be viewed.
+  // process.exit(1)
 }
 
 if (process.env.NODE_ENV !== 'test') {
