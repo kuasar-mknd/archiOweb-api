@@ -21,10 +21,10 @@ export const getAllGardens = async (req, res, next) => {
   }
 }
 
-// Retrieve a single garden by ID TO DO : ajout authentification
+// Retrieve a single garden by ID
 export const getGardenById = async (req, res, next) => {
   try {
-    const garden = await gardenService.getGardenById(req.params.id)
+    const garden = await gardenService.getGardenById(req.params.id, req.user)
     sendResponse(res, 200, garden)
   } catch (error) {
     next(error)
