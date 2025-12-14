@@ -10,9 +10,16 @@ import http from 'http'
 import { connectDB } from '../config/database.js'
 import { startWebSocketServer } from '../lib/websocket.js'
 
+const dbUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden'
+const maskedUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')
+console.log(`Attempting to connect to database: ${maskedUrl}`)
+
 connectDB().catch(err => {
-  console.error('Failed to connect to database. Please check your DATABASE_URL environment variable.')
-  console.error(err)
+  console.error('Failed to connect to database.')
+  console.error('1. Check if your DATABASE_URL is correct (no typos, no trailing spaces).')
+  console.error('2. Ensure your MongoDB Atlas Cluster AllowList includes 0.0.0.0/0 (for Render).')
+  console.error('3. Check if your cluster is paused.')
+  console.error('Original Error:', err)
   process.exit(1)
 })
 
