@@ -30,7 +30,8 @@ const plantSchema = new mongoose.Schema(
         'Fragrance'
       ]
     },
-    garden: { type: mongoose.Schema.Types.ObjectId, ref: 'Garden' } // Lien vers le jardin où la plante est cultivée
+    // Index added for performance: filtering plants by garden is a frequent operation
+    garden: { type: mongoose.Schema.Types.ObjectId, ref: 'Garden', index: true } // Lien vers le jardin où la plante est cultivée
   },
   {
     timestamps: true // Ajoute les champs createdAt et updatedAt
