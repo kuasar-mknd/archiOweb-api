@@ -7,7 +7,7 @@ const gardenSchema = new mongoose.Schema({
     coordinates: { type: [Number], required: true }
   },
   plants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true }
 }, { timestamps: true })
 
 // Index pour la recherche géospatiale

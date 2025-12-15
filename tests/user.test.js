@@ -330,6 +330,7 @@ describe('User API Tests', function () {
       const user = await User.findOne({ identifier: 'testuser@example.com' })
       const res = await chai.request(app)
         .get(`/api/users/${user._id}`)
+        .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
       expect(res.body.data).to.have.property('identifier', 'testuser@example.com')
@@ -339,6 +340,7 @@ describe('User API Tests', function () {
     it('should return 404 for non-existent user', async function () {
       const res = await chai.request(app)
         .get('/api/users/60f7e6e0b4e2a7001f7b8e1d') // Invalid ID
+        .set('Authorization', `Bearer ${token}`)
       expect(res).to.have.status(404)
     })
   })
