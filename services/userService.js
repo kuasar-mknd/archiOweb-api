@@ -94,12 +94,21 @@ export const getUserGardens = async (userId) => {
   return user.gardens
 }
 
-export const fetchUserById = async (userId) => {
+export const fetchUserById = async (userId, requestingUser) => {
   const user = await User.findById(userId)
   if (!user) {
     throw new AppError('User not found', 404)
   }
   const userResponse = user.toObject()
   delete userResponse.password
+
+  // If requestingUser is NOT the owner AND NOT admin, filter sensitive data
+  // requestingUser.userId is from the token
+  if (requestingUser.userId !== userId.toString() && requestingUser.role !== 'admin') {
+    delete userResponse.identifier
+    delete userResponse.birthDate
+    delete userResponse.updatedAt
+  }
+
   return userResponse
 }

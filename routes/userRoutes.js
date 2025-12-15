@@ -334,6 +334,8 @@ router.delete('/', verifyToken, deleteUser)
  *   get:
  *     summary: Récupère le profil public d'un utilisateur par son ID
  *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -348,11 +350,13 @@ router.delete('/', verifyToken, deleteUser)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: No token, authorization denied.
  *       404:
  *         description: Utilisateur non trouvé
  *       500:
  *         description: Erreur interne du serveur
  */
-router.get('/:id', getUserById)
+router.get('/:id', verifyToken, getUserById)
 
 export default router
