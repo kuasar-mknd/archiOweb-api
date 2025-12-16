@@ -29,9 +29,19 @@ export const createUser = async (userData) => {
   return userResponse
 }
 
+// Pre-computed hash with cost 10 to mitigate timing attacks (User Enumeration)
+const DUMMY_HASH = '$2b$10$CpKfxnNBcbnlYOwHlj6AHOKo2eEVwfmtGzceFLXeiSyu5QoHF/mp6'
+
 export const authenticateUser = async (identifier, password) => {
   const user = await User.findOne({ identifier: { $eq: identifier } })
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+
+  // Sentinel: Mitigation for Timing Attack (User Enumeration)
+  // We always execute bcrypt.compare to ensure the response time is consistent
+  // regardless of whether the user exists or not.
+  const passwordToCompare = user ? user.password : DUMMY_HASH
+  const isMatch = await bcrypt.compare(password, passwordToCompare)
+
+  if (!user || !isMatch) {
     throw new AppError('Auth failed', 401)
   }
 
