@@ -119,7 +119,7 @@ export const deleteGarden = async (gardenId, userRequesting) => {
 }
 
 export const listPlantsInGarden = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId).populate('plants')
+  const garden = await Garden.findById(gardenId)
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -129,7 +129,7 @@ export const listPlantsInGarden = async (gardenId, userRequesting) => {
     throw new AppError('Not authorized to get the plants from this garden', 403)
   }
 
-  return garden.plants
+  return await Plant.find({ garden: gardenId })
 }
 
 export const getGardenAggregation = async (gardenId, userRequesting) => {
