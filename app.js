@@ -38,9 +38,7 @@ app.use(cors())
 if (process.env.NODE_ENV !== 'test') {
   app.use(limiter)
 }
-app.use(helmet({
-  contentSecurityPolicy: false // Required for Swagger UI to work correctly
-}))
+app.use(helmet())
 app.use(express.json({ limit: '10kb' })) // Body limit is 10kb
 app.use(express.urlencoded({ extended: false }))
 // Custom mongoSanitize to avoid assigning to read-only req.query in Express 5
@@ -50,7 +48,10 @@ app.use((req, res, next) => {
   if (req.params) mongoSanitize.sanitize(req.params)
   next()
 })
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+// Disable CSP *only* for Swagger UI docs route
+app.use('/api-docs', helmet({
+  contentSecurityPolicy: false // Required for Swagger UI to work correctly
+}), swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use(compression())
 
