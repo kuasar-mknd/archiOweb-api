@@ -58,7 +58,7 @@ export const getAllGardens = async (queryFilters) => {
 }
 
 export const getGardenById = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId).populate('plants')
+  const garden = await Garden.findById(gardenId).lean()
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -66,6 +66,10 @@ export const getGardenById = async (gardenId, userRequesting) => {
   if (!isOwnerOrAdmin(userRequesting, garden.user)) {
     throw new AppError('Not authorized to access this garden', 403)
   }
+
+  // ⚡ Bolt: Optimize by querying Plant collection directly using index.
+  // This avoids populating the potentially stale 'plants' array in Garden doc.
+  garden.plants = await Plant.find({ garden: gardenId }).lean()
 
   return garden
 }

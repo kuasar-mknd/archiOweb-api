@@ -1,15 +1,10 @@
-import chai from 'chai'
-import chaiHttp from 'chai-http'
+import { chai, expect } from './chai-setup.js'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
 import Garden from '../models/gardenModel.js'
 import User from '../models/userModel.js'
 import sinon from 'sinon' // Assurez-vous d'importer le modèle User
 import { connectDB, disconnectDB } from '../config/database.js'
-
-// Chai middleware
-chai.use(chaiHttp)
-const { expect } = chai
 
 describe('Garden API Tests', function () {
   let token // Variable pour stocker le token d'authentification

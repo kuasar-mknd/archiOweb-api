@@ -1,4 +1,4 @@
-import chai from 'chai'
+import { chai, expect } from './chai-setup.js'
 import chaiHttp from 'chai-http'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
@@ -6,8 +6,7 @@ import Garden from '../models/gardenModel.js'
 import User from '../models/userModel.js'
 import { connectDB, disconnectDB } from '../config/database.js'
 
-chai.use(chaiHttp)
-const { expect } = chai
+
 
 describe('Sentinel Security Tests - Access Control Enforcement', function () {
   let ownerToken
