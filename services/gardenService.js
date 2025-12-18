@@ -58,8 +58,6 @@ export const getAllGardens = async (queryFilters) => {
 }
 
 export const getGardenById = async (gardenId, userRequesting) => {
-  // Optimized: Use lean() and manual query instead of populate()
-  // This is faster and avoids issues with stale IDs in the garden.plants array
   const garden = await Garden.findById(gardenId).lean()
   if (!garden) {
     throw new AppError('Garden not found', 404)
@@ -69,8 +67,9 @@ export const getGardenById = async (gardenId, userRequesting) => {
     throw new AppError('Not authorized to access this garden', 403)
   }
 
-  const plants = await Plant.find({ garden: gardenId }).lean()
-  garden.plants = plants
+  // ⚡ Bolt: Optimize by querying Plant collection directly using index.
+  // This avoids populating the potentially stale 'plants' array in Garden doc.
+  garden.plants = await Plant.find({ garden: gardenId }).lean()
 
   return garden
 }
