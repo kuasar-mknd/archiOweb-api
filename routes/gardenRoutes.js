@@ -170,6 +170,8 @@ router.get('/', getAllGardens)
  *   get:
  *     summary: Récupère un jardin par son ID
  *     tags: [Gardens]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -188,12 +190,16 @@ router.get('/', getAllGardens)
  *                   type: boolean
  *                 data:
  *                   $ref: '#/components/schemas/Garden'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (Not owner)
  *       404:
  *         description: Garden not found
  *       422:
  *         description: Invalid ID format
  */
-router.get('/:id', validate(gardenIdValidation), getGardenById)
+router.get('/:id', verifyToken, validate(gardenIdValidation), getGardenById)
 
 /**
  * @swagger

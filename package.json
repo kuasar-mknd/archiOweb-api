@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "engines": {
-        "node": ">=20.9.0"
+        "node": "20.x"
     },
     "scripts": {
         "start": "node --trace-deprecation ./bin/start",
@@ -29,7 +29,7 @@
         "helmet": "^8.0.0",
         "http-errors": "^2.0.0",
         "jsonwebtoken": "^9.0.3",
-        "mongoose": "^8.9.3",
+        "mongoose": "^9.0.1",
         "morgan": "^1.10.0",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
