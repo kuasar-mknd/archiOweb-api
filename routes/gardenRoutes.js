@@ -165,7 +165,6 @@ router.post('/', verifyToken, validate(gardenValidation), createGarden)
  *       401:
  *         description: Unauthorized
  */
-router.post('/', verifyToken, validate(gardenValidation), createGarden)
 router.get('/', verifyToken, getAllGardens)
 
 /**
