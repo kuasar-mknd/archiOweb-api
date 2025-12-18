@@ -127,6 +127,8 @@ router.post('/', verifyToken, validate(gardenValidation), createGarden)
  *   get:
  *     summary: Récupère la liste des jardins (avec filtres optionnels)
  *     tags: [Gardens]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: lat
@@ -160,9 +162,10 @@ router.post('/', verifyToken, validate(gardenValidation), createGarden)
  *                     $ref: '#/components/schemas/Garden'
  *       400:
  *         description: Invalid parameters
+ *       401:
+ *         description: Unauthorized
  */
-router.post('/', verifyToken, validate(gardenValidation), createGarden)
-router.get('/', getAllGardens)
+router.get('/', verifyToken, getAllGardens)
 
 /**
  * @swagger

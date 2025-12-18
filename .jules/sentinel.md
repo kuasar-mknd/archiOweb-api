@@ -1,5 +1,10 @@
 # Sentinel's Journal
 
+## 2025-02-18 - Unauthenticated Garden Enumeration
+**Vulnerability:** `GET /api/gardens` allowed unauthenticated users to list all gardens and their locations, enabling mass enumeration and potential privacy leaks of user locations.
+**Learning:** Even "public" listing endpoints can leak sensitive aggregate data or metadata (like locations of all users). Default to secure/private, and explicitly design public interfaces.
+**Prevention:** Apply authentication middleware (`verifyToken`) to all list endpoints by default.
+
 ## 2025-02-17 - Broken Access Control on Garden Details
 **Vulnerability:** `GET /api/gardens/:id` was unauthenticated and returned garden details including populated plant data. This bypassed the access control on `listPlantsInGarden`, allowing any user (or unauthenticated person) to view plants in any garden.
 **Learning:** When an endpoint populates related data (like `populate('plants')`), it must enforce the strictest access control applicable to that related data.
