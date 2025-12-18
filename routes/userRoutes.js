@@ -1,16 +1,37 @@
 import express from 'express'
+import { body } from 'express-validator'
 import {
   registerUser,
   loginUser,
   updateUser,
   deleteUser,
-  listUserGardens
+  listUserGardens,
+  getUserById
 } from '../controllers/userController.js'
-
+import { validate } from '../middlewares/validator.js'
 // Middleware pour vérifier l'authentification
 import verifyToken from '../middlewares/verifyToken.js'
 
 const router = express.Router()
+
+// Validation rules
+const registerValidation = [
+  body('identifier').isEmail().withMessage('A valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+  body('firstName').notEmpty().withMessage('First name is required'),
+  body('lastName').notEmpty().withMessage('Last name is required')
+]
+
+const loginValidation = [
+  body('identifier').isEmail().withMessage('A valid email is required'),
+  body('password').notEmpty().withMessage('Password is required')
+]
+
+const updateValidation = [
+  body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
+  body('lastName').optional().notEmpty().withMessage('Last name cannot be empty'),
+  body('identifier').optional().isEmail().withMessage('A valid email is required')
+]
 
 /**
  * @swagger
@@ -22,7 +43,6 @@ const router = express.Router()
  *         - identifier
  *         - firstName
  *         - lastName
- *         - birthDate
  *         - password
  *         - gardens
  *       properties:
@@ -34,7 +54,7 @@ const router = express.Router()
  *           description: Le prénom d'utilisateur
  *         lastName:
  *           type: string
- *           format: email
+ *           format: string
  *           description: Le nom d'utilisateur
  *         birthDate:
  *          type: string
@@ -77,23 +97,50 @@ const router = express.Router()
  *             properties:
  *               identifier:
  *                 type: string
+ *                 default:  john@gmail.com
  *               firstName:
  *                 type: string
+ *                 default: john
  *               lastName:
  *                 type: string
+ *                 default: doe
  *               birthDate:
  *                 type: string
+ *                 default: 1990-01-01
  *               password:
  *                 type: string
+ *                 default: password123
  *     responses:
  *       201:
  *         description: User registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     identifier:
+ *                       type: string
+ *                     firstName:
+ *                       type: string
+ *                     lastName:
+ *                       type: string
+ *                 message:
+ *                   type: string
  *       400:
- *         description: Bad request.
+ *         description: Bad request, user already exists.
+ *       422:
+ *         description: Validation error.
  *       500:
  *         description: Internal Server Error.
  */
-router.post('/register', registerUser)
+router.post('/register', validate(registerValidation), registerUser)
 
 /**
  * @swagger
@@ -113,94 +160,203 @@ router.post('/register', registerUser)
  *             properties:
  *               identifier:
  *                 type: string
+ *                 default:  john@gmail.com
  *                 description: Email ou nom d'utilisateur pour l'authentification
  *               password:
  *                 type: string
+ *                 default: password123
  *                 description: Mot de passe pour l'authentification
  *     responses:
  *       200:
- *         description: Authentification réussie, token retourné
+ *         description: Authentication successful, token returned
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: Token JWT pour authentification
+ *                 message:
  *                   type: string
- *                   description: Token JWT pour authentification
  *       400:
- *         description: Données d'entrée invalides
+ *         description: Données d'entrée invalides.
  *       401:
- *         description: Authentification échouée
+ *         description: Authentification Auth failed.
+ *       422:
+ *         description: Validation error.
  *       500:
  *         description: Internal Server Error.
  */
-router.post('/login', loginUser)
+router.post('/login', validate(loginValidation), loginUser)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users/gardens:
+ *   get:
+ *     summary: liste les gardens des users
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of successfully returned gardens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Garden'
+ *       400:
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *        description: Internal Server Error.
+ */
+
+router.get('/gardens', verifyToken, listUserGardens)
+
+/**
+ * @swagger
+ * /api/users:
  *   put:
  *     summary: Met à jour les informations d'un utilisateur
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID unique de l'utilisateur
- *         schema:
- *           type: string
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               identifier:
+ *                 type: string
+ *                 example:  john@gmail.com
+ *               firstName:
+ *                 type: string
+ *                 example: john
+ *               lastName:
+ *                 type: string
+ *                 example: doe
+ *               birthDate:
+ *                 type: string
+ *                 example: 1990-01-01
+ *               password:
+ *                 type: string
+ *                 example: password123
  *     responses:
  *       200:
- *         description: Utilisateur mis à jour
+ *         description: Successful user update
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 _id :
+ *                  type: string
+ *                 identifier:
+ *                  type: string
+ *                 firstName:
+ *                  type: string
+ *                 lastName:
+ *                  type: string
+ *                 birthDate:
+ *                  type: string
+ *                 gardens:
+ *                  type: array
+ *                  items:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *               example:
+ *                 location: { type: Point, coordinates: [string, string]}
+ *                 _id: string
+ *                 identifier: string
+ *                 firstName: string
+ *                 lastName: string
+ *                 birthDate: string
+ *                 gardens: [string]
+ *                 createdAt: string
+ *                 updatedAt: string
  *       400:
- *         description: Erreur dans la mise à jour
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
  *       404:
- *         description: Utilisateur non trouvé
+ *         description: User not found.
  *       500:
  *         description: Internal Server Error.
  */
-router.put('/', verifyToken, updateUser)
+router.put('/', verifyToken, validate(updateValidation), updateUser)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users:
  *   delete:
  *     summary: Supprime un utilisateur
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID unique de l'utilisateur
- *         schema:
- *           type: string
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       204:
- *         description: Utilisateur supprimé avec succès
+ *         description: User, associated gardens, and plants deleted.
  *       400:
- *         description: Erreur dans la suppression
+ *         description: Bad request, token is not valid.
+ *       401:
+ *         description: No token, authorization denied.
  *       404:
- *         description: Utilisateur non trouvé
+ *         description: User not found.
  *       500:
  *        description: Internal Server Error.
  */
 router.delete('/', verifyToken, deleteUser)
 
-router.get('/gardens', verifyToken, listUserGardens)
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Récupère le profil public d'un utilisateur par son ID
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID de l'utilisateur à récupérer
+ *     responses:
+ *       200:
+ *         description: Profil public de l'utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: No token, authorization denied.
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur interne du serveur
+ */
+router.get('/:id', verifyToken, getUserById)
 
 export default router

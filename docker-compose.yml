@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  api:
+    image: ghcr.io/kuasar-mknd/archioweb-api:latest
+    container_name: archioweb-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # API
+      - "3001:3001" # WebSocket
+    environment:
+      - NODE_ENV=production
+      # DATABASE_URL doit être défini dans Portainer (Connection String Atlas)
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - "com.centurylinklabs.watchtower.enable=true"

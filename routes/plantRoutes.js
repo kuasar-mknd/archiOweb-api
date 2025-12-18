@@ -1,4 +1,5 @@
 import express from 'express'
+import { body, param } from 'express-validator'
 import {
   createPlant,
   getAllPlants,
@@ -6,11 +7,24 @@ import {
   updatePlant,
   deletePlant
 } from '../controllers/plantController.js'
-
-// Middleware pour vérifier l'authentification
+import { validate } from '../middlewares/validator.js'
 import verifyToken from '../middlewares/verifyToken.js'
 
 const router = express.Router()
+
+// Validation Rules
+const plantValidation = [
+  body('commonName').notEmpty().withMessage('Common name is required'),
+  body('scientificName').notEmpty().withMessage('Scientific name is required'),
+  body('family').notEmpty().withMessage('Family is required'),
+  body('exposure').isIn(['Full Sun', 'Partial Shade', 'Shade']).withMessage('Invalid exposure'),
+  body('garden').isMongoId().withMessage('Invalid garden ID')
+]
+
+const plantIdValidation = [
+  param('id').isMongoId().withMessage('Invalid plant ID')
+]
+
 /**
  * @swagger
  * components:
@@ -22,70 +36,58 @@ const router = express.Router()
  *         - scientificName
  *         - family
  *         - exposure
+ *         - garden
  *       properties:
  *         commonName:
- *          type: string
- *          description: Le nom commun de la plantes
+ *           type: string
+ *           description: Le nom commun de la plante
  *         scientificName:
- *          type: string
- *          description: Le nom scientifique de la plantes
+ *           type: string
+ *           description: Le nom scientifique de la plante
  *         family:
- *          type: string
- *          description: La famille de la plantes
+ *           type: string
+ *           description: La famille de la plante
+ *         description:
+ *           type: string
+ *           description: Description de la plante
  *         origin:
- *          type: string
- *          description: L'origine de la plantes
+ *           type: string
+ *           description: L'origine de la plante
  *         exposure:
- *          type: string
- *          description: L'exposition de la plantes
- *          enum: [Full Sun, Partial Shade, Shade]
+ *           type: string
+ *           enum: [Full Sun, Partial Shade, Shade]
+ *           description: L'exposition requise pour la plante
  *         watering:
- *          type: string
- *          description: L'arrosage de la plantes
+ *           type: string
+ *           description: Les besoins en arrosage de la plante
  *         soilType:
- *          type: string
- *          description: Le type de sol de la plantes
+ *           type: string
+ *           description: Le type de sol requis pour la plante
  *         flowerColor:
- *          type: string
- *          description: La couleur de la fleur de la plantes
+ *           type: string
+ *           description: La couleur des fleurs de la plante
  *         height:
- *          type: number
- *          description: La taille de la plantes
+ *           type: number
+ *           description: La hauteur de la plante
  *         bloomingSeason:
- *          type: string
- *          description: La saison de floraison de la plantes
+ *           type: string
+ *           description: La saison de floraison de la plante
  *         plantingSeason:
- *          type: string
- *          description: La saison de plantation de la plantes
+ *           type: string
+ *           description: La saison de plantation de la plante
  *         care:
- *          type: string
- *          description: Les soins de la plantes
+ *           type: string
+ *           description: Les soins spécifiques pour la plante
  *         imageUrl:
- *          type: string
- *          description: L'URL de l'image de la plantes
+ *           type: string
+ *           description: L'URL de l'image de la plante
  *         use:
- *          type: string
- *          description: L'utilisation de la plantes
- *          enum: [Ornamental, Groundcover, Food, Medicinal, Fragrance]
+ *           type: string
+ *           enum: [Ornamental, Groundcover, Food, Medicinal, Fragrance]
+ *           description: L'utilisation de la plante
  *         garden:
- *          type: string
- *          description: Le jardin où la plantes est cultivée
- *       example:
- *         commonName: Basilic
- *         scientificName: Ocimum basilicum
- *         family: Lamiaceae
- *         origin: Inde
- *         exposure: Full Sun
- *         watering: 1 fois par semaine
- *         soilType: terreau
- *         flowerColor: blanc
- *         height: 30 cm
- *         bloomingSeason: été
- *         plantingSeason: printemps
- *         care: arroser régulièrement
- *         imageUrl: https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Basil-Basilico-Ocimum_basilicum-albahaca.jpg/1200px-Basil-Basilico-Ocimum_basilicum-albahaca.jpg
- *         use: Food
- *         garden: 60a4d1a6a7b6f8e1e4a0a6d2
+ *           type: string
+ *           description: L'ID du jardin auquel la plante appartient
  */
 
 /**
@@ -94,117 +96,129 @@ const router = express.Router()
  *   post:
  *     tags:
  *       - Plants
- *     summary: Crée une plante
- *     description: Cette route vous permet d'enregistrer une nouvelle plante.
+ *     security:
+ *       - BearerAuth: []
+ *     summary: Crée une nouvelle plante
+ *     description: Permet de créer une nouvelle plante dans un jardin.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - commonName
- *               - scientificName
- *               - family
- *               - exposure
- *             properties:
- *               commonName:
- *                 type: string
- *               scientificName:
- *                 type: string
- *               family:
- *                 type: string
- *               origin:
- *                 type: string
- *               exposure:
- *                 type: string
- *               watering:
- *                 type: string
- *               soilType:
- *                 type: string
- *               flowerColor:
- *                 type: string
- *               height:
- *                 type: number
- *               bloomingSeason:
- *                 type: string
- *               plantingSeason:
- *                 type: string
- *               care:
- *                 type: string
- *               imageUrl:
- *                 type: string
- *               use:
- *                 type: string
- *               garden:
- *                 type: string
-*     responses:
+ *             $ref: '#/components/schemas/Plant'
+ *     responses:
  *       201:
- *         description: Plant registered successfully.
+ *         description: Plant created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Plant'
+ *                 message:
+ *                   type: string
  *       400:
  *         description: Bad request.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to add plants to this garden.
+ *       404:
+ *         description: Garden not found.
+ *       422:
+ *         description: Validation error.
  *       500:
  *         description: Internal Server Error.
  */
+router.post('/', verifyToken, validate(plantValidation), createPlant)
 
-// Route pour créer une nouvelle plante
-router.post('/', verifyToken, createPlant)
 /**
  * @swagger
  * /api/plants:
  *   get:
  *     summary: Récupère la liste de toutes les plantes
  *     tags: [Plants]
+ *     security:
+ *       - BearerAuth: []
  *     responses:
+ *       200:
+ *         description: List of plants successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Plant'
+ *       401:
+ *         description: No token, authorization denied.
  *       500:
  *         description: Internal Server Error.
  */
-
-// Route pour récupérer toutes les plantes
 router.get('/', verifyToken, getAllPlants)
+
 /**
  * @swagger
  * /api/plants/{id}:
  *   get:
- *     summary: Récupère une plante spécifique par son ID
+ *     summary: Récupère les détails d'une plante par son ID
  *     tags: [Plants]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: string
  *         required: true
  *         description: ID de la plante
+ *         schema:
+ *           type: string
  *     responses:
- *       500:
- *         description: Internal Server Error.
  *       200:
- *         description: Détails de la plante
+ *         description: Plant details successfully retrieved
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Garden'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Plant'
+ *       400:
+ *         description: Bad request (invalid ID).
+ *       401:
+ *         description: No token, authorization denied.
  *       404:
- *         description: Plante non trouvée
+ *         description: Plant not found.
+ *       422:
+ *         description: Validation error (invalid ID format).
+ *       500:
+ *         description: Internal Server Error.
  */
+router.get('/:id', verifyToken, validate(plantIdValidation), getPlantById)
 
-// Route pour récupérer une plante spécifique par son ID
-router.get('/:id', verifyToken, getPlantById)
 /**
  * @swagger
  * /api/plants/{id}:
  *   put:
- *     summary: Met à jour une plante spécifique par son ID
+ *     summary: Met à jour les informations d'une plante
  *     tags: [Plants]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID de la plante
+ *         description: ID de la plante à mettre à jour
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -213,48 +227,62 @@ router.get('/:id', verifyToken, getPlantById)
  *             $ref: '#/components/schemas/Plant'
  *     responses:
  *       200:
- *         description: Plante mise à jour avec succès
+ *         description: Plant updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Plant'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Plant'
  *       400:
- *         description: Erreur dans la mise à jour
+ *         description: Bad request.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to update this plant.
  *       404:
- *         description: Plante non trouvée
+ *         description: Plant not found or Garden not found.
+ *       422:
+ *         description: Validation error.
  *       500:
  *         description: Internal Server Error.
  */
+router.put('/:id', verifyToken, validate([...plantIdValidation, ...plantValidation]), updatePlant)
 
-// Route pour mettre à jour une plante spécifique par son ID
-router.put('/:id', verifyToken, updatePlant)
 /**
  * @swagger
  * /api/plants/{id}:
  *   delete:
- *     summary: Supprime une plante spécifique par son ID
+ *     summary: Supprime une plante
  *     tags: [Plants]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID de la plante
+ *         description: ID de la plante à supprimer
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       204:
- *         description: Plante supprimée avec succès
+ *         description: Plant deleted successfully
  *       400:
- *         description: Erreur dans la suppression
+ *         description: Bad request.
+ *       401:
+ *         description: No token, authorization denied.
+ *       403:
+ *         description: Not authorized to delete this plant.
  *       404:
- *         description: Plante non trouvée
+ *         description: Plant not found or Garden not found.
+ *       422:
+ *         description: Validation error (invalid ID format).
  *       500:
- *        description: Internal Server Error.
+ *         description: Internal Server Error.
  */
-
-// Route pour supprimer une plante spécifique par son ID
-router.delete('/:id', verifyToken, deletePlant)
+router.delete('/:id', verifyToken, validate(plantIdValidation), deletePlant)
 
 export default router

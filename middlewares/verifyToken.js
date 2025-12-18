@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
     req.user = decoded
     next()
   } catch (e) {
-    res.status(400).json({ message: 'Token is not valid' })
+    res.status(400).json({ message: 'Bad request, token is not valid' })
   }
 }
 
