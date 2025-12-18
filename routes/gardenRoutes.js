@@ -161,7 +161,7 @@ router.post('/', verifyToken, validate(gardenValidation), createGarden)
  *       400:
  *         description: Invalid parameters
  */
-router.post('/', verifyToken, validate(gardenValidation), createGarden)
+
 router.get('/', getAllGardens)
 
 /**
