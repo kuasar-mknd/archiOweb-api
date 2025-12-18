@@ -57,11 +57,16 @@ export const getAllGardens = async (queryFilters) => {
   return gardens
 }
 
-export const getGardenById = async (gardenId) => {
+export const getGardenById = async (gardenId, userRequesting) => {
   const garden = await Garden.findById(gardenId).populate('plants')
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
+
+  if (!isOwnerOrAdmin(userRequesting, garden.user)) {
+    throw new AppError('Not authorized to access this garden', 403)
+  }
+
   return garden
 }
 
@@ -119,7 +124,7 @@ export const deleteGarden = async (gardenId, userRequesting) => {
 }
 
 export const listPlantsInGarden = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId).populate('plants')
+  const garden = await Garden.findById(gardenId)
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -129,7 +134,7 @@ export const listPlantsInGarden = async (gardenId, userRequesting) => {
     throw new AppError('Not authorized to get the plants from this garden', 403)
   }
 
-  return garden.plants
+  return await Plant.find({ garden: gardenId })
 }
 
 export const getGardenAggregation = async (gardenId, userRequesting) => {
@@ -146,40 +151,6 @@ export const getGardenAggregation = async (gardenId, userRequesting) => {
   }
 
   const { ObjectId } = mongoose.Types
-  const aggregation = await Garden.aggregate([
-    { $match: { _id: new ObjectId(gardenId) } },
-    {
-      $lookup: {
-        from: 'plants',
-        localField: '_id',
-        foreignField: 'garden',
-        as: 'plants'
-      }
-    },
-    { $unwind: '$plants' },
-    {
-      $group: {
-        _id: '$plants._id',
-        name: { $first: '$plants.commonName' }, // Assuming grouping by plant unique ID makes name strict
-        // Original logic was grouping logic? Let's check original controller code.
-        // Original:
-        /*
-        { $match: { _id: gardenId } },
-        {
-          $lookup: { from: 'plants', localField: 'plants', foreignField: '_id', as: 'plants' }
-        },
-        { $unwind: '$plants' },
-        {
-          $group: {
-            _id: '$plants.commonName', // Group by commonName
-            numberofplants: { $sum: 1 }
-          }
-        },
-        { $project: { _id: 0, name: '$_id', numberofplants: 1 } }
-        */
-      }
-    }
-  ])
   
   // Let's implement EXACTLY the original aggregation logic
   const originalAggregation = await Garden.aggregate([

@@ -10,14 +10,18 @@ import http from 'http'
 import { connectDB } from '../config/database.js'
 import { startWebSocketServer } from '../lib/websocket.js'
 
-try {
-  await connectDB()
-} catch (error) {
-  console.error('Failed to connect to database:', error)
-  console.warn('⚠️  Starting server WITHOUT database connection! API endpoints requiring DB will fail.')
-  // We do not exit the process so that the deployment can succeed and logs can be viewed.
-  // process.exit(1)
-}
+const dbUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden'
+const maskedUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')
+console.log(`Attempting to connect to database: ${maskedUrl}`)
+
+connectDB().catch(err => {
+  console.error('Failed to connect to database.')
+  console.error('1. Check if your DATABASE_URL is correct (no typos, no trailing spaces).')
+  console.error('2. Ensure your MongoDB Atlas Cluster AllowList includes 0.0.0.0/0 (for Render).')
+  console.error('3. Check if your cluster is paused.')
+  console.error('Original Error:', err)
+  process.exit(1)
+})
 
 if (process.env.NODE_ENV !== 'test') {
   startWebSocketServer()
