@@ -35,7 +35,9 @@ db.once('open', function () {
 const app = express()
 // Apply to all requests & sanitize req.body
 app.use(cors())
-app.use(limiter)
+if (process.env.NODE_ENV !== 'test') {
+  app.use(limiter)
+}
 app.use(helmet({
   contentSecurityPolicy: false // Required for Swagger UI to work correctly
 }))
