@@ -13,3 +13,8 @@
 **Vulnerability:** `authenticateUser` returned immediately if the user was not found, while performing a slow bcrypt comparison if the user existed. This allowed attackers to enumerate valid email addresses based on response time.
 **Learning:** Short-circuit evaluation in authentication logic can introduce timing side channels.
 **Prevention:** Always perform the same amount of work (e.g., hash comparison) regardless of whether the user exists or not.
+
+## 2025-02-18 - Excessive Data Exposure in Plant List
+**Vulnerability:** `GET /api/plants` allowed any authenticated user to list ALL plants in the database, including those from private gardens of other users. This was due to `plantService.getAllPlants` returning `Plant.find()` without filtering.
+**Learning:** List endpoints in a multi-tenant application must always be filtered by the user's context/ownership. Implicit "public by default" for collections is dangerous. Also discovered that running large test suites can trigger rate limits, causing false positives in tests.
+**Prevention:** Pass the requesting user context to all service methods and enforce ownership filters (e.g. `user: req.user.id` or `garden: { $in: userGardenIds }`). Disable rate limiting in test environments.
