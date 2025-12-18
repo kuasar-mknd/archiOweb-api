@@ -1,11 +1,9 @@
-import chai from 'chai'
-import chaiHttp from 'chai-http'
+import { chai, expect } from './chai-setup.js'
 import { after, before, describe, it } from 'mocha'
 import app from '../app.js'
 import { connectDB, disconnectDB } from '../config/database.js'
 
-chai.use(chaiHttp)
-const { expect } = chai
+
 
 describe('Sentinel Reproduction - Public Garden Exposure', function () {
   before(async function () {
