@@ -1,7 +1,8 @@
-import { use, expect } from 'chai'
+import * as chaiModule from 'chai'
 import chaiHttp from 'chai-http'
 
-const chai = use(chaiHttp)
+const chai = chaiModule.use(chaiHttp)
+const expect = chaiModule.expect
 const requestObj = chai.request
 
 // Fix compatibility between chai 6 and chai-http 5
