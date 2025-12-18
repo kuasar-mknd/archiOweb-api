@@ -1,19 +1,32 @@
 import express from 'express'
+import { body, param } from 'express-validator'
 import {
   createGarden,
   getAllGardens,
   getGardenById,
   updateGarden,
-  listPlantsInGarden,
   deleteGarden,
+  listPlantsInGarden,
   getGardenAggregation
 } from '../controllers/gardenController.js'
-
-// Middleware pour vérifier l'authentification
+import { validate } from '../middlewares/validator.js'
 import verifyToken from '../middlewares/verifyToken.js'
 
 const router = express.Router()
 
+// Validations
+const gardenValidation = [
+  body('name').notEmpty().withMessage('Name is required'),
+  body('location').notEmpty().withMessage('Location is required').isObject(),
+  body('location.type').equals('Point').withMessage('Location type must be Point'),
+  body('location.coordinates').isArray({ min: 2, max: 2 }).withMessage('Coordinates must be an array of 2 numbers')
+]
+
+const gardenIdValidation = [
+  param('id').isMongoId().withMessage('Invalid garden ID')
+]
+
+// Routes
 /**
  * @swagger
  * components:
@@ -23,39 +36,46 @@ const router = express.Router()
  *       required:
  *         - name
  *         - location
- *         - plants
  *         - user
  *       properties:
  *         name:
  *           type: string
  *           description: Le nom du jardin
  *         location:
- *           type: Point
- *           coordinates: [longitude, latitude]
- *           description: La localisation du jardin en coordonnées GPS
- *         plants:
- *          type: Array
- *          description: Les plantes du jardin
+ *           type: object
+ *           properties:
+ *             type:
+ *               type: string
+ *               enum: [Point]
+ *             coordinates:
+ *               type: array
+ *               items:
+ *                 type: number
+ *           description: GeoJSON Point
  *         user:
  *           type: string
- *           description: L'utilisateur du jardin
- *       example:
- *         name: potagé
- *         location: { type: Point, coordinates: [41.40338, 2.17403]}
- *         plants: [Ocimum basilicum, Mentha spicata, Rosmarinus officinalis]
- *         user: John Doe
+ *           description: ID du propriétaire
+ *         plants:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Liste des IDs des plantes
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
  */
 
 /**
- * @openapi
+ * @swagger
  * /api/gardens:
  *   post:
- *     tags:
- *       - Gardens
+ *     summary: Crée un nouveau jardin
+ *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
- *     summary: Crée un jardin
- *     description: This route allows you to register a new garden.
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -65,59 +85,97 @@ const router = express.Router()
  *             required:
  *               - name
  *               - location
- *               - plants
- *               - user
  *             properties:
  *               name:
  *                 type: string
  *               location:
- *                 type: string
- *               plants:
- *                 type: string
- *               user:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   type:
+ *                     type: string
+ *                     enum: [Point]
+ *                   coordinates:
+ *                     type: array
+ *                     items:
+ *                       type: number
  *     responses:
  *       201:
- *         description: Graden registered successfully.
+ *         description: Garden created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Garden'
+ *                 message:
+ *                   type: string
  *       400:
- *         description: Bad request, token is not valid.
+ *         description: Bad request
  *       401:
- *         description: No token, authorization denied.
- *       488:
- *         description: Incorrect content.
- *       500:
- *         description: Internal Server Error.
+ *         description: Unauthorized
+ *       422:
+ *         description: Validation error
  */
+router.post('/', verifyToken, validate(gardenValidation), createGarden)
 
-// Route pour créer un nouveau jardin
-router.post('/', verifyToken, createGarden)
 /**
  * @swagger
  * /api/gardens:
  *   get:
- *     summary: Récupère la liste de tous les jardins
+ *     summary: Récupère la liste des jardins (avec filtres optionnels)
  *     tags: [Gardens]
+ *     parameters:
+ *       - in: query
+ *         name: lat
+ *         schema:
+ *           type: number
+ *         description: Latitude pour recherche géographique
+ *       - in: query
+ *         name: lng
+ *         schema:
+ *           type: number
+ *         description: Longitude pour recherche géographique
+ *       - in: query
+ *         name: radius
+ *         schema:
+ *           type: number
+ *           default: 10000
+ *         description: Rayon de recherche en mètres
  *     responses:
+ *       200:
+ *         description: List of gardens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Garden'
  *       400:
- *        description: Bad request,Invalid latitude or longitude.
- *       500:
- *         description: Internal Server Error.
-
+ *         description: Invalid parameters
  */
-
-// Route pour récupérer tous les jardins
+router.post('/', verifyToken, validate(gardenValidation), createGarden)
 router.get('/', getAllGardens)
+
 /**
  * @swagger
  * /api/gardens/{id}:
  *   get:
- *     summary: Récupère les détails d'un jardin par son ID
+ *     summary: Récupère un jardin par son ID
  *     tags: [Gardens]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID du jardin
  *         schema:
  *           type: string
  *     responses:
@@ -126,27 +184,35 @@ router.get('/', getAllGardens)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Garden'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Garden'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (Not owner)
  *       404:
- *         description: Garden not found, Invalid garden ID.
+ *         description: Garden not found
+ *       422:
+ *         description: Invalid ID format
  */
-
-// Route pour récupérer un jardin spécifique par son ID
-router.get('/:id', getGardenById)
+router.get('/:id', verifyToken, validate(gardenIdValidation), getGardenById)
 
 /**
  * @swagger
  * /api/gardens/{id}:
  *   put:
- *     summary: Met à jour les informations d'un jardin
+ *     summary: Met à jour un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID unique du jardin
  *         schema:
  *           type: string
  *     requestBody:
@@ -157,25 +223,22 @@ router.get('/:id', getGardenById)
  *             $ref: '#/components/schemas/Garden'
  *     responses:
  *       200:
- *         description: Updated garden
+ *         description: Garden updated
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Garden'
- *       400:
- *         description: Bad request, token is not valid.
- *       401:
- *         description: No token, authorization denied.
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Garden'
  *       403:
- *         description: Not authorized to update this garden.
+ *         description: Not authorized
  *       404:
- *         description: Garden not found, Invalid garden ID.
- *       500:
- *         description: Internal Server Error.
+ *         description: Garden not found
  */
-
-// Route pour mettre à jour un jardin spécifique par son ID
-router.put('/:id', verifyToken, updateGarden)
+router.put('/:id', verifyToken, validate([...gardenIdValidation, ...gardenValidation]), updateGarden)
 
 /**
  * @swagger
@@ -184,92 +247,92 @@ router.put('/:id', verifyToken, updateGarden)
  *     summary: Supprime un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID unique du jardin
  *         schema:
  *           type: string
  *     responses:
  *       204:
- *         description: Garden successfully deleted
- *       400:
- *         description: Bad request, token is not valid.
- *       401:
- *         description: No token, authorization denied.
+ *         description: Garden deleted
  *       403:
- *         description: Not authorized to delete this garden.
+ *         description: Not authorized
  *       404:
- *         description: Garden not found, Invalid garden ID.
- *       500:
- *        description: Internal Server Error.
+ *         description: Garden not found
  */
-
-// Route pour supprimer un jardin spécifique par son ID
-router.delete('/:id', verifyToken, deleteGarden)
+router.delete('/:id', verifyToken, validate(gardenIdValidation), deleteGarden)
 
 /**
  * @swagger
  * /api/gardens/{id}/plants:
  *   get:
- *     summary: Récupère les plantes d'un jardin
+ *     summary: Liste les plantes d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID du jardin
  *         schema:
  *           type: string
  *     responses:
- *       400:
- *         description: Bad request,Token is not valid.
- *       401:
- *         description: No token, authorization denied.
+ *       200:
+ *         description: List of plants
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Plant'
  *       403:
- *         description: Not authorized to get plants in this garden.
+ *         description: Not authorized
  *       404:
- *         description: Garden not found, Invalid garden ID.
- *       500:
- *         description: Internal Server Error.
+ *         description: Garden not found
  */
-
-// Route pour récupérer les plantes d'un jardin
-router.get('/:id/plants', verifyToken, listPlantsInGarden)
+router.get('/:id/plants', verifyToken, validate(gardenIdValidation), listPlantsInGarden)
 
 /**
  * @swagger
  * /api/gardens/{id}/plants/aggregate:
  *   get:
- *     summary: Récupère l'aggrégation des plantes d'un jardin
+ *     summary: Agrégation des plantes d'un jardin
  *     tags: [Gardens]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *     name: id
- *     required: true
- *     description: ID du jardin
- *     schema:
- *       type: string
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
- *       400:
- *         description: Bad request,Token is not valid.
- *       401:
- *         description: No token, authorization denied.
- *       403:
- *         description: Not authorized to get plants in this garden.
- *       404:
- *         description: Garden not found, Invalid garden ID.
- *       500:
- *         description: Internal Server Error (Not authorized to get the plants from this garden).
+ *       200:
+ *         description: Aggregated plant data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                       numberofplants:
+ *                         type: integer
  */
-
-// Route pour récupérer aggrégation des plantes d'un jardin
-router.get('/:id/plants/aggregate', verifyToken, getGardenAggregation)
+router.get('/:id/plants/aggregate', verifyToken, validate(gardenIdValidation), getGardenAggregation)
 
 export default router

@@ -2,10 +2,10 @@ import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
-import { connectDB, disconnectDB } from '../config/database.js'
 import User from '../models/userModel.js'
+import sinon from 'sinon'
+import { connectDB, disconnectDB } from '../config/database.js'
 
-// Chai middleware for HTTP assertions
 chai.use(chaiHttp)
 const { expect } = chai
 
@@ -13,6 +13,7 @@ describe('User API Tests', function () {
   let token
   // Setup and teardown
   before(async function () {
+    this.timeout(30000)
     await connectDB()
   })
 
@@ -41,7 +42,11 @@ describe('User API Tests', function () {
       password: newUser.password
     })
 
-    token = res.body.token
+    token = res.body.data.token
+  })
+
+  afterEach(function () {
+    sinon.restore()
   })
 
   describe('POST /api/users/register', function () {
@@ -87,12 +92,13 @@ describe('User API Tests', function () {
           lastName: 'User'
         })
 
-      expect(res).to.have.status(488)
+      expect(res).to.have.status(422)
     })
 
     it('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+      // Simuler une erreur de base de données
+      sinon.stub(User, 'findOne').throws(new Error('Database error'))
+
       const res = await chai.request(app)
         .post('/api/users/register')
         .send({
@@ -103,9 +109,6 @@ describe('User API Tests', function () {
         })
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -118,7 +121,7 @@ describe('User API Tests', function () {
           password: 'password'
         })
       expect(res).to.have.status(200)
-      expect(res.body).to.have.property('token')
+      expect(res.body.data).to.have.property('token')
     })
 
     it('should not login user with incorrect credentials', async function () {
@@ -136,8 +139,8 @@ describe('User API Tests', function () {
     })
 
     it('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+      // Simuler une erreur de base de données
+      sinon.stub(User, 'findOne').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .post('/api/users/login')
@@ -146,9 +149,6 @@ describe('User API Tests', function () {
           password: 'pasdsword'
         })
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
   })
 
@@ -167,8 +167,8 @@ describe('User API Tests', function () {
     })
 
     it('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+      // Simuler une erreur
+      sinon.stub(User, 'findByIdAndUpdate').throws(new Error('Database error'))
 
       const updateData = {
         identifier: 'testusernew@example.com'
@@ -179,9 +179,6 @@ describe('User API Tests', function () {
         .send(updateData)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
 
     it('should return 404 for non-existent user', async function () {
@@ -216,7 +213,7 @@ describe('User API Tests', function () {
         .send(gardenData)
       expect(res).to.have.status(201)
 
-      const createdGardenId = res.body._id
+      const createdGardenId = res.body.data._id
 
       const plantData = {
         commonName: 'Nom commun',
@@ -239,17 +236,14 @@ describe('User API Tests', function () {
     })
 
     it('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+      // Simuler une erreur
+      sinon.stub(User, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .delete('/api/users/')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
-
-      // Reconnecter la base de données
-      await connectDB()
     })
 
     it('should delete a user and associated gardens', async function () {
@@ -266,7 +260,7 @@ describe('User API Tests', function () {
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.have.property('name', 'Test Garden')
+      expect(res.body.data).to.have.property('name', 'Test Garden')
 
       // Delete the user
       const res2 = await chai.request(app)
@@ -277,7 +271,7 @@ describe('User API Tests', function () {
 
       // Check that the garden was deleted
       const res3 = await chai.request(app)
-        .get(`/api/gardens/${res.body._id}`)
+        .get(`/api/gardens/${res.body.data._id}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res3).to.have.status(404)
@@ -303,7 +297,7 @@ describe('User API Tests', function () {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.be.an('array')
+      expect(res.body.data).to.be.an('array')
     })
 
     it('should return 404 for non-existent user', async function () {
@@ -320,17 +314,34 @@ describe('User API Tests', function () {
     })
 
     it('should return error 500 for server errors', async function () {
-      // Déconnecter la base de données
-      await disconnectDB()
+      // Simuler une erreur
+      sinon.stub(User, 'findById').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/users/gardens')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(500)
+    })
+  })
 
-      // Reconnecter la base de données
-      await connectDB()
+  describe('GET /api/users/:id', function () {
+    it('should get a user by ID', async function () {
+      const user = await User.findOne({ identifier: 'testuser@example.com' })
+      const res = await chai.request(app)
+        .get(`/api/users/${user._id}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body.data).to.have.property('identifier', 'testuser@example.com')
+      expect(res.body.data).to.not.have.property('password')
+    })
+
+    it('should return 404 for non-existent user', async function () {
+      const res = await chai.request(app)
+        .get('/api/users/60f7e6e0b4e2a7001f7b8e1d') // Invalid ID
+        .set('Authorization', `Bearer ${token}`)
+      expect(res).to.have.status(404)
     })
   })
 })
