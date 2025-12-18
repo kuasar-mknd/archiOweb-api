@@ -7,6 +7,7 @@ const gardenSchema = new mongoose.Schema({
     coordinates: { type: [Number], required: true }
   },
   plants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
+  // Index added for performance: filtering gardens by user is a frequent operation
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true }
 }, { timestamps: true })
 
