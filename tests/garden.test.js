@@ -6,9 +6,6 @@ import User from '../models/userModel.js'
 import sinon from 'sinon' // Assurez-vous d'importer le modèle User
 import { connectDB, disconnectDB } from '../config/database.js'
 
-// Chai middleware
-
-
 describe('Garden API Tests', function () {
   let token // Variable pour stocker le token d'authentification
   let createdGardenId // Pour stocker l'ID du jardin créé

@@ -5,8 +5,6 @@ import User from '../models/userModel.js'
 import sinon from 'sinon'
 import { connectDB, disconnectDB } from '../config/database.js'
 
-
-
 describe('User API Tests', function () {
   let token
   // Setup and teardown

@@ -7,9 +7,6 @@ import Plant from '../models/plantModel.js'
 import sinon from 'sinon'
 import { connectDB, disconnectDB } from '../config/database.js'
 
-// Chai middleware
-
-
 describe('Plants API Tests', function () {
   let token // Variable pour stocker le token d'authentification
   let createdGardenId
