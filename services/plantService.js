@@ -42,8 +42,17 @@ export const createPlant = async (plantData, userId, userRequesting) => {
   return savedPlant
 }
 
-export const getAllPlants = async () => {
-  return await Plant.find()
+export const getAllPlants = async (userRequesting) => {
+  // Sentinel: Broken Access Control Fix
+  // Only return plants from gardens owned by the user (or all if admin)
+  if (userRequesting && userRequesting.role === 'admin') {
+    return await Plant.find()
+  }
+
+  const userGardens = await Garden.find({ user: userRequesting.userId }).select('_id')
+  const gardenIds = userGardens.map(g => g._id)
+
+  return await Plant.find({ garden: { $in: gardenIds } })
 }
 
 export const getPlantById = async (plantId) => {

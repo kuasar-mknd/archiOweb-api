@@ -14,7 +14,7 @@ export const createPlant = async (req, res, next) => {
 
 export const getAllPlants = async (req, res, next) => {
   try {
-    const plants = await plantService.getAllPlants()
+    const plants = await plantService.getAllPlants(req.user)
     sendResponse(res, 200, plants)
   } catch (error) {
     next(error)
