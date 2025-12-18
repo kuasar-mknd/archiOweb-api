@@ -1,12 +1,8 @@
-import chai from 'chai'
-import chaiHttp from 'chai-http'
+import { chai, expect } from './chai-setup.js'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
 import User from '../models/userModel.js'
 import { connectDB, disconnectDB } from '../config/database.js'
-
-chai.use(chaiHttp)
-const { expect } = chai
 
 describe('Security: User PII Protection', function () {
   let userAToken
