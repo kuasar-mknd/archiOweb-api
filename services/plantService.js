@@ -55,11 +55,21 @@ export const getAllPlants = async (userRequesting) => {
   return await Plant.find({ garden: { $in: gardenIds } })
 }
 
-export const getPlantById = async (plantId) => {
+export const getPlantById = async (plantId, userRequesting) => {
   const plant = await Plant.findById(plantId)
   if (!plant) {
     throw new AppError('Plant not found', 404)
   }
+
+  // Sentinel: Broken Access Control Fix
+  // Check if the user is authorized to view this plant (must be owner of the garden or admin)
+  if (userRequesting) {
+    const garden = await Garden.findById(plant.garden)
+    if (garden && !isOwnerOrAdmin(userRequesting, garden.user)) {
+      throw new AppError('Not authorized to view this plant', 403)
+    }
+  }
+
   return plant
 }
 
