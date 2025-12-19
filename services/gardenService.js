@@ -53,7 +53,7 @@ export const getAllGardens = async (queryFilters) => {
     }
   }
 
-  const gardens = await Garden.find(query).skip(skip).limit(pageSize)
+  const gardens = await Garden.find(query).skip(skip).limit(pageSize).lean()
   return gardens
 }
 
@@ -138,7 +138,7 @@ export const listPlantsInGarden = async (gardenId, userRequesting) => {
     throw new AppError('Not authorized to get the plants from this garden', 403)
   }
 
-  return await Plant.find({ garden: gardenId })
+  return await Plant.find({ garden: gardenId }).lean()
 }
 
 export const getGardenAggregation = async (gardenId, userRequesting) => {
@@ -201,12 +201,12 @@ export const getNearGardens = async (lat, lng, radius = 10000) => {
       }
     }
   }
-  return await Garden.find(query)
+  return await Garden.find(query).lean()
 }
 
 // Alias for websocket usage compatibility
 export const getNearbyGardens = getNearGardens
 
 export const getGardensByUser = async (userId) => {
-  return await Garden.find({ user: userId })
+  return await Garden.find({ user: userId }).lean()
 }
