@@ -24,3 +24,8 @@
 **Vulnerability:** `GET /api/plants` allowed any authenticated user to list ALL plants in the database, including those from private gardens of other users. This was due to `plantService.getAllPlants` returning `Plant.find()` without filtering.
 **Learning:** List endpoints in a multi-tenant application must always be filtered by the user's context/ownership. Implicit "public by default" for collections is dangerous. Also discovered that running large test suites can trigger rate limits, causing false positives in tests.
 **Prevention:** Pass the requesting user context to all service methods and enforce ownership filters (e.g. `user: req.user.id` or `garden: { $in: userGardenIds }`). Disable rate limiting in test environments.
+
+## 2025-02-19 - Broken Access Control on Plant Details
+**Vulnerability:** `GET /api/plants/:id` allowed any authenticated user to retrieve details of any plant by ID, regardless of ownership. This was an IDOR (Insecure Direct Object Reference) vulnerability.
+**Learning:** Checking authentication (`verifyToken`) is not enough. Authorization (ownership check) is required for every resource access, especially when accessing by ID. Service methods often defaulted to just returning the object found by ID without checking if the requester owns it.
+**Prevention:** In `getPlantById`, explicitly verify if `req.user` is the owner of the garden containing the plant (or is admin) before returning the plant.

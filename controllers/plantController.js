@@ -23,7 +23,7 @@ export const getAllPlants = async (req, res, next) => {
 
 export const getPlantById = async (req, res, next) => {
   try {
-    const plant = await plantService.getPlantById(req.params.id)
+    const plant = await plantService.getPlantById(req.params.id, req.user)
     sendResponse(res, 200, plant)
   } catch (error) {
     next(error)
