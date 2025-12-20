@@ -33,12 +33,23 @@ export const createGarden = async (gardenData, userId) => {
   return savedGarden
 }
 
-export const getAllGardens = async (queryFilters) => {
+export const getAllGardens = async (queryFilters, userRequesting) => {
   const { page = 1, lat, lng, radius = 10000 } = queryFilters
   const pageSize = 10
   const skip = (page - 1) * pageSize
   
   const query = {}
+
+  // Sentinel: Enforce ownership/privacy
+  // Only return gardens owned by the user (or all if admin)
+  if (!userRequesting || userRequesting.role !== 'admin') {
+    if (userRequesting) {
+      query.user = userRequesting.userId
+    } else {
+      // Should not happen if route is protected, but safe default
+      throw new AppError('Authentication required', 401)
+    }
+  }
 
   if (lat && lng) {
     // Basic validation is done in controller/validator, but safe here too
