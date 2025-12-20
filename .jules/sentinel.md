@@ -29,3 +29,8 @@
 **Vulnerability:** `GET /api/plants/:id` allowed any authenticated user to retrieve details of any plant by ID, regardless of ownership. This was an IDOR (Insecure Direct Object Reference) vulnerability.
 **Learning:** Checking authentication (`verifyToken`) is not enough. Authorization (ownership check) is required for every resource access, especially when accessing by ID. Service methods often defaulted to just returning the object found by ID without checking if the requester owns it.
 **Prevention:** In `getPlantById`, explicitly verify if `req.user` is the owner of the garden containing the plant (or is admin) before returning the plant.
+
+## 2025-02-19 - Excessive Data Exposure in Garden List
+**Vulnerability:** `GET /api/gardens` allowed any authenticated user to list ALL gardens in the database, including the precise location (coordinates) of private gardens owned by other users. This was due to `gardenService.getAllGardens` returning `Garden.find()` without filtering by user ownership.
+**Learning:** List endpoints must always be filtered by the requesting user's context (authorization) in a multi-tenant/private data application. Just because an endpoint is authenticated doesn't mean the user should see everything.
+**Prevention:** Modified `gardenService.getAllGardens` to filter gardens by `user: userRequesting.userId` unless the user is an admin.

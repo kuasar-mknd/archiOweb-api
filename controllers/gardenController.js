@@ -14,7 +14,7 @@ export const createGarden = async (req, res, next) => {
 // Retrieve all gardens
 export const getAllGardens = async (req, res, next) => {
   try {
-    const gardens = await gardenService.getAllGardens(req.query)
+    const gardens = await gardenService.getAllGardens(req.query, req.user)
     sendResponse(res, 200, gardens)
   } catch (error) {
     next(error)
