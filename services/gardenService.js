@@ -156,23 +156,13 @@ export const getGardenAggregation = async (gardenId, userRequesting) => {
 
   const { ObjectId } = mongoose.Types
   
-  // Let's implement EXACTLY the original aggregation logic
-  const originalAggregation = await Garden.aggregate([
-    { $match: { _id: new ObjectId(gardenId) } },
-    {
-      $lookup: {
-        from: 'plants',
-        localField: 'plants', // Garden has array of plant IDs in 'plants' field? 
-        // Garden Model: plants: [{ type: ObjectId, ref: 'Plant' }]
-        // Yes.
-        foreignField: '_id',
-        as: 'plants'
-      }
-    },
-    { $unwind: '$plants' },
+  // ⚡ Bolt: Optimization - Use direct aggregation on Plant collection using index
+  // instead of $lookup on Garden.plants array. This is faster and avoids issues with stale array data.
+  const aggregation = await Plant.aggregate([
+    { $match: { garden: new ObjectId(gardenId) } },
     {
       $group: {
-        _id: '$plants.commonName',
+        _id: '$commonName',
         numberofplants: { $sum: 1 }
       }
     },
@@ -185,7 +175,7 @@ export const getGardenAggregation = async (gardenId, userRequesting) => {
     }
   ])
 
-  return originalAggregation
+  return aggregation
 }
 
 export const getNearGardens = async (lat, lng, radius = 10000) => {
