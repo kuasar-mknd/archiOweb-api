@@ -311,7 +311,7 @@ describe('User API Tests', function () {
 
     it('should return error 500 for server errors', async function () {
       // Simuler une erreur
-      sinon.stub(User, 'findById').throws(new Error('Database error'))
+      sinon.stub(User, 'exists').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/users/gardens')
