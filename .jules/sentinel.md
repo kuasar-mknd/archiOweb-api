@@ -34,3 +34,8 @@
 **Vulnerability:** `GET /api/gardens` allowed any authenticated user to list ALL gardens in the database, including the precise location (coordinates) of private gardens owned by other users. This was due to `gardenService.getAllGardens` returning `Garden.find()` without filtering by user ownership.
 **Learning:** List endpoints must always be filtered by the requesting user's context (authorization) in a multi-tenant/private data application. Just because an endpoint is authenticated doesn't mean the user should see everything.
 **Prevention:** Modified `gardenService.getAllGardens` to filter gardens by `user: userRequesting.userId` unless the user is an admin.
+
+## 2025-02-19 - Unauthenticated Data Exposure in WebSocket
+**Vulnerability:** The `getNearbyGardens` WebSocket event handler was unauthenticated and returned ALL gardens within a radius, ignoring the application's privacy model (users only see their own gardens). This allowed any unauthenticated user to enumerate all garden locations.
+**Learning:** WebSocket handlers often bypass standard Express middleware (like `verifyToken`). Security must be explicitly implemented in the message handler. Also, duplicated logic (`getNearGardens` in service vs `getAllGardens`) led to one being fixed (REST API) and the other remaining vulnerable (WebSocket).
+**Prevention:** Always reuse service methods that enforce security policies. Ensure all WebSocket event handlers verify authentication tokens before processing sensitive requests.
