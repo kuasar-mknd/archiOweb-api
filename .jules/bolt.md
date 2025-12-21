@@ -7,3 +7,7 @@
 ## 2025-01-26 - Mongoose Lean for Read Operations
 **Learning:** Using `.lean()` on Mongoose `find` queries significantly reduces overhead (verified ~30% faster in micro-benchmark) by skipping document hydration. This is safe for this project as there are no global `toJSON` virtuals or critical instance methods used in the Controller layer for list responses.
 **Action:** Always use `.lean()` for read-only `find` operations in Service layer, especially for list endpoints.
+
+## 2025-01-26 - Parallel Existence Checks
+**Learning:** When needing to verify a parent document exists while fetching its children (without `populate`), using `Promise.all([Parent.exists(id), Child.find({parent: id})])` is faster than sequential awaits. `Model.exists()` is extremely lightweight (index scan) compared to `findById()`.
+**Action:** Use parallel `Promise.all` pattern for independent async operations like existence checks and data retrieval.
