@@ -189,24 +189,6 @@ export const getGardenAggregation = async (gardenId, userRequesting) => {
   return aggregation
 }
 
-export const getNearGardens = async (lat, lng, radius = 10000) => {
-  // Copied logic from getAllGardens for dedicated export
-  const query = {
-    location: {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: [parseFloat(lat), parseFloat(lng)]
-        },
-        $maxDistance: radius
-      }
-    }
-  }
-  return await Garden.find(query).lean()
-}
-
-// Alias for websocket usage compatibility
-export const getNearbyGardens = getNearGardens
 
 export const getGardensByUser = async (userId) => {
   return await Garden.find({ user: userId }).lean()
