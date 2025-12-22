@@ -46,17 +46,21 @@ export const getAllPlants = async (userRequesting) => {
   // Sentinel: Broken Access Control Fix
   // Only return plants from gardens owned by the user (or all if admin)
   if (userRequesting && userRequesting.role === 'admin') {
-    return await Plant.find()
+    // ⚡ Bolt: Use lean() for performance
+    return await Plant.find().lean()
   }
 
-  const userGardens = await Garden.find({ user: userRequesting.userId }).select('_id')
+  // ⚡ Bolt: Use lean() for performance
+  const userGardens = await Garden.find({ user: userRequesting.userId }).select('_id').lean()
   const gardenIds = userGardens.map(g => g._id)
 
-  return await Plant.find({ garden: { $in: gardenIds } })
+  // ⚡ Bolt: Use lean() for performance
+  return await Plant.find({ garden: { $in: gardenIds } }).lean()
 }
 
 export const getPlantById = async (plantId, userRequesting) => {
-  const plant = await Plant.findById(plantId)
+  // ⚡ Bolt: Use lean() for performance
+  const plant = await Plant.findById(plantId).lean()
   if (!plant) {
     throw new AppError('Plant not found', 404)
   }
@@ -64,7 +68,8 @@ export const getPlantById = async (plantId, userRequesting) => {
   // Sentinel: Broken Access Control Fix
   // Check if the user is authorized to view this plant (must be owner of the garden or admin)
   if (userRequesting) {
-    const garden = await Garden.findById(plant.garden)
+    // ⚡ Bolt: Use lean() for performance
+    const garden = await Garden.findById(plant.garden).lean()
     if (garden && !isOwnerOrAdmin(userRequesting, garden.user)) {
       throw new AppError('Not authorized to view this plant', 403)
     }
@@ -74,12 +79,14 @@ export const getPlantById = async (plantId, userRequesting) => {
 }
 
 export const updatePlant = async (plantId, updateData, userRequesting) => {
-  const plant = await Plant.findById(plantId)
+  // ⚡ Bolt: Use lean() for performance - we only need the doc for checks
+  const plant = await Plant.findById(plantId).lean()
   if (!plant) {
     throw new AppError('Plant not found', 404)
   }
 
-  const garden = await Garden.findById(plant.garden)
+  // ⚡ Bolt: Use lean() for performance
+  const garden = await Garden.findById(plant.garden).lean()
   if (!garden) {
     throw new AppError('Garden not found associated with this plant', 404)
   }
@@ -97,17 +104,20 @@ export const updatePlant = async (plantId, updateData, userRequesting) => {
       return obj
     }, {})
 
-  const updatedPlant = await Plant.findByIdAndUpdate(plantId, filteredUpdateData, { new: true, runValidators: true })
+  // ⚡ Bolt: Use lean() for performance
+  const updatedPlant = await Plant.findByIdAndUpdate(plantId, filteredUpdateData, { new: true, runValidators: true }).lean()
   return updatedPlant
 }
 
 export const deletePlant = async (plantId, userRequesting) => {
-  const plant = await Plant.findById(plantId)
+  // ⚡ Bolt: Use lean() for performance
+  const plant = await Plant.findById(plantId).lean()
   if (!plant) {
     throw new AppError('Plant not found', 404)
   }
   
-  const garden = await Garden.findById(plant.garden)
+  // ⚡ Bolt: Use lean() for performance
+  const garden = await Garden.findById(plant.garden).lean()
   if (!garden) {
      // If garden is missing, maybe just delete the plant? Or error?
      // Original controller returns 404 Garden not found
