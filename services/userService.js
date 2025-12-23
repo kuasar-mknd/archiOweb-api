@@ -33,7 +33,7 @@ export const createUser = async (userData) => {
 const DUMMY_HASH = '$2b$10$CpKfxnNBcbnlYOwHlj6AHOKo2eEVwfmtGzceFLXeiSyu5QoHF/mp6'
 
 export const authenticateUser = async (identifier, password) => {
-  const user = await User.findOne({ identifier: { $eq: identifier } })
+  const user = await User.findOne({ identifier: { $eq: identifier } }).select('+password')
 
   // Sentinel: Mitigation for Timing Attack (User Enumeration)
   // We always execute bcrypt.compare to ensure the response time is consistent
