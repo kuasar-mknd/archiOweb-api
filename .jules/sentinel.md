@@ -39,3 +39,8 @@
 **Vulnerability:** The `getNearbyGardens` WebSocket event handler was unauthenticated and returned ALL gardens within a radius, ignoring the application's privacy model (users only see their own gardens). This allowed any unauthenticated user to enumerate all garden locations.
 **Learning:** WebSocket handlers often bypass standard Express middleware (like `verifyToken`). Security must be explicitly implemented in the message handler. Also, duplicated logic (`getNearGardens` in service vs `getAllGardens`) led to one being fixed (REST API) and the other remaining vulnerable (WebSocket).
 **Prevention:** Always reuse service methods that enforce security policies. Ensure all WebSocket event handlers verify authentication tokens before processing sensitive requests.
+
+## 2025-02-20 - Password Hash Leakage Prevention
+**Vulnerability:** `User.find()` and `User.findOne()` returned the password hash by default. While service layer often cleaned this up, any new query or logging of the raw document object could leak the hash.
+**Learning:** Relying on manual field deletion in the service layer is error-prone and brittle (defense in depth).
+**Prevention:** Set `select: false` on sensitive fields like `password` in the Mongoose schema. Explicitly select them only when needed (e.g. login).
