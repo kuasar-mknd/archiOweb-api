@@ -81,18 +81,23 @@ export const deleteUser = async (userId) => {
     throw new AppError('User not found', 404)
   }
 
-  // Suppression en cascade (Jardins et Plantes)
-  // Note: Idéalement, ceci devrait être dans un hook 'pre remove' Mongoose ou une transaction
-  const gardens = await Garden.find({ user: userId })
+  // ⚡ Bolt: Optimized cascade deletion
+  // Instead of iterating and deleting plants one by one (N+1),
+  // we fetch all garden IDs and delete all associated plants in one query.
   
-  // Suppression des plantes de chaque jardin
-  for (const garden of gardens) {
-    await Plant.deleteMany({ garden: garden._id })
+  // Get all garden IDs for the user
+  const userGardens = await Garden.find({ user: userId }).select('_id').lean()
+  const gardenIds = userGardens.map(g => g._id)
+
+  if (gardenIds.length > 0) {
+    // Delete all plants in these gardens
+    await Plant.deleteMany({ garden: { $in: gardenIds } })
   }
-  // Suppression des jardins
+
+  // Delete all gardens for the user
   await Garden.deleteMany({ user: userId })
   
-  // Suppression de l'utilisateur
+  // Delete the user
   await User.findByIdAndDelete(userId)
 }
 
