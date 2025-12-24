@@ -44,3 +44,8 @@
 **Vulnerability:** `User.find()` and `User.findOne()` returned the password hash by default. While service layer often cleaned this up, any new query or logging of the raw document object could leak the hash.
 **Learning:** Relying on manual field deletion in the service layer is error-prone and brittle (defense in depth).
 **Prevention:** Set `select: false` on sensitive fields like `password` in the Mongoose schema. Explicitly select them only when needed (e.g. login).
+
+## 2025-02-21 - Lack of Rate Limiting on Registration
+**Vulnerability:** `POST /api/users/register` was missing a dedicated rate limiter, falling back to the generous global limiter (350 requests/15min). This allowed for potential account spamming and DoS.
+**Learning:** Authentication endpoints (login, register, password reset) require strict, dedicated rate limiting policies separate from the global API limits. Testing rate limits in a CI environment requires explicit configuration (`TEST_RATE_LIMIT` env var) to override default skip behaviors.
+**Prevention:** Implemented `registerLimiter` (5 requests/hour) and applied it to the registration route. Added explicit test coverage that enables rate limiting for the specific test suite.

@@ -11,7 +11,7 @@ import {
 import { validate } from '../middlewares/validator.js'
 // Middleware pour vérifier l'authentification
 import verifyToken from '../middlewares/verifyToken.js'
-import { loginLimiter } from '../middlewares/rateLimiters.js'
+import { loginLimiter, registerLimiter } from '../middlewares/rateLimiters.js'
 
 const router = express.Router()
 
@@ -141,7 +141,7 @@ const updateValidation = [
  *       500:
  *         description: Internal Server Error.
  */
-router.post('/register', validate(registerValidation), registerUser)
+router.post('/register', registerLimiter, validate(registerValidation), registerUser)
 
 /**
  * @swagger
