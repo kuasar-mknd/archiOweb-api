@@ -68,8 +68,8 @@ export const getPlantById = async (plantId, userRequesting) => {
   // Sentinel: Broken Access Control Fix
   // Check if the user is authorized to view this plant (must be owner of the garden or admin)
   if (userRequesting) {
-    // ⚡ Bolt: Use lean() for performance
-    const garden = await Garden.findById(plant.garden).lean()
+    // ⚡ Bolt: Optimized to select only 'user' field for auth check
+    const garden = await Garden.findById(plant.garden).select('user').lean()
     if (garden && !isOwnerOrAdmin(userRequesting, garden.user)) {
       throw new AppError('Not authorized to view this plant', 403)
     }
@@ -85,8 +85,8 @@ export const updatePlant = async (plantId, updateData, userRequesting) => {
     throw new AppError('Plant not found', 404)
   }
 
-  // ⚡ Bolt: Use lean() for performance
-  const garden = await Garden.findById(plant.garden).lean()
+  // ⚡ Bolt: Optimized to select only 'user' field for auth check
+  const garden = await Garden.findById(plant.garden).select('user').lean()
   if (!garden) {
     throw new AppError('Garden not found associated with this plant', 404)
   }
@@ -116,8 +116,8 @@ export const deletePlant = async (plantId, userRequesting) => {
     throw new AppError('Plant not found', 404)
   }
   
-  // ⚡ Bolt: Use lean() for performance
-  const garden = await Garden.findById(plant.garden).lean()
+  // ⚡ Bolt: Optimized to select only 'user' field for auth check
+  const garden = await Garden.findById(plant.garden).select('user').lean()
   if (!garden) {
      // If garden is missing, maybe just delete the plant? Or error?
      // Original controller returns 404 Garden not found

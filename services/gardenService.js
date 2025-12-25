@@ -86,7 +86,8 @@ export const getGardenById = async (gardenId, userRequesting) => {
 }
 
 export const updateGarden = async (gardenId, updateData, userRequesting) => {
-  const garden = await Garden.findById(gardenId)
+  // ⚡ Bolt: Optimized to select only 'user' field for auth check
+  const garden = await Garden.findById(gardenId).select('user').lean()
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -122,7 +123,8 @@ export const updateGarden = async (gardenId, updateData, userRequesting) => {
 }
 
 export const deleteGarden = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId)
+  // ⚡ Bolt: Optimized to select only 'user' field for auth check
+  const garden = await Garden.findById(gardenId).select('user').lean()
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -139,7 +141,8 @@ export const deleteGarden = async (gardenId, userRequesting) => {
 }
 
 export const listPlantsInGarden = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId)
+  // ⚡ Bolt: Optimized to select only 'user' field for auth check
+  const garden = await Garden.findById(gardenId).select('user').lean()
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -154,7 +157,8 @@ export const listPlantsInGarden = async (gardenId, userRequesting) => {
 
 export const getGardenAggregation = async (gardenId, userRequesting) => {
   // Check existence and auth first (as per original logic logic)
-  const garden = await Garden.findById(gardenId)
+  // ⚡ Bolt: Optimized to select only 'user' field for auth check
+  const garden = await Garden.findById(gardenId).select('user').lean()
   if (!garden) {
     // If original logic check auth first, we need garden first to know owner.
     // Original controller: findById then check auth.
