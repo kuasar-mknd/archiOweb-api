@@ -5,7 +5,11 @@ export const getWeatherData = async (location) => {
     const [longitude, latitude] = location.coordinates
 
     // Requête pour les prévisions météo horaires
-    const response = await axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,cloudcover,precipitation&current_weather=true`)
+    // Sentinel: Added timeout (5s) to prevent DoS/resource exhaustion
+    const response = await axios.get(
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,cloudcover,precipitation&current_weather=true`,
+      { timeout: 5000 }
+    )
     const data = response.data
 
     // Conditions météorologiques actuelles
@@ -36,6 +40,8 @@ export const getWeatherData = async (location) => {
       precipitationNext48h: totalPrecipitation
     }
   } catch (error) {
+    // If axios timeout error, we can handle it specifically if needed,
+    // but generic error is fine for now as per original code structure
     throw new Error('Erreur lors de la récupération des données météorologiques.')
   }
 }
