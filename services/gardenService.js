@@ -14,8 +14,8 @@ const isOwnerOrAdmin = (userRequesting, resourceOwnerId) => {
 export const createGarden = async (gardenData, userId) => {
   const { name, location } = gardenData
   
-  const userObject = await User.findById(userId)
-  if (!userObject) {
+  const userExists = await User.exists({ _id: userId })
+  if (!userExists) {
     throw new AppError('User not found', 404)
   }
 
@@ -27,8 +27,8 @@ export const createGarden = async (gardenData, userId) => {
 
   const savedGarden = await garden.save()
   
-  userObject.gardens.push(savedGarden._id)
-  await userObject.save()
+  // ⚡ Bolt: Removed redundant update to User.gardens array.
+  // We query gardens by { user: userId } instead. This saves a database write.
 
   return savedGarden
 }

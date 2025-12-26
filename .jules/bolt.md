@@ -11,3 +11,7 @@
 ## 2025-01-26 - Parallel Existence Checks
 **Learning:** When needing to verify a parent document exists while fetching its children (without `populate`), using `Promise.all([Parent.exists(id), Child.find({parent: id})])` is faster than sequential awaits. `Model.exists()` is extremely lightweight (index scan) compared to `findById()`.
 **Action:** Use parallel `Promise.all` pattern for independent async operations like existence checks and data retrieval.
+
+## 2025-01-26 - Redundant Array Updates
+**Learning:** Maintaining arrays of child ObjectIds on parent documents (e.g., `User.gardens`, `Garden.plants`) causes unnecessary write operations and potential unbound array growth. Removing these updates saved ~15-25% time per creation operation in benchmarks.
+**Action:** Do not push child IDs to parent arrays during creation. Rely on foreign key queries (e.g., `Garden.find({ user: userId })`) instead.
