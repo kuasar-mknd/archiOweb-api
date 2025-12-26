@@ -157,8 +157,8 @@ describe('Garden API Tests', function () {
     })
 
     it('should return 500 server error', async function () {
-      // Stubbing User.findById which is used in createGarden service
-      sinon.stub(User, 'findById').throws(new Error('Database error'))
+      // Stubbing User.exists which is used in createGarden service
+      sinon.stub(User, 'exists').throws(new Error('Database error'))
 
       const gardenData = {
         name: 'Mon jardin',

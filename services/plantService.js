@@ -14,7 +14,8 @@ export const createPlant = async (plantData, userId, userRequesting) => {
     throw new AppError('Invalid garden ID', 400)
   }
 
-  const garden = await Garden.findById(gardenId)
+  // ⚡ Bolt: Select only necessary fields (user) for auth check
+  const garden = await Garden.findById(gardenId).select('user')
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -35,9 +36,8 @@ export const createPlant = async (plantData, userId, userRequesting) => {
 
   const savedPlant = await plant.save()
 
-  // Add plant to garden's list
-  garden.plants.push(savedPlant._id)
-  await garden.save()
+  // ⚡ Bolt: Removed redundant update to Garden.plants array.
+  // We query plants by { garden: gardenId } instead. This saves a database write.
 
   return savedPlant
 }
