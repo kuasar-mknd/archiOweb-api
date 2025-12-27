@@ -1,8 +1,27 @@
 import axios from 'axios'
 
+// ⚡ Bolt: Cache for weather data to prevent redundant external API calls
+// Key: "latitude,longitude", Value: { timestamp, data }
+const weatherCache = new Map()
+const CACHE_TTL = 15 * 60 * 1000 // 15 minutes
+const MAX_CACHE_SIZE = 100 // Prevent memory leaks
+
 export const getWeatherData = async (location) => {
   try {
     const [longitude, latitude] = location.coordinates
+    const cacheKey = `${latitude},${longitude}`
+
+    // ⚡ Bolt: Check cache before making request
+    const cached = weatherCache.get(cacheKey)
+    if (cached) {
+      const now = Date.now()
+      if (now - cached.timestamp < CACHE_TTL) {
+        // Return a copy to prevent mutation of cached state
+        return { ...cached.data }
+      }
+      // Cache expired, remove it
+      weatherCache.delete(cacheKey)
+    }
 
     // Requête pour les prévisions météo horaires
     // Sentinel: Added timeout (5s) to prevent DoS/resource exhaustion
@@ -34,11 +53,26 @@ export const getWeatherData = async (location) => {
     const precipitationForecast = hourlyForecast.precipitation
     const totalPrecipitation = precipitationForecast.reduce((acc, val) => acc + val, 0)
 
-    return {
+    const result = {
       temperature: currentTemperature,
       skyCondition,
       precipitationNext48h: totalPrecipitation
     }
+
+    // ⚡ Bolt: Store in cache
+    // Simple eviction policy: if full, clear everything (safe and simple for now)
+    // A more complex LRU is overkill for this specific "small improvement" task
+    if (weatherCache.size >= MAX_CACHE_SIZE) {
+      weatherCache.clear()
+    }
+
+    weatherCache.set(cacheKey, {
+      timestamp: Date.now(),
+      data: result
+    })
+
+    // Return a copy
+    return { ...result }
   } catch (error) {
     // If axios timeout error, we can handle it specifically if needed,
     // but generic error is fine for now as per original code structure
