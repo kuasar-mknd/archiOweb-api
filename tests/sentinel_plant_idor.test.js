@@ -31,7 +31,7 @@ describe('Sentinel: Plant IDOR Vulnerability Test', function () {
       identifier: 'usera@example.com',
       firstName: 'User',
       lastName: 'A',
-      password: 'password'
+      password: 'Password123!'
     }
     await chai.request(app).post('/api/users/register').send(userA)
     const loginA = await chai.request(app).post('/api/users/login').send({
@@ -70,7 +70,7 @@ describe('Sentinel: Plant IDOR Vulnerability Test', function () {
       identifier: 'userb@example.com',
       firstName: 'User',
       lastName: 'B',
-      password: 'password'
+      password: 'Password123!'
     }
     await chai.request(app).post('/api/users/register').send(userB)
     const loginB = await chai.request(app).post('/api/users/login').send({

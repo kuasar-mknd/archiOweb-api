@@ -3,26 +3,9 @@ import { sendResponse } from '../utils/responseHandler.js'
 import { body, validationResult } from 'express-validator'
 import verifyToken from '../middlewares/verifyToken.js'
 
-// Middlewares for validation
-const validateUserInput = [
-  body('identifier').isEmail().withMessage('A valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  // Add more validations as necessary
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-     // Utilisation de la structure d'erreur standardisée
-     // Le middleware global ou responseHandler gèrera le format
-     // Ici on retourne directement pour valider le test qui attend 422
-      return res.status(422).json({ 
-        success: false, 
-        message: 'Validation failed', 
-        errors: errors.array() 
-      })
-    }
-    next()
-  }
-]
+// Sentinel: Removed redundant validateUserInput middleware.
+// Validation is now correctly handled by the routes using the 'validate' middleware.
+// This prevents double validation and allows distinct policies for login and register.
 
 const sanitizeUserUpdate = [
   (req, res, next) => {
@@ -43,7 +26,7 @@ const sanitizeUserUpdate = [
 ]
 
 export const registerUser = [
-  validateUserInput,
+  // Sentinel: Removed validateUserInput, relying on route-level validation
   async (req, res, next) => {
     try {
       const user = await userService.createUser(req.body)
@@ -64,7 +47,7 @@ export const getUserById = async (req, res, next) => {
 }
 
 export const loginUser = [
-  validateUserInput,
+  // Sentinel: Removed validateUserInput, relying on route-level validation
   async (req, res, next) => {
     try {
       const { identifier, password } = req.body

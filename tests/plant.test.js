@@ -33,7 +33,7 @@ describe('Plants API Tests', function () {
       identifier: 'testuser@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      password: 'password'
+      password: 'Password123!'
     }
 
     // Register a new user
@@ -140,7 +140,7 @@ describe('Plants API Tests', function () {
         identifier: 'usertest2@exemple.com',
         firstName: 'John',
         lastName: 'Doe',
-        password: 'password'
+        password: 'Password123!'
       }
       // Register a new user
       await chai
@@ -321,7 +321,7 @@ describe('Plants API Tests', function () {
         identifier: 'usertest2@exemple.com',
         firstName: 'John',
         lastName: 'Doe',
-        password: 'password'
+        password: 'Password123!'
       }
       // Register a new user
       await chai
@@ -418,7 +418,7 @@ describe('Plants API Tests', function () {
         identifier: 'usertest2@exemple.com',
         firstName: 'John',
         lastName: 'Doe',
-        password: 'password'
+        password: 'Password123!'
       }
       // Register a new user
       await chai

@@ -22,7 +22,7 @@ describe('Sentinel Reproduction - Garden Leak', function () {
     // Create User A (Attacker)
     const userA = await User.create({
       identifier: 'attacker@example.com',
-      password: 'password123',
+      password: 'Password123!',
       firstName: 'Attacker',
       lastName: 'User'
     })
@@ -31,7 +31,7 @@ describe('Sentinel Reproduction - Garden Leak', function () {
     // Create User B (Victim)
     userB = await User.create({
       identifier: 'victim@example.com',
-      password: 'password123',
+      password: 'Password123!',
       firstName: 'Victim',
       lastName: 'User'
     })

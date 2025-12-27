@@ -24,7 +24,7 @@ describe('Security: Timing Attacks', function () {
       identifier: 'existing@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      password: 'password123',
+      password: 'Password123!',
       birthDate: '1990-01-01'
     }
     // Register via API to ensure proper hashing etc.
@@ -35,14 +35,14 @@ describe('Security: Timing Attacks', function () {
     const iterations = 5
 
     // Warmup
-    await chai.request(app).post('/api/users/login').send({ identifier: 'existing@example.com', password: 'wrongpassword' })
-    await chai.request(app).post('/api/users/login').send({ identifier: 'nonexistent@example.com', password: 'randompassword' })
+    await chai.request(app).post('/api/users/login').send({ identifier: 'existing@example.com', password: 'WrongPassword123!' })
+    await chai.request(app).post('/api/users/login').send({ identifier: 'nonexistent@example.com', password: 'RandomPassword123!' })
 
     // Measure existing user (wrong password)
     let existingTotalTime = 0
     for (let i = 0; i < iterations; i++) {
       const start = performance.now()
-      await chai.request(app).post('/api/users/login').send({ identifier: 'existing@example.com', password: 'wrongpassword' })
+      await chai.request(app).post('/api/users/login').send({ identifier: 'existing@example.com', password: 'WrongPassword123!' })
       const end = performance.now()
       existingTotalTime += (end - start)
     }
@@ -52,7 +52,7 @@ describe('Security: Timing Attacks', function () {
     let nonExistingTotalTime = 0
     for (let i = 0; i < iterations; i++) {
       const start = performance.now()
-      await chai.request(app).post('/api/users/login').send({ identifier: 'nonexistent@example.com', password: 'randompassword' })
+      await chai.request(app).post('/api/users/login').send({ identifier: 'nonexistent@example.com', password: 'RandomPassword123!' })
       const end = performance.now()
       nonExistingTotalTime += (end - start)
     }
