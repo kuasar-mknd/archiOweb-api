@@ -27,14 +27,14 @@ describe('Security: User PII Protection', function () {
       firstName: 'Alice',
       lastName: 'Smith',
       birthDate: '1990-01-01',
-      password: 'password123'
+      password: 'Password123!'
     })
     userAId = resA.body.data._id
 
     // Login User A
     const loginA = await chai.request(app).post('/api/users/login').send({
       identifier: 'userA@example.com',
-      password: 'password123'
+      password: 'Password123!'
     })
     userAToken = loginA.body.data.token
 
@@ -43,13 +43,13 @@ describe('Security: User PII Protection', function () {
       identifier: 'userB@example.com',
       firstName: 'Bob',
       lastName: 'Jones',
-      password: 'password123'
+      password: 'Password123!'
     })
 
     // Login User B
     const loginB = await chai.request(app).post('/api/users/login').send({
       identifier: 'userB@example.com',
-      password: 'password123'
+      password: 'Password123!'
     })
     userBToken = loginB.body.data.token
   })

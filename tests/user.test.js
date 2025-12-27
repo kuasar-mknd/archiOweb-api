@@ -23,7 +23,7 @@ describe('User API Tests', function () {
       identifier: 'testuser@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      password: 'password'
+      password: 'Password123!'
     }
 
     // Register a new user
@@ -53,7 +53,7 @@ describe('User API Tests', function () {
           identifier: 'test@example.com',
           firstName: 'Test',
           lastName: 'User',
-          password: 'password'
+          password: 'Password123!'
         })
       expect(res).to.have.status(201)
       expect(res.body).to.have.property(
@@ -69,7 +69,7 @@ describe('User API Tests', function () {
           identifier: 'testuser@example.com',
           firstName: 'Test',
           lastName: 'User',
-          password: 'password'
+          password: 'Password123!'
         })
       expect(res).to.have.status(400)
       expect(res.body).to.have.property(
@@ -101,7 +101,7 @@ describe('User API Tests', function () {
           identifier: 'test@example.com',
           firstName: 'Test',
           lastName: 'User',
-          password: 'password'
+          password: 'Password123!'
         })
 
       expect(res).to.have.status(500)
@@ -114,7 +114,7 @@ describe('User API Tests', function () {
         .post('/api/users/login')
         .send({
           identifier: 'testuser@example.com',
-          password: 'password'
+          password: 'Password123!'
         })
       expect(res).to.have.status(200)
       expect(res.body.data).to.have.property('token')
@@ -125,7 +125,7 @@ describe('User API Tests', function () {
         .post('/api/users/login')
         .send({
           identifier: 'test@example.com',
-          password: 'pasdsword'
+          password: 'Password123wrong!'
         })
       expect(res).to.have.status(401)
       expect(res.body).to.have.property(
@@ -142,7 +142,7 @@ describe('User API Tests', function () {
         .post('/api/users/login')
         .send({
           identifier: 'test@example.com',
-          password: 'pasdsword'
+          password: 'Password123wrong!'
         })
       expect(res).to.have.status(500)
     })

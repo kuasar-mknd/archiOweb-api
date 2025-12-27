@@ -17,7 +17,7 @@ describe('Sentinel: Password Leak Check', function () {
       identifier: 'leaktest@example.com',
       firstName: 'Leak',
       lastName: 'Test',
-      password: 'hashedpassword'
+      password: 'b0'
     })
     await newUser.save()
 

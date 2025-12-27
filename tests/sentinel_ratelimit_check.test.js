@@ -13,7 +13,7 @@ describe('Sentinel Security - Rate Limiting', function () {
     // Create a user for login testing
     await User.create({
       identifier: 'ratelimit@example.com',
-      password: 'password123',
+      password: 'Password123!',
       firstName: 'Rate',
       lastName: 'Limit'
     })
@@ -28,7 +28,7 @@ describe('Sentinel Security - Rate Limiting', function () {
   it('should rate limit login attempts', async function () {
     const loginDetails = {
       identifier: 'ratelimit@example.com',
-      password: 'wrongpassword' // Use wrong password to be fast
+      password: 'WrongPassword123!' // Use wrong password to be fast
     }
 
     // Login limiter allows 5 attempts
@@ -51,7 +51,7 @@ describe('Sentinel Security - Rate Limiting', function () {
 
   it('should rate limit registration attempts', async function () {
       const baseUser = {
-        password: 'password123',
+        password: 'Password123!',
         firstName: 'Rate',
         lastName: 'Limit'
       }

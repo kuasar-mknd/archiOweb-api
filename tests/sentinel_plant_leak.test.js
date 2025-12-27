@@ -37,7 +37,7 @@ describe('Sentinel Security Tests - Data Leakage', function () {
       identifier: 'owner@example.com',
       firstName: 'Alice',
       lastName: 'Owner',
-      password: 'password123'
+      password: 'Password123!'
     }
     await chai.request(app).post('/api/users/register').send(owner)
     const ownerLogin = await chai.request(app).post('/api/users/login').send({ identifier: owner.identifier, password: owner.password })
@@ -48,7 +48,7 @@ describe('Sentinel Security Tests - Data Leakage', function () {
       identifier: 'attacker@example.com',
       firstName: 'Bob',
       lastName: 'Attacker',
-      password: 'password123'
+      password: 'Password123!'
     }
     await chai.request(app).post('/api/users/register').send(attacker)
     const attackerLogin = await chai.request(app).post('/api/users/login').send({ identifier: attacker.identifier, password: attacker.password })

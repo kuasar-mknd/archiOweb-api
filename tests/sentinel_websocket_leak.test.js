@@ -35,7 +35,7 @@ describe('Sentinel - WebSocket Data Leak', function () {
     // Create User A
     const userA = await User.create({
       identifier: 'usera@example.com',
-      password: 'password',
+      password: 'Password123!',
       firstName: 'User',
       lastName: 'A'
     })
