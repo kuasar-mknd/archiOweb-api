@@ -16,6 +16,12 @@ export const getWeatherData = async (location) => {
     if (cached) {
       const now = Date.now()
       if (now - cached.timestamp < CACHE_TTL) {
+        // ⚡ Bolt: LRU Policy - Refresh entry position
+        // Delete and re-set moves the key to the end of the Map (most recently used)
+        weatherCache.delete(cacheKey)
+        weatherCache.set(cacheKey, cached)
+        // console.log(`DEBUG: Cache HIT for ${cacheKey}. Moved to end.`)
+
         // Return a copy to prevent mutation of cached state
         return { ...cached.data }
       }
@@ -59,11 +65,15 @@ export const getWeatherData = async (location) => {
       precipitationNext48h: totalPrecipitation
     }
 
-    // ⚡ Bolt: Store in cache
-    // Simple eviction policy: if full, clear everything (safe and simple for now)
-    // A more complex LRU is overkill for this specific "small improvement" task
+    // ⚡ Bolt: Smart Cache Eviction (LRU)
+    // Instead of clearing the whole cache when full (performance cliff),
+    // we remove the oldest entry (first key in Map) to make space.
     if (weatherCache.size >= MAX_CACHE_SIZE) {
-      weatherCache.clear()
+      // Map.keys() returns an iterator in insertion order.
+      // The first item is the oldest (Least Recently Used because we re-insert on access).
+      const oldestKey = weatherCache.keys().next().value
+      // console.log(`DEBUG: Cache FULL. Evicting oldest: ${oldestKey}`)
+      weatherCache.delete(oldestKey)
     }
 
     weatherCache.set(cacheKey, {
