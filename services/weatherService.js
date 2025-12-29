@@ -8,7 +8,29 @@ const MAX_CACHE_SIZE = 100 // Prevent memory leaks
 
 export const getWeatherData = async (location) => {
   try {
+    // Sentinel: Input Validation
+    if (!location || !location.coordinates) {
+      throw new Error('Invalid location data')
+    }
+
+    if (!Array.isArray(location.coordinates) || location.coordinates.length !== 2) {
+      throw new Error('Invalid coordinates format')
+    }
+
     const [longitude, latitude] = location.coordinates
+
+    if (typeof longitude !== 'number' || typeof latitude !== 'number' || isNaN(longitude) || isNaN(latitude)) {
+      throw new Error('Invalid coordinates values')
+    }
+
+    if (latitude < -90 || latitude > 90) {
+      throw new Error('Latitude must be between -90 and 90')
+    }
+
+    if (longitude < -180 || longitude > 180) {
+      throw new Error('Longitude must be between -180 and 180')
+    }
+
     const cacheKey = `${latitude},${longitude}`
 
     // ⚡ Bolt: Check cache before making request
@@ -74,6 +96,10 @@ export const getWeatherData = async (location) => {
     // Return a copy
     return { ...result }
   } catch (error) {
+    // Sentinel: Re-throw validation errors to caller
+    if (error.message.startsWith('Invalid') || error.message.includes('must be between')) {
+      throw error
+    }
     // If axios timeout error, we can handle it specifically if needed,
     // but generic error is fine for now as per original code structure
     throw new Error('Erreur lors de la récupération des données météorologiques.')
