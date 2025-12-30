@@ -8,7 +8,8 @@ import AppError from '../utils/AppError.js'
 export const createUser = async (userData) => {
   const { identifier, password, firstName, lastName, birthDate } = userData
 
-  const userExists = await User.findOne({ identifier: { $eq: identifier } })
+  // ⚡ Bolt: Use .exists() instead of .findOne() for lighter query
+  const userExists = await User.exists({ identifier: { $eq: identifier } })
   if (userExists) {
     throw new AppError('User already exists', 400)
   }
@@ -33,7 +34,8 @@ export const createUser = async (userData) => {
 const DUMMY_HASH = '$2b$10$CpKfxnNBcbnlYOwHlj6AHOKo2eEVwfmtGzceFLXeiSyu5QoHF/mp6'
 
 export const authenticateUser = async (identifier, password) => {
-  const user = await User.findOne({ identifier: { $eq: identifier } }).select('+password')
+  // ⚡ Bolt: Use .lean() to avoid document hydration overhead
+  const user = await User.findOne({ identifier: { $eq: identifier } }).select('+password').lean()
 
   // Sentinel: Mitigation for Timing Attack (User Enumeration)
   // We always execute bcrypt.compare to ensure the response time is consistent
@@ -117,11 +119,12 @@ export const getUserGardens = async (userId) => {
 }
 
 export const fetchUserById = async (userId, requestingUser) => {
-  const user = await User.findById(userId)
+  // ⚡ Bolt: Use .lean() to avoid document hydration overhead
+  const user = await User.findById(userId).lean()
   if (!user) {
     throw new AppError('User not found', 404)
   }
-  const userResponse = user.toObject()
+  const userResponse = user
   delete userResponse.password
 
   // If requestingUser is NOT the owner AND NOT admin, filter sensitive data
