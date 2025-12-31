@@ -4,7 +4,11 @@ import axios from 'axios'
 // Key: "latitude,longitude", Value: { timestamp, data }
 const weatherCache = new Map()
 const CACHE_TTL = 15 * 60 * 1000 // 15 minutes
-const MAX_CACHE_SIZE = 100 // Prevent memory leaks
+let MAX_CACHE_SIZE = 100 // Prevent memory leaks
+
+export const _setCacheSize = (size) => {
+  MAX_CACHE_SIZE = size
+}
 
 export const getWeatherData = async (location) => {
   try {
@@ -38,6 +42,11 @@ export const getWeatherData = async (location) => {
     if (cached) {
       const now = Date.now()
       if (now - cached.timestamp < CACHE_TTL) {
+        // ⚡ Bolt: Refresh LRU status by deleting and re-setting
+        // This ensures frequent items stay in cache
+        weatherCache.delete(cacheKey)
+        weatherCache.set(cacheKey, cached)
+
         // Return a copy to prevent mutation of cached state
         return { ...cached.data }
       }
@@ -82,10 +91,11 @@ export const getWeatherData = async (location) => {
     }
 
     // ⚡ Bolt: Store in cache
-    // Simple eviction policy: if full, clear everything (safe and simple for now)
-    // A more complex LRU is overkill for this specific "small improvement" task
+    // Optimized Eviction Policy: LRU (Least Recently Used)
     if (weatherCache.size >= MAX_CACHE_SIZE) {
-      weatherCache.clear()
+      // Delete the first key (which is the oldest/least recently used in a Map)
+      const oldestKey = weatherCache.keys().next().value
+      weatherCache.delete(oldestKey)
     }
 
     weatherCache.set(cacheKey, {
