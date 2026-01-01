@@ -69,7 +69,12 @@ export const getAllGardens = async (queryFilters, userRequesting) => {
 }
 
 export const getGardenById = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId).lean()
+  // ⚡ Bolt: Parallelize fetching garden and plants to reduce latency.
+  const [garden, plants] = await Promise.all([
+    Garden.findById(gardenId).lean(),
+    Plant.find({ garden: gardenId }).lean()
+  ])
+
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -78,9 +83,8 @@ export const getGardenById = async (gardenId, userRequesting) => {
     throw new AppError('Not authorized to access this garden', 403)
   }
 
-  // ⚡ Bolt: Optimize by querying Plant collection directly using index.
-  // This avoids populating the potentially stale 'plants' array in Garden doc.
-  garden.plants = await Plant.find({ garden: gardenId }).lean()
+  // Assign the independently fetched plants to the garden object
+  garden.plants = plants
 
   return garden
 }
