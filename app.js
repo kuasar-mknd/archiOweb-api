@@ -39,6 +39,23 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(limiter)
 }
 app.use(helmet())
+
+// Sentinel: Database Maintenance Mode Middleware
+// If DB is not connected (readyState !== 1), return 503 to prevent hanging/crashes
+app.use((req, res, next) => {
+  // 1 = connected. If we are in 'test' env, we might be using memory server which is managed differently,
+  // but typically readyState should still be valid.
+  // We skip this check for static assets or documentation if needed, but for API it's critical.
+  if (mongoose.connection.readyState !== 1 && process.env.NODE_ENV !== 'test') {
+    return res.status(503).json({
+      success: false,
+      message: 'Service Unavailable: Database connection is down. Please check server logs and configuration.',
+      maintenance: true
+    })
+  }
+  next()
+})
+
 app.use(express.json({ limit: '10kb' })) // Body limit is 10kb
 app.use(express.urlencoded({ extended: false }))
 // Custom mongoSanitize to avoid assigning to read-only req.query in Express 5

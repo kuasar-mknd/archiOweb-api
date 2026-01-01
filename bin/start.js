@@ -23,9 +23,6 @@ connectDB().catch(err => {
 
   // Sentinel: Improved diagnostics
   try {
-    // If it's a standard connection string, extract the hostname to help user debug
-    // Handle 'mongodb+srv://' which standard URL parser might struggle with if strict,
-    // but usually it works or we can simple regex.
     const hostnameMatch = dbUrl.match(/@([^/?]+)/)
     if (hostnameMatch && hostnameMatch[1]) {
         console.error(`   -> Hostname attempting to resolve: '${hostnameMatch[1]}'`)
@@ -36,7 +33,13 @@ connectDB().catch(err => {
   }
 
   console.error('Original Error:', err)
-  process.exit(1)
+
+  // Sentinel: Maintenance Mode Strategy
+  // Do NOT crash the process. Allow the server to start so Render deployment succeeds.
+  // The application will respond with 503 Service Unavailable via middleware.
+  console.warn('⚠️  WARNING: Starting server in MAINTENANCE MODE due to Database Connection Failure.')
+  console.warn('⚠️  API endpoints will return 503 until the database connection is fixed.')
+  // process.exit(1) // Removed to prevent crash loop
 })
 
 if (process.env.NODE_ENV !== 'test') {
