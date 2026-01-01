@@ -15,12 +15,17 @@ const connectDB = async () => {
     const uri = mongoServer.getUri()
     await mongoose.connect(uri)
   } else {
-// ... existing code ...
-    // Connect to the actual database for other environments
-    const conn = await mongoose.connect(
-      process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden'
-    )
-    console.log(`MongoDB Connected: ${conn.connection.host}`)
+    // Sentinel: Robustness fix
+    // Trim the connection string to prevent errors from accidental whitespace in env vars
+    const dbUrl = (process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden').trim()
+
+    try {
+      const conn = await mongoose.connect(dbUrl)
+      console.log(`MongoDB Connected: ${conn.connection.host}`)
+    } catch (error) {
+      // Allow the error to propagate to bin/start.js for logging and exit
+      throw error
+    }
   }
 }
 

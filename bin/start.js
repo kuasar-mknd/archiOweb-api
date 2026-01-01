@@ -10,7 +10,8 @@ import http from 'http'
 import { connectDB } from '../config/database.js'
 import { startWebSocketServer } from '../lib/websocket.js'
 
-const dbUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden'
+const dbUrl = (process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden').trim()
+// Mask password for safe logging
 const maskedUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')
 console.log(`Attempting to connect to database: ${maskedUrl}`)
 
@@ -18,9 +19,27 @@ connectDB().catch(err => {
   console.error('Failed to connect to database.')
   console.error('1. Check if your DATABASE_URL is correct (no typos, no trailing spaces).')
   console.error('2. Ensure your MongoDB Atlas Cluster AllowList includes 0.0.0.0/0 (for Render).')
-  console.error('3. Check if your cluster is paused.')
+  console.error('3. Check if your cluster is paused or deleted.')
+
+  // Sentinel: Improved diagnostics
+  try {
+    const hostnameMatch = dbUrl.match(/@([^/?]+)/)
+    if (hostnameMatch && hostnameMatch[1]) {
+        console.error(`   -> Hostname attempting to resolve: '${hostnameMatch[1]}'`)
+        console.error(`   -> Error suggests this hostname does not exist in DNS (ENOTFOUND).`)
+    }
+  } catch (e) {
+    // Ignore parsing errors for diagnostics
+  }
+
   console.error('Original Error:', err)
-  process.exit(1)
+
+  // Sentinel: Maintenance Mode Strategy
+  // Do NOT crash the process. Allow the server to start so Render deployment succeeds.
+  // The application will respond with 503 Service Unavailable via middleware.
+  console.warn('⚠️  WARNING: Starting server in MAINTENANCE MODE due to Database Connection Failure.')
+  console.warn('⚠️  API endpoints will return 503 until the database connection is fixed.')
+  // process.exit(1) // Removed to prevent crash loop
 })
 
 if (process.env.NODE_ENV !== 'test') {

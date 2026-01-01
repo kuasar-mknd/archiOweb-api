@@ -49,3 +49,8 @@
 **Vulnerability:** `POST /api/users/register` was missing a dedicated rate limiter, falling back to the generous global limiter (350 requests/15min). This allowed for potential account spamming and DoS.
 **Learning:** Authentication endpoints (login, register, password reset) require strict, dedicated rate limiting policies separate from the global API limits. Testing rate limits in a CI environment requires explicit configuration (`TEST_RATE_LIMIT` env var) to override default skip behaviors.
 **Prevention:** Implemented `registerLimiter` (5 requests/hour) and applied it to the registration route. Added explicit test coverage that enables rate limiting for the specific test suite.
+
+## 2025-02-21 - WebSocket Denial of Service (DoS)
+**Vulnerability:** The WebSocket server lacked a `maxPayload` limit and an `error` event handler. A malicious client could send a massive payload (default 100MB+) causing memory exhaustion, or trigger a socket error that would crash the entire Node.js process due to unhandled exceptions.
+**Learning:** Node.js `ws` library defaults are not secure for production. Missing an error handler on the socket is a guaranteed crash if a client sends malformed data or resets the connection abruptly.
+**Prevention:** Explicitly set `maxPayload` (e.g., 50KB) in `WebSocketServer` options. Always attach `ws.on('error', ...)` handler to every new connection.
