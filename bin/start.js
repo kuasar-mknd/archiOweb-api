@@ -10,7 +10,8 @@ import http from 'http'
 import { connectDB } from '../config/database.js'
 import { startWebSocketServer } from '../lib/websocket.js'
 
-const dbUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden'
+const dbUrl = (process.env.DATABASE_URL || 'mongodb://localhost:27017/homeGarden').trim()
+// Mask password for safe logging
 const maskedUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')
 console.log(`Attempting to connect to database: ${maskedUrl}`)
 
@@ -18,7 +19,22 @@ connectDB().catch(err => {
   console.error('Failed to connect to database.')
   console.error('1. Check if your DATABASE_URL is correct (no typos, no trailing spaces).')
   console.error('2. Ensure your MongoDB Atlas Cluster AllowList includes 0.0.0.0/0 (for Render).')
-  console.error('3. Check if your cluster is paused.')
+  console.error('3. Check if your cluster is paused or deleted.')
+
+  // Sentinel: Improved diagnostics
+  try {
+    // If it's a standard connection string, extract the hostname to help user debug
+    // Handle 'mongodb+srv://' which standard URL parser might struggle with if strict,
+    // but usually it works or we can simple regex.
+    const hostnameMatch = dbUrl.match(/@([^/?]+)/)
+    if (hostnameMatch && hostnameMatch[1]) {
+        console.error(`   -> Hostname attempting to resolve: '${hostnameMatch[1]}'`)
+        console.error(`   -> Error suggests this hostname does not exist in DNS (ENOTFOUND).`)
+    }
+  } catch (e) {
+    // Ignore parsing errors for diagnostics
+  }
+
   console.error('Original Error:', err)
   process.exit(1)
 })
