@@ -69,7 +69,14 @@ export const getAllGardens = async (queryFilters, userRequesting) => {
 }
 
 export const getGardenById = async (gardenId, userRequesting) => {
-  const garden = await Garden.findById(gardenId).lean()
+  // ⚡ Bolt: Parallelize fetching Garden and its Plants to reduce latency.
+  // We accept the trade-off of speculative execution (fetching plants before auth check)
+  // to improve response time for the happy path (authorized access).
+  const [garden, plants] = await Promise.all([
+    Garden.findById(gardenId).lean(),
+    Plant.find({ garden: gardenId }).lean()
+  ])
+
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
@@ -78,9 +85,7 @@ export const getGardenById = async (gardenId, userRequesting) => {
     throw new AppError('Not authorized to access this garden', 403)
   }
 
-  // ⚡ Bolt: Optimize by querying Plant collection directly using index.
-  // This avoids populating the potentially stale 'plants' array in Garden doc.
-  garden.plants = await Plant.find({ garden: gardenId }).lean()
+  garden.plants = plants
 
   return garden
 }
@@ -141,18 +146,21 @@ export const deleteGarden = async (gardenId, userRequesting) => {
 }
 
 export const listPlantsInGarden = async (gardenId, userRequesting) => {
-  // ⚡ Bolt: Optimized to select only 'user' field for auth check
-  const garden = await Garden.findById(gardenId).select('user').lean()
+  // ⚡ Bolt: Parallelize existence/auth check and data retrieval.
+  const [garden, plants] = await Promise.all([
+    Garden.findById(gardenId).select('user').lean(),
+    Plant.find({ garden: gardenId }).lean()
+  ])
+
   if (!garden) {
     throw new AppError('Garden not found', 404)
   }
 
-  // Access control? Original controller had it.
   if (!isOwnerOrAdmin(userRequesting, garden.user)) {
     throw new AppError('Not authorized to get the plants from this garden', 403)
   }
 
-  return await Plant.find({ garden: gardenId }).lean()
+  return plants
 }
 
 export const getGardenAggregation = async (gardenId, userRequesting) => {
