@@ -65,14 +65,16 @@ export const updateUser = async (userId, updateData) => {
       return obj
     }, {})
 
+  // ⚡ Bolt: Use .lean() to avoid hydration and .select('-password') to avoid fetching sensitive data
   const user = await User.findByIdAndUpdate(userId, filteredUpdateData, { new: true, runValidators: true })
+    .select('-password')
+    .lean()
+
   if (!user) {
     throw new AppError('User not found', 404)
   }
   
-  const userResponse = user.toObject()
-  delete userResponse.password
-  return userResponse
+  return user
 }
 
 export const deleteUser = async (userId) => {
