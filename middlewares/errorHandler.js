@@ -45,7 +45,8 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).json({
       success: false,
       status: 'fail',
-      message: `Invalid ${err.path}: ${err.value}.`
+      // Sentinel: Prevent Reflected XSS by not echoing invalid input values
+      message: `Invalid ${err.path}.`
     })
   }
 
