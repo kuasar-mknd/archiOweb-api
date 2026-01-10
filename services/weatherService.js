@@ -38,6 +38,11 @@ export const getWeatherData = async (location) => {
     if (cached) {
       const now = Date.now()
       if (now - cached.timestamp < CACHE_TTL) {
+        // ⚡ Bolt: LRU Optimization - refresh recency by re-inserting
+        // Deleting and re-setting the key moves it to the end of the Map (most recent)
+        weatherCache.delete(cacheKey)
+        weatherCache.set(cacheKey, cached)
+
         // Return a copy to prevent mutation of cached state
         return { ...cached.data }
       }
@@ -82,10 +87,19 @@ export const getWeatherData = async (location) => {
     }
 
     // ⚡ Bolt: Store in cache
-    // Simple eviction policy: if full, clear everything (safe and simple for now)
-    // A more complex LRU is overkill for this specific "small improvement" task
-    if (weatherCache.size >= MAX_CACHE_SIZE) {
-      weatherCache.clear()
+    // ⚡ Bolt: LRU Eviction Policy
+    // If cache is full, remove the oldest item (first in Map)
+    // This replaces the previous strategy of clearing the entire cache.
+    if (weatherCache.size >= MAX_CACHE_SIZE && !weatherCache.has(cacheKey)) {
+      // weatherCache.keys().next().value returns the first inserted key (oldest)
+      const oldestKey = weatherCache.keys().next().value
+      weatherCache.delete(oldestKey)
+    }
+
+    // Ensure we delete first to guarantee it moves to the end (newest) even if it existed
+    // Although we deleted it above if it was expired, this is safe redundant or catch-all
+    if (weatherCache.has(cacheKey)) {
+      weatherCache.delete(cacheKey)
     }
 
     weatherCache.set(cacheKey, {
