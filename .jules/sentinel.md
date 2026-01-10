@@ -8,7 +8,7 @@
 ## 2025-02-17 - Broken Access Control on Garden Details
 **Vulnerability:** `GET /api/gardens/:id` was unauthenticated and returned garden details including populated plant data. This bypassed the access control on `listPlantsInGarden`, allowing any user (or unauthenticated person) to view plants in any garden.
 **Learning:** When an endpoint populates related data (like `populate('plants')`), it must enforce the strictest access control applicable to that related data.
-**Prevention:** Always verify authorization (ownership) when retrieving resources by ID, especially when sensitive sub-resources are included.
+**Prevention:** Always verify authorization (ownership) when retrieving resources by ID, especially when retrieving sensitive sub-resources.
 
 ## 2025-01-27 - Unauthenticated PII Exposure in User Profile
 **Vulnerability:** `GET /api/users/:id` allowed unauthenticated access to user email and birthdate.
@@ -49,3 +49,8 @@
 **Vulnerability:** `POST /api/users/register` was missing a dedicated rate limiter, falling back to the generous global limiter (350 requests/15min). This allowed for potential account spamming and DoS.
 **Learning:** Authentication endpoints (login, register, password reset) require strict, dedicated rate limiting policies separate from the global API limits. Testing rate limits in a CI environment requires explicit configuration (`TEST_RATE_LIMIT` env var) to override default skip behaviors.
 **Prevention:** Implemented `registerLimiter` (5 requests/hour) and applied it to the registration route. Added explicit test coverage that enables rate limiting for the specific test suite.
+
+## 2025-02-21 - WebSocket DoS via Unbounded Payloads
+**Vulnerability:** The WebSocket server lacked a `maxPayload` limit, allowing attackers to send potentially infinite payloads (up to 100MB default), leading to Denial of Service via memory exhaustion. Additionally, missing `error` handlers on sockets could cause the process to crash if a payload limit was breached or other socket errors occurred.
+**Learning:** WebSockets operate independently of Express `body-parser` limits. They require their own explicit configuration for payload limits (`maxPayload`) and robust error handling to prevent the Node.js process from crashing on unhandled socket exceptions.
+**Prevention:** Configured `WebSocketServer` with `maxPayload: 50KB` and added a global `error` listener to all new WebSocket connections to catch and log errors safely.
