@@ -32,20 +32,23 @@ const errorHandler = (err, req, res, next) => {
 
   // Erreurs Mongoose de duplication (E11000)
   if (err.code === 11000) {
-    const value = err.errmsg.match(/(["'])(?:\\.|[^\\'"])*\1/)[0]
+    // Sentinel: Removed value leakage to prevent User Enumeration and Information Disclosure
+    // Old: message: `Duplicate field value: ${value}. Please use another value.`
     return res.status(400).json({
       success: false,
       status: 'fail',
-      message: `Duplicate field value: ${value}. Please use another value.`
+      message: 'Duplicate field value. Please use another value.'
     })
   }
 
   // Erreurs Mongoose CastError (mauvais ID)
   if (err.name === 'CastError') {
+    // Sentinel: Removed value leakage to prevent Reflected XSS and Internal Path Disclosure
+    // Old: message: `Invalid ${err.path}: ${err.value}.`
     return res.status(400).json({
       success: false,
       status: 'fail',
-      message: `Invalid ${err.path}: ${err.value}.`
+      message: `Invalid value for field ${err.path}.`
     })
   }
 

@@ -49,3 +49,8 @@
 **Vulnerability:** `POST /api/users/register` was missing a dedicated rate limiter, falling back to the generous global limiter (350 requests/15min). This allowed for potential account spamming and DoS.
 **Learning:** Authentication endpoints (login, register, password reset) require strict, dedicated rate limiting policies separate from the global API limits. Testing rate limits in a CI environment requires explicit configuration (`TEST_RATE_LIMIT` env var) to override default skip behaviors.
 **Prevention:** Implemented `registerLimiter` (5 requests/hour) and applied it to the registration route. Added explicit test coverage that enables rate limiting for the specific test suite.
+
+## 2025-02-22 - Information Leakage in Error Handler
+**Vulnerability:** The global error handler leaked sensitive data by echoing duplicate key values (User Enumeration risk) and raw input values (Reflected XSS risk) in `E11000` and `CastError` responses.
+**Learning:** Automated error parsing that regex-matches and returns parts of the raw database error message is a security risk. It exposes implementation details and user data.
+**Prevention:** Modified `middlewares/errorHandler.js` to return generic, sanitized messages ("Duplicate field value" / "Invalid value") instead of echoing specific values.
