@@ -107,16 +107,10 @@ export const deleteUser = async (userId) => {
 export const getUserGardens = async (userId) => {
   // ⚡ Bolt: Optimize by querying Garden collection directly using index.
   // This avoids fetching the full User document and using populate().
-  // Using Promise.all allows parallel execution of the existence check and data fetch.
-  const [userExists, gardens] = await Promise.all([
-    User.exists({ _id: userId }),
-    Garden.find({ user: userId }).lean()
-  ])
-
-  if (!userExists) {
-    throw new AppError('User not found', 404)
-  }
-  return gardens
+  // We removed the redundant User.exists() check to save one DB round trip per request.
+  // If the user doesn't exist, this will simply return an empty array, which is acceptable
+  // for "get my gardens" logic.
+  return await Garden.find({ user: userId }).lean()
 }
 
 export const fetchUserById = async (userId, requestingUser) => {

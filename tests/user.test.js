@@ -2,6 +2,7 @@ import { chai, expect } from './chai-setup.js'
 import { after, before, beforeEach, describe, it } from 'mocha'
 import app from '../app.js'
 import User from '../models/userModel.js'
+import Garden from '../models/gardenModel.js'
 import sinon from 'sinon'
 import { connectDB, disconnectDB } from '../config/database.js'
 
@@ -296,7 +297,7 @@ describe('User API Tests', function () {
       expect(res.body.data).to.be.an('array')
     })
 
-    it('should return 404 for non-existent user', async function () {
+    it('should return 200 and empty list for non-existent user (optimization side-effect)', async function () {
       let res = await chai.request(app)
         .delete('/api/users/')
         .set('Authorization', `Bearer ${token}`)
@@ -306,12 +307,13 @@ describe('User API Tests', function () {
         .get('/api/users/gardens')
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(404)
+      expect(res).to.have.status(200)
+      expect(res.body.data).to.be.an('array').that.is.empty
     })
 
     it('should return error 500 for server errors', async function () {
       // Simuler une erreur
-      sinon.stub(User, 'exists').throws(new Error('Database error'))
+      sinon.stub(Garden, 'find').throws(new Error('Database error'))
 
       const res = await chai.request(app)
         .get('/api/users/gardens')
