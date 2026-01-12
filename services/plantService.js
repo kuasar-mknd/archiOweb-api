@@ -95,6 +95,18 @@ export const updatePlant = async (plantId, updateData, userRequesting) => {
     throw new AppError('Not authorized to update this plant', 403)
   }
 
+  // Sentinel: IDOR/BAC Prevention
+  // If moving the plant to a different garden, verify ownership of the NEW garden
+  if (updateData.garden && updateData.garden !== plant.garden.toString()) {
+    const newGarden = await Garden.findById(updateData.garden).select('user').lean()
+    if (!newGarden) {
+      throw new AppError('Target garden not found', 404)
+    }
+    if (!isOwnerOrAdmin(userRequesting, newGarden.user)) {
+      throw new AppError('Not authorized to move plant to this garden', 403)
+    }
+  }
+
   // Filter allowed fields to prevent arbitrary updates/injection
   const allowedUpdates = ['commonName', 'scientificName', 'family', 'exposure', 'garden']
   const filteredUpdateData = Object.keys(updateData)

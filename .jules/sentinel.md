@@ -54,3 +54,8 @@
 **Vulnerability:** The global error handler leaked sensitive data by echoing duplicate key values (User Enumeration risk) and raw input values (Reflected XSS risk) in `E11000` and `CastError` responses.
 **Learning:** Automated error parsing that regex-matches and returns parts of the raw database error message is a security risk. It exposes implementation details and user data.
 **Prevention:** Modified `middlewares/errorHandler.js` to return generic, sanitized messages ("Duplicate field value" / "Invalid value") instead of echoing specific values.
+
+## 2025-02-24 - Broken Access Control on Plant Move
+**Vulnerability:** `PUT /api/plants/:id` allowed users to update the `garden` field of a plant to a garden ID they did not own. While the endpoint verified ownership of the *current* garden, it failed to verify ownership of the *target* garden, enabling IDOR/BAC where users could inject plants into others' gardens.
+**Learning:** When an update operation changes a relationship (e.g., moving an item to a new parent), access control checks must be performed on BOTH the current parent (to authorize removal) and the new parent (to authorize addition).
+**Prevention:** In `plantService.updatePlant`, added an explicit check: if `garden` is being updated, fetch the new garden and verify the requesting user is the owner (or admin).
