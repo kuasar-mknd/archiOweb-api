@@ -18,7 +18,13 @@ const plantValidation = [
   body('scientificName').notEmpty().withMessage('Scientific name is required'),
   body('family').notEmpty().withMessage('Family is required'),
   body('exposure').isIn(['Full Sun', 'Partial Shade', 'Shade']).withMessage('Invalid exposure'),
-  body('garden').isMongoId().withMessage('Invalid garden ID')
+  body('garden').isMongoId().withMessage('Invalid garden ID'),
+  // Sentinel: Stored XSS Prevention
+  // Validate that imageUrl is a valid URL with http/https protocols to prevent javascript: schemes
+  body('imageUrl')
+    .optional()
+    .isURL({ protocols: ['http', 'https'], require_protocol: true })
+    .withMessage('Image URL must be a valid HTTP/HTTPS URL')
 ]
 
 const plantIdValidation = [
