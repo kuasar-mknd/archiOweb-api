@@ -59,3 +59,8 @@
 **Vulnerability:** `PUT /api/plants/:id` allowed users to update the `garden` field of a plant to a garden ID they did not own. While the endpoint verified ownership of the *current* garden, it failed to verify ownership of the *target* garden, enabling IDOR/BAC where users could inject plants into others' gardens.
 **Learning:** When an update operation changes a relationship (e.g., moving an item to a new parent), access control checks must be performed on BOTH the current parent (to authorize removal) and the new parent (to authorize addition).
 **Prevention:** In `plantService.updatePlant`, added an explicit check: if `garden` is being updated, fetch the new garden and verify the requesting user is the owner (or admin).
+
+## 2025-02-24 - Stored XSS via Image URL
+**Vulnerability:** The `imageUrl` field in `POST /api/plants` was completely unvalidated, allowing attackers to store malicious JavaScript payloads (e.g., `javascript:alert(1)`) which could be executed in a victim's browser if rendered in a vulnerable way (Stored XSS).
+**Learning:** Assuming that fields named "URL" are automatically safe is dangerous. `express-validator`'s `isURL` method requires careful configuration to reject dangerous protocols like `javascript:`.
+**Prevention:** Added strict validation to `imageUrl` in `routes/plantRoutes.js`, forcing `http` or `https` protocols using `.isURL({ protocols: ['http', 'https'], require_protocol: true })`.
